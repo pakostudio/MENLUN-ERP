@@ -72,7 +72,7 @@ main {
   display: flex;
   align-items: center;
   gap: 16px;
-  margin-bottom: 56px;
+  margin-bottom: 48px;
 }
 
 .eyebrow {
@@ -198,9 +198,10 @@ body.is-app .workspace-view {
 }
 
 .logo-frame {
-  display: grid;
-  place-items: center;
-  overflow: visible;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
   border: 0;
   border-radius: 0;
   background: transparent;
@@ -210,8 +211,8 @@ body.is-app .workspace-view {
 
 .logo-frame img {
   display: block;
-  width: auto;
-  max-height: 100%;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
 }
 
@@ -233,32 +234,35 @@ body.is-app .workspace-view {
 
 .logo-frame-large {
   width: 160px;
-  height: 82px;
+  height: 104px;
   font-size: 24px;
 }
 
 .logo-frame-large img {
   max-width: 160px;
+  max-height: 104px;
 }
 
 .logo-frame-sidebar {
   width: 120px;
-  height: 48px;
+  height: 76px;
   font-size: 13px;
 }
 
 .logo-frame-sidebar img {
   max-width: 120px;
+  max-height: 76px;
 }
 
 .logo-frame-header {
   width: 90px;
-  height: 40px;
+  height: 58px;
   font-size: 14px;
 }
 
 .logo-frame-header img {
   max-width: 90px;
+  max-height: 58px;
 }
 
 .module-nav {
