@@ -109,7 +109,7 @@ loginForm.addEventListener("submit", async (event) => {
     await loginWithAppwrite(email, secret);
     await initializeAppData();
   } catch (error) {
-    loginError.textContent = "Usuario o contraseña incorrectos, o backend no disponible.";
+    loginError.textContent = "Usuario o contraseña incorrectos, o servicio no disponible.";
     passwordInput.value = "";
     passwordInput.focus();
     console.warn(error);
@@ -187,13 +187,13 @@ appContent.addEventListener("click", async (event) => {
     if (action === "missing-evidence") await changeReportStatus(target, "falta evidencia");
     if (action === "close-report") await changeReportStatus(target, "cerrado");
   } catch (error) {
-    notify("No se pudo completar la acción. Revisa conexión con Appwrite.");
+    notify("No se pudo completar la acción. Revisa la conexión del sistema.");
     console.warn(error);
   }
 });
 
 async function initializeAppData() {
-  setDataStatus("Conectando Appwrite...", "loading");
+  setDataStatus("Conectando sistema...", "loading");
 
   try {
     const [remoteGerencias, remoteUsers, remoteReports, remoteAuditLogs] = await Promise.all([
@@ -233,11 +233,11 @@ async function initializeAppData() {
 
     appwriteOnline = true;
     appwriteDataLoaded = true;
-    setDataStatus("Appwrite conectado", "online");
+    setDataStatus("Sistema en línea", "online");
   } catch (error) {
     appwriteOnline = false;
-    setDataStatus("Backend no disponible", "offline");
-    console.warn("Appwrite no disponible.", error);
+    setDataStatus("Servicio no disponible", "offline");
+    console.warn("Servicio de datos no disponible.", error);
     throw error;
   } finally {
     appwriteLoading = false;
@@ -600,7 +600,7 @@ async function createManagement() {
   };
 
   if (!appwriteOnline) {
-    notify("No se puede crear gerencia sin conexión al backend.");
+    notify("No se puede crear gerencia sin conexión al sistema.");
     return;
   }
 
@@ -626,7 +626,7 @@ async function editManagement(label) {
   const budget = Number(window.prompt("Presupuesto asignado:", item.budget) || item.budget);
 
   if (!appwriteOnline || !item.rowId) {
-    notify("No se puede actualizar gerencia sin conexión al backend.");
+    notify("No se puede actualizar gerencia sin conexión al sistema.");
     return;
   }
 
@@ -651,7 +651,7 @@ async function disableManagement(label) {
   if (!item) return;
 
   if (!appwriteOnline || !item.rowId) {
-    notify("No se puede cambiar estatus sin conexión al backend.");
+    notify("No se puede cambiar estatus sin conexión al sistema.");
     return;
   }
 
@@ -744,7 +744,7 @@ function openReportEditModal(report) {
 
     try {
       if (!appwriteOnline || !report.rowId) {
-        throw new Error("Backend no disponible.");
+        throw new Error("Servicio no disponible.");
       }
 
       const nextReport = {
@@ -799,7 +799,7 @@ function openStatusModal(report, status) {
 
     try {
       if (!appwriteOnline || !report.rowId) {
-        throw new Error("Backend no disponible.");
+        throw new Error("Servicio no disponible.");
       }
 
       const nextReport = {
@@ -1368,7 +1368,7 @@ function renderCaptureForm() {
     if (!appwriteOnline) {
       submitButton.disabled = false;
       submitButton.textContent = "Guardar reporte";
-      notify("No se puede guardar sin conexión al backend.");
+      notify("No se puede guardar sin conexión al sistema.");
       return;
     }
 
@@ -1408,7 +1408,7 @@ function renderCaptureForm() {
     } catch (error) {
       submitButton.disabled = false;
       submitButton.textContent = "Guardar reporte";
-      notify("No se pudo guardar el reporte en backend.");
+      notify("No se pudo guardar el reporte en el sistema.");
       console.warn(error);
       return;
     }
