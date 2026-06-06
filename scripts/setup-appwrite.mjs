@@ -15,17 +15,41 @@ const headers = {
   "X-Appwrite-Response-Format": "1.9.5"
 };
 
+const userIds = {
+  "pako@menlun.com": "pako",
+  "carmen@menlun.com": "carmen",
+  "direccion@menlun.com": "direccion",
+  "produccion@menlun.com": "produccion",
+  "calidad@menlun.com": "calidad",
+  "compras@menlun.com": "compras",
+  "almacen@menlun.com": "almacen",
+  "logistica@menlun.com": "logistica",
+  "mantenimiento@menlun.com": "mantenimiento",
+  "ventas@menlun.com": "ventas",
+  "rh@menlun.com": "rh",
+  "contabilidad@menlun.com": "contabilidad",
+  "sistemas@menlun.com": "sistemas"
+};
+
+const areaUserIds = {
+  "Producción": "produccion",
+  "Calidad": "calidad",
+  "Compras": "compras",
+  "Almacén": "almacen",
+  "Logística": "logistica",
+  "Mantenimiento": "mantenimiento",
+  "Ventas": "ventas",
+  "Recursos Humanos": "rh",
+  "Contabilidad": "contabilidad",
+  "Sistemas": "sistemas"
+};
+
+const adminUserIds = ["pako", "carmen"];
+const executiveUserIds = ["direccion"];
+
 const tablePermissions = [
   'read("users")',
-  'create("users")',
-  'update("users")',
-  'delete("users")'
-];
-
-const rowPermissions = [
-  'read("users")',
-  'update("users")',
-  'delete("users")'
+  'create("users")'
 ];
 
 const tables = [
@@ -69,9 +93,9 @@ const tables = [
       string("estatus", 30, true)
     ],
     rows: [
-      row("pako", { nombre: "Pako", email: "pako@menlun.com", rol: "Administrador General", gerencia: "Todas", pin: "1234", estatus: "Activo" }),
-      row("carmen", { nombre: "Carmen", email: "carmen@menlun.com", rol: "Acceso Total Operativo", gerencia: "Todas", pin: "1234", estatus: "Activo" }),
-      row("direccion", { nombre: "Dirección General", email: "direccion@menlun.com", rol: "Vista Ejecutiva", gerencia: "Dirección", pin: "1234", estatus: "Activo" })
+      row("pako", { nombre: "Pako", email: "pako@menlun.com", rol: "Administrador General", gerencia: "Todas", pin: "", estatus: "Activo" }),
+      row("carmen", { nombre: "Carmen", email: "carmen@menlun.com", rol: "Acceso Total Operativo", gerencia: "Todas", pin: "", estatus: "Activo" }),
+      row("direccion", { nombre: "Dirección General", email: "direccion@menlun.com", rol: "Vista Ejecutiva", gerencia: "Dirección", pin: "", estatus: "Activo" })
     ]
   },
   {
@@ -220,7 +244,7 @@ async function ensureTable(table) {
     await request("PUT", `/tablesdb/${databaseId}/tables/${table.id}`, {
       name: table.name,
       permissions: tablePermissions,
-      rowSecurity: false,
+      rowSecurity: true,
       enabled: true,
       purge: true
     });
@@ -232,7 +256,7 @@ async function ensureTable(table) {
     tableId: table.id,
     name: table.name,
     permissions: tablePermissions,
-    rowSecurity: false,
+    rowSecurity: true,
     enabled: true,
     columns: [],
     indexes: []
@@ -267,11 +291,12 @@ async function waitForColumns(tableId, keys) {
 }
 
 async function ensureRow(tableId, seedRow) {
+  const permissions = permissionsForRow(tableId, seedRow.data, seedRow.id);
   const existing = await request("GET", `/tablesdb/${databaseId}/tables/${tableId}/rows/${seedRow.id}`, null, [404]);
   if (existing.status === 200) {
     await request("PATCH", `/tablesdb/${databaseId}/tables/${tableId}/rows/${seedRow.id}`, {
       data: seedRow.data,
-      permissions: rowPermissions
+      permissions
     });
     console.log(`  Fila actualizada: ${tableId}.${seedRow.id}`);
     return;
@@ -280,7 +305,7 @@ async function ensureRow(tableId, seedRow) {
   await request("POST", `/tablesdb/${databaseId}/tables/${tableId}/rows`, {
     rowId: seedRow.id,
     data: seedRow.data,
-    permissions: rowPermissions
+    permissions
   });
   console.log(`  Fila creada: ${tableId}.${seedRow.id}`);
 }
@@ -291,11 +316,76 @@ async function hardenRows(tableId) {
 
   for (const existingRow of rows) {
     await request("PATCH", `/tablesdb/${databaseId}/tables/${tableId}/rows/${existingRow.$id}`, {
-      permissions: rowPermissions
+      permissions: permissionsForRow(tableId, existingRow, existingRow.$id)
     });
   }
 
   console.log(`  Permisos cerrados: ${tableId} (${rows.length} filas)`);
+}
+
+function permissionsForRow(tableId, data, rowId = "") {
+  if (tableId === "usuarios") {
+    const ownerId = userIds[String(data.email || "").toLowerCase()] || rowId;
+    return uniquePermissions([
+      ...readForUsers([...adminUserIds, ownerId]),
+      ...updateForUsers(adminUserIds),
+      ...deleteForUsers(adminUserIds),
+    ]);
+  }
+
+  if (tableId === "gerencias") {
+    const areaUserId = areaUserIds[data.gerencia];
+    return uniquePermissions([
+      ...readForUsers([...adminUserIds, ...executiveUserIds, areaUserId]),
+      ...updateForUsers(adminUserIds),
+      ...deleteForUsers(adminUserIds),
+    ]);
+  }
+
+  if (["reportes", "autorizaciones", "tareas", "evidencias"].includes(tableId)) {
+    const areaUserId = areaUserIds[data.gerencia] || areaUserIds[areaFromReport(data.reporteId)];
+    return uniquePermissions([
+      ...readForUsers([...adminUserIds, ...executiveUserIds, areaUserId]),
+      ...updateForUsers([...adminUserIds, areaUserId]),
+      ...deleteForUsers(adminUserIds),
+    ]);
+  }
+
+  if (tableId === "bitacora") {
+    return uniquePermissions([
+      ...readForUsers(adminUserIds),
+      ...updateForUsers(adminUserIds),
+      ...deleteForUsers(adminUserIds),
+    ]);
+  }
+
+  return uniquePermissions([
+    ...readForUsers(adminUserIds),
+    ...updateForUsers(adminUserIds),
+    ...deleteForUsers(adminUserIds),
+  ]);
+}
+
+function areaFromReport(reportId) {
+  const reportTable = tables.find((table) => table.id === "reportes");
+  const report = reportTable?.rows.find((item) => item.id === reportId);
+  return report?.data.gerencia || "";
+}
+
+function readForUsers(ids) {
+  return ids.filter(Boolean).map((id) => `read("user:${id}")`);
+}
+
+function updateForUsers(ids) {
+  return ids.filter(Boolean).map((id) => `update("user:${id}")`);
+}
+
+function deleteForUsers(ids) {
+  return ids.filter(Boolean).map((id) => `delete("user:${id}")`);
+}
+
+function uniquePermissions(permissions) {
+  return Array.from(new Set(permissions));
 }
 
 async function request(method, path, body, expectedSoftErrors = []) {
