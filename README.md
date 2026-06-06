@@ -119,6 +119,26 @@ El archivo [scripts/setup-appwrite-storage.mjs](scripts/setup-appwrite-storage.m
 - La carga de evidencias ya usa Appwrite Storage; falta versionar evidencias y agregar previsualizacion avanzada.
 - La bitacora registra cambios principales y ya cuenta con pantalla de consulta, filtros y exportacion.
 - Los reportes cuentan con filtros y exportacion en Panel Carmen, Reportes, Kanban y modulos por gerencia.
+- La app registra una actividad diaria por usuario autenticado para dejar evidencia de uso operativo sin saturar la bitacora.
+
+### Rutina temporal para Appwrite Free
+
+Appwrite Free puede pausar proyectos por inactividad. Para reducir el riesgo durante la fase de aprobacion del cliente, este repositorio incluye una rutina diaria en GitHub Actions:
+
+- Archivo: `.github/workflows/appwrite-heartbeat.yml`
+- Script: `scripts/appwrite-heartbeat.mjs`
+- Frecuencia: diaria a las 14:00 UTC y ejecucion manual desde GitHub Actions.
+- Accion: inserta un registro `heartbeat` en la tabla `bitacora`.
+
+Para activarla en GitHub:
+
+1. Ir al repositorio en GitHub.
+2. Entrar a **Settings > Secrets and variables > Actions**.
+3. Crear el Secret `APPWRITE_API_KEY` con una API key valida de Appwrite.
+4. Entrar a **Actions > Appwrite heartbeat**.
+5. Ejecutar **Run workflow** una vez para validar que registre correctamente.
+
+Esta rutina ayuda a monitorear y generar actividad tecnica, pero no sustituye un plan pagado si el cliente requiere disponibilidad garantizada. Antes de una demo importante, revisar manualmente que el proyecto siga activo en Appwrite Console.
 
 ## Pendientes futuros
 
@@ -136,9 +156,14 @@ El archivo [scripts/setup-appwrite-storage.mjs](scripts/setup-appwrite-storage.m
    - `styles.css`
    - `app.js`
    - `assets/pmps-logo.png`
+   - `assets/pmps-icon.png`
    - `README.md`
+   - `.github/workflows/appwrite-heartbeat.yml`
    - `.gitignore`
+   - `scripts/appwrite-heartbeat.mjs`
    - `scripts/setup-appwrite.mjs` si se desea conservar el instalador tecnico del backend
+   - `scripts/setup-appwrite-auth.mjs` si se desea conservar el instalador tecnico de usuarios
+   - `scripts/setup-appwrite-storage.mjs` si se desea conservar el instalador tecnico de evidencias
 3. Entrar a **Settings** del repositorio.
 4. Ir a **Pages**.
 5. En **Build and deployment**, seleccionar:

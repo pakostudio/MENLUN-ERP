@@ -1,0 +1,28 @@
+name: Appwrite heartbeat
+
+on:
+  schedule:
+    - cron: "0 14 * * *"
+  workflow_dispatch:
+
+jobs:
+  heartbeat:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Register backend heartbeat
+        env:
+          APPWRITE_API_KEY: ${{ secrets.APPWRITE_API_KEY }}
+          APPWRITE_ENDPOINT: https://nyc.cloud.appwrite.io/v1
+          APPWRITE_PROJECT_ID: menlun-control-360
+          APPWRITE_DATABASE_ID: menlun_control_360
+        run: node scripts/appwrite-heartbeat.mjs

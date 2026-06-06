@@ -47,6 +47,7 @@ const USER_IDS_BY_AREA = {
 
 const ADMIN_USER_IDS = ["pako", "carmen"];
 const EXECUTIVE_USER_IDS = ["direccion"];
+const DAILY_HEARTBEAT_PREFIX = "menlun-heartbeat";
 
 const SYSTEM_USERS = [
   { name: "Pako", role: "Administrador General", email: "pako@menlun.com", userId: "pako", access: "all" },
@@ -163,6 +164,7 @@ loginForm.addEventListener("submit", async (event) => {
   document.body.classList.add("is-app");
   applyVisibilityRules();
   navigateInitialView();
+  registerDailyHeartbeat();
 });
 
 logoutButton.addEventListener("click", async () => {
@@ -797,6 +799,23 @@ async function logAudit(action, report, detail) {
   } catch (error) {
     console.warn("No se pudo registrar bitácora.", error);
   }
+}
+
+async function registerDailyHeartbeat() {
+  if (!appwriteOnline || !activeUser) return;
+
+  const today = new Date().toISOString().slice(0, 10);
+  const storageKey = `${DAILY_HEARTBEAT_PREFIX}:${activeUser.email}:${today}`;
+
+  if (window.localStorage.getItem(storageKey)) return;
+
+  await logAudit(
+    "actividad diaria",
+    null,
+    `Validación automática de sesión activa para ${activeUser.name}.`
+  );
+
+  window.localStorage.setItem(storageKey, "ok");
 }
 
 function openReportEditModal(report) {
