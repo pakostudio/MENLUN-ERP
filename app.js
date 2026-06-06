@@ -16,13 +16,43 @@ const STORAGE = {
   evidencias: "evidencias",
 };
 
-const SYSTEM_USERS = [
-  { name: "Pako", role: "Administrador General", email: "pako@menlun.com", access: "all" },
-  { name: "Carmen", role: "Acceso Total Operativo", email: "carmen@menlun.com", access: "all" },
-  { name: "Direccion General", role: "Vista Ejecutiva", email: "direccion@menlun.com", access: "executive" },
-];
+const USER_IDS_BY_EMAIL = {
+  "pako@menlun.com": "pako",
+  "carmen@menlun.com": "carmen",
+  "direccion@menlun.com": "direccion",
+  "produccion@menlun.com": "produccion",
+  "calidad@menlun.com": "calidad",
+  "compras@menlun.com": "compras",
+  "almacen@menlun.com": "almacen",
+  "logistica@menlun.com": "logistica",
+  "mantenimiento@menlun.com": "mantenimiento",
+  "ventas@menlun.com": "ventas",
+  "rh@menlun.com": "rh",
+  "contabilidad@menlun.com": "contabilidad",
+  "sistemas@menlun.com": "sistemas",
+};
 
-const authenticatedRowPermissions = ['read("users")', 'update("users")', 'delete("users")'];
+const USER_IDS_BY_AREA = {
+  Produccion: "produccion",
+  Calidad: "calidad",
+  Compras: "compras",
+  Almacen: "almacen",
+  Logistica: "logistica",
+  Mantenimiento: "mantenimiento",
+  Ventas: "ventas",
+  "Recursos Humanos": "rh",
+  Contabilidad: "contabilidad",
+  Sistemas: "sistemas",
+};
+
+const ADMIN_USER_IDS = ["pako", "carmen"];
+const EXECUTIVE_USER_IDS = ["direccion"];
+
+const SYSTEM_USERS = [
+  { name: "Pako", role: "Administrador General", email: "pako@menlun.com", userId: "pako", access: "all" },
+  { name: "Carmen", role: "Acceso Total Operativo", email: "carmen@menlun.com", userId: "carmen", access: "all" },
+  { name: "Direccion General", role: "Vista Ejecutiva", email: "direccion@menlun.com", userId: "direccion", access: "executive" },
+];
 
 let appwriteOnline = false;
 let appwriteLoading = true;
@@ -214,6 +244,7 @@ async function initializeAppData() {
           name: item.manager,
           role: item.role,
           email: item.email,
+          userId: USER_IDS_BY_EMAIL[item.email.toLowerCase()],
           access: "area",
           area: item.area,
           status: item.status,
@@ -256,6 +287,7 @@ function buildUsers() {
       name: item.manager,
       role: item.role,
       email: item.email,
+      userId: USER_IDS_BY_EMAIL[item.email.toLowerCase()],
       access: "area",
       area: item.area,
     })),
@@ -332,28 +364,28 @@ async function listRows(tableId) {
   return data.rows || [];
 }
 
-async function createRow(tableId, rowId, data) {
+async function createRow(tableId, rowId, data, permissions = permissionsForRow(tableId, data)) {
   return appwriteRequest(`/tablesdb/${APPWRITE_CONFIG.databaseId}/tables/${tableId}/rows`, {
     method: "POST",
-    body: { rowId, data, permissions: authenticatedRowPermissions },
+    body: { rowId, data, permissions },
   });
 }
 
-async function updateRow(tableId, rowId, data) {
+async function updateRow(tableId, rowId, data, permissions = permissionsForRow(tableId, data)) {
   return appwriteRequest(`/tablesdb/${APPWRITE_CONFIG.databaseId}/tables/${tableId}/rows/${rowId}`, {
     method: "PATCH",
-    body: { data, permissions: authenticatedRowPermissions },
+    body: { data, permissions },
   });
 }
 
-async function uploadEvidenceFile(file) {
+async function uploadEvidenceFile(file, area) {
   if (!file) return "";
 
   const fileId = createRowId("file");
   const formData = new FormData();
   formData.append("fileId", fileId);
   formData.append("file", file);
-  authenticatedRowPermissions.forEach((permission) => formData.append("permissions[]", permission));
+  permissionsForArea(area).forEach((permission) => formData.append("permissions[]", permission));
 
   const data = await appwriteUpload(`/storage/buckets/${STORAGE.evidencias}/files`, formData);
   return `${data.$id}|${file.name}`;
@@ -439,10 +471,63 @@ function mapUserRow(row) {
     name: row.nombre || row.email,
     role,
     email: row.email,
+    userId: USER_IDS_BY_EMAIL[String(row.email || "").toLowerCase()] || row.$id,
     access,
     area,
     status: row.estatus || "Activo",
   };
+}
+
+function permissionsForRow(tableId, data) {
+  if (tableId === TABLES.usuarios) {
+    const ownerId = USER_IDS_BY_EMAIL[String(data.email || "").toLowerCase()];
+    return uniquePermissions([
+      ...readPermissions([...ADMIN_USER_IDS, ownerId]),
+      ...updatePermissions(ADMIN_USER_IDS),
+      ...deletePermissions(ADMIN_USER_IDS),
+    ]);
+  }
+
+  if (tableId === TABLES.gerencias) {
+    return permissionsForArea(areaKeyFromLabel(data.gerencia), { adminOnlyUpdate: true });
+  }
+
+  if (tableId === TABLES.bitacora) {
+    return uniquePermissions([
+      ...readPermissions(ADMIN_USER_IDS),
+      ...updatePermissions(ADMIN_USER_IDS),
+      ...deletePermissions(ADMIN_USER_IDS),
+    ]);
+  }
+
+  return permissionsForArea(areaKeyFromLabel(data.gerencia));
+}
+
+function permissionsForArea(area, options = {}) {
+  const areaUserId = USER_IDS_BY_AREA[area];
+  const updateUsers = options.adminOnlyUpdate ? ADMIN_USER_IDS : [...ADMIN_USER_IDS, areaUserId];
+
+  return uniquePermissions([
+    ...readPermissions([...ADMIN_USER_IDS, ...EXECUTIVE_USER_IDS, areaUserId]),
+    ...updatePermissions(updateUsers),
+    ...deletePermissions(ADMIN_USER_IDS),
+  ]);
+}
+
+function readPermissions(ids) {
+  return ids.filter(Boolean).map((id) => `read("user:${id}")`);
+}
+
+function updatePermissions(ids) {
+  return ids.filter(Boolean).map((id) => `update("user:${id}")`);
+}
+
+function deletePermissions(ids) {
+  return ids.filter(Boolean).map((id) => `delete("user:${id}")`);
+}
+
+function uniquePermissions(permissions) {
+  return Array.from(new Set(permissions));
 }
 
 function mapReportRow(row) {
@@ -1374,7 +1459,7 @@ function renderCaptureForm() {
 
     if (evidenceFile) {
       try {
-        evidenceValue = await uploadEvidenceFile(evidenceFile);
+        evidenceValue = await uploadEvidenceFile(evidenceFile, selectedArea);
       } catch (error) {
         submitButton.disabled = false;
         submitButton.textContent = "Guardar reporte";

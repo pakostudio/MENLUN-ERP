@@ -51,7 +51,7 @@ Las contrasenas deben administrarse desde Appwrite Auth. No se publican contrase
 ## Flujo de operacion
 
 1. La app intenta conectar con Appwrite y cargar gerencias/reportes.
-2. Si Appwrite responde, el indicador superior muestra `Appwrite conectado`.
+2. Si el servicio responde, el indicador superior muestra `Sistema en línea`.
 3. El usuario inicia sesion con email y contrasena real. La sesion se valida contra Appwrite Auth.
 4. El sistema muestra solo los modulos permitidos para su rol.
 5. Pako y Carmen pueden revisar el dashboard ejecutivo, Panel Carmen, Gerencias, reportes, kanban y calendario.
@@ -113,16 +113,16 @@ El archivo [scripts/setup-appwrite-storage.mjs](scripts/setup-appwrite-storage.m
 
 - El frontend lee/escribe en Appwrite y valida sesion con Appwrite Auth.
 - Si Appwrite no responde, el sistema bloquea escrituras para evitar datos locales inconsistentes.
-- Las tablas y filas Appwrite quedaron cerradas a usuarios autenticados (`users`), no lectura anonima.
-- Los permisos finos por rol se aplican en interfaz; el siguiente endurecimiento seria moverlos a Appwrite Teams/Functions por gerencia.
+- Las tablas tienen seguridad por fila activa en Appwrite.
+- Las filas quedan con permisos por usuario: Pako/Carmen ven todo, Direccion consulta vistas ejecutivas y cada gerente accede solo a su gerencia.
+- Las acciones administrativas quedan limitadas a Pako/Carmen desde interfaz y permisos de fila.
 - La carga de evidencias ya usa Appwrite Storage; falta versionar evidencias y agregar previsualizacion avanzada.
 - La bitacora registra cambios principales y ya cuenta con pantalla de consulta, filtros y exportacion.
 - Los reportes cuentan con filtros y exportacion en Panel Carmen, Reportes, Kanban y modulos por gerencia.
 
 ## Pendientes futuros
 
-- Implementar reglas por rol con Appwrite Teams o Functions.
-- Migrar permisos de `users` a equipos por rol/gerencia.
+- Migrar de permisos por usuario a Appwrite Teams si la plantilla de usuarios crece de forma masiva.
 - Agregar versionado de evidencias y previsualizacion avanzada.
 - Agregar permisos finos por accion.
 - Crear version movil optimizada.
