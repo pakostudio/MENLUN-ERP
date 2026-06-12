@@ -1,20 +1,6 @@
-const APPWRITE_CONFIG = {
-  endpoint: "https://nyc.cloud.appwrite.io/v1",
-  projectId: "menlun-control-360",
-  databaseId: "menlun_control_360",
-};
-
-const TABLES = {
-  gerencias: "gerencias",
-  usuarios: "usuarios",
-  reportes: "reportes",
-  evidencias: "evidencias",
-  bitacora: "bitacora",
-};
-
-const STORAGE = {
-  evidencias: "evidencias",
-};
+const APPWRITE_CONFIG = window.MENLUN_APPWRITE_CONFIG;
+const TABLES = APPWRITE_CONFIG.collections;
+const STORAGE = APPWRITE_CONFIG.buckets;
 
 const USER_IDS_BY_EMAIL = {
   "pako@menlun.com": "pako",
@@ -47,7 +33,7 @@ const USER_IDS_BY_AREA = {
 
 const ADMIN_USER_IDS = ["pako", "carmen"];
 const EXECUTIVE_USER_IDS = ["direccion"];
-const DAILY_HEARTBEAT_PREFIX = "menlun-heartbeat";
+const APPWRITE_PAUSED_MESSAGE = "Proyecto Appwrite pausado o sin conexión. Restaurar proyecto desde Appwrite Console antes de continuar.";
 
 const SYSTEM_USERS = [
   { name: "Pako", role: "Administrador General", email: "pako@menlun.com", userId: "pako", access: "all" },
@@ -93,6 +79,18 @@ let auditLogs = [
   { id: "local-1", date: "2026-06-05", user: "Sistema", role: "Sistema", action: "inicio", reportId: "", area: "Todas", detail: "Bitácora local inicial." },
 ];
 
+let tasks = [
+  { rowId: "task-001", title: "Cargar evidencia de desviación", area: "Calidad", responsible: "Mariana Ruiz", priority: "alta", status: "vencida", due: "2026-06-04", reportId: "rep-002" },
+  { rowId: "task-002", title: "Validar gasto de refacciones", area: "Produccion", responsible: "Luis Ortega", priority: "alta", status: "pendiente", due: "2026-06-06", reportId: "rep-001" },
+];
+
+let jefaturas = [
+  { rowId: "jef-moises-prado", name: "Moisés Prado", photo: "", position: "Supervisor de Almacén", area: "Almacen", leadership: "Almacén", email: "supervisor.almacen@pmpsquimicos.com", phone: "56 4007 0190", whatsapp: "56 4007 0190", boss: "Carmen", user: "supervisor.almacen@pmpsquimicos.com", role: "Jefatura", status: "Activo", monthlyGoal: "Inventario exacto y evidencias completas", quarterlyGoal: "Reducir diferencias físicas", annualGoal: "Mejorar control operativo de almacén", mainKpi: "Exactitud de inventario", secondaryKpis: "Evidencias, reportes, cumplimiento", budget: 410000, spent: 51000, carmenComments: "Reforzar evidencia semanal.", directionComments: "Prioridad media." },
+  { rowId: "jef-guillermo-nieto", name: "Guillermo Nieto", photo: "", position: "Jefe de Logística", area: "Logistica", leadership: "Logística", email: "logistica.lf21@gmail.com", phone: "56 4000 5236", whatsapp: "56 4000 5236", boss: "Carmen", user: "logistica.lf21@gmail.com", role: "Jefatura", status: "Activo", monthlyGoal: "Optimizar rutas y comprobar viáticos", quarterlyGoal: "Bajar costo por ruta", annualGoal: "Modelo logístico medible", mainKpi: "Costo logístico", secondaryKpis: "Rutas, viáticos, evidencias", budget: 640000, spent: 87000, carmenComments: "Revisar gastos fuera de presupuesto.", directionComments: "Foco en ROI." },
+  { rowId: "jef-jose-luis-sanchez", name: "José Luis Sánchez", photo: "", position: "Jefe de Mantenimiento", area: "Mantenimiento", leadership: "Mantenimiento", email: "mantto.operadora@gmail.com", phone: "56 4001 1248", whatsapp: "56 4001 1248", boss: "Carmen", user: "mantto.operadora@gmail.com", role: "Jefatura", status: "Activo", monthlyGoal: "Cerrar correctivos críticos", quarterlyGoal: "Reducir reincidencias", annualGoal: "Plan preventivo estable", mainKpi: "Incidencias críticas", secondaryKpis: "Preventivos, correctivos, reincidencias", budget: 560000, spent: 69000, carmenComments: "Prioridad alta por vencimientos.", directionComments: "Revisar compresor." },
+  { rowId: "jef-jose-carlos-gonzalez", name: "José Carlos González", photo: "", position: "Jefe de Ventas", area: "Ventas", leadership: "Ventas", email: "josecarlos.gonzalez@pmpsquimicos.com", phone: "55 6784 5354", whatsapp: "55 6784 5354", boss: "Dirección General", user: "josecarlos.gonzalez@pmpsquimicos.com", role: "Jefatura", status: "Activo", monthlyGoal: "Controlar descuentos y rentabilidad", quarterlyGoal: "Aumentar conversión", annualGoal: "Crecimiento rentable", mainKpi: "Rentabilidad comercial", secondaryKpis: "Solicitudes, ROI, ventas", budget: 820000, spent: 96000, carmenComments: "Validar descuentos especiales.", directionComments: "Foco comercial." },
+];
+
 const calendarEvents = [
   { day: 3, title: "Corte semanal", type: "Semanal" },
   { day: 7, title: "Vencimientos de tareas", type: "Tareas" },
@@ -116,6 +114,7 @@ const userChip = document.querySelector("#user-chip");
 const logoutButton = document.querySelector("#logout-button");
 const appContent = document.querySelector("#app-content");
 const dataStatus = document.querySelector("#data-status");
+const globalSearchInput = document.querySelector("#global-search");
 
 let activeUser = null;
 
@@ -140,7 +139,7 @@ loginForm.addEventListener("submit", async (event) => {
     await loginWithAppwrite(email, secret);
     await initializeAppData();
   } catch (error) {
-    loginError.textContent = "Usuario o contraseña incorrectos, o servicio no disponible.";
+    loginError.textContent = error.isAppwriteUnavailable ? APPWRITE_PAUSED_MESSAGE : "Usuario o contraseña incorrectos.";
     passwordInput.value = "";
     passwordInput.focus();
     console.warn(error);
@@ -197,6 +196,16 @@ navButtons.forEach((button) => {
   });
 });
 
+globalSearchInput?.addEventListener("input", () => {
+  const query = globalSearchInput.value.trim();
+  if (query.length >= 2) {
+    navButtons.forEach((item) => item.classList.remove("active"));
+    moduleTitle.textContent = "Búsqueda global";
+    moduleArea.textContent = "Control operativo";
+    renderGlobalSearch(query);
+  }
+});
+
 appContent.addEventListener("click", async (event) => {
   const button = event.target.closest("[data-action]");
   if (!button) return;
@@ -213,6 +222,9 @@ appContent.addEventListener("click", async (event) => {
     if (action === "new-management") await createManagement();
     if (action === "edit-management") await editManagement(target);
     if (action === "disable-management") await disableManagement(target);
+    if (action === "edit-leadership") await editLeadership(target);
+    if (action === "toggle-leadership") await toggleLeadership(target);
+    if (action === "quick-action") await runQuickAction(button.dataset.quick, target);
     if (action === "edit-report") await editReport(target);
     if (action === "approve-report") await changeReportStatus(target, "aprobado");
     if (action === "reject-report") await changeReportStatus(target, "rechazado");
@@ -228,11 +240,15 @@ async function initializeAppData() {
   setDataStatus("Conectando sistema...", "loading");
 
   try {
-    const [remoteGerencias, remoteUsers, remoteReports, remoteAuditLogs] = await Promise.all([
+    validateAppwriteConfig();
+
+    const [remoteGerencias, remoteUsers, remoteReports, remoteAuditLogs, remoteJefaturas, remoteTasks] = await Promise.all([
       listRows(TABLES.gerencias),
       listRows(TABLES.usuarios),
       listRows(TABLES.reportes),
       listRows(TABLES.bitacora),
+      listRowsOptional(TABLES.jefaturas),
+      listRowsOptional(TABLES.tareas),
     ]);
 
     if (remoteGerencias.length) {
@@ -264,12 +280,20 @@ async function initializeAppData() {
       auditLogs = remoteAuditLogs.map(mapAuditRow).sort((a, b) => String(b.date).localeCompare(String(a.date)));
     }
 
+    if (remoteJefaturas.length) {
+      jefaturas = remoteJefaturas.map(mapJefaturaRow);
+    }
+
+    if (remoteTasks.length) {
+      tasks = remoteTasks.map(mapTaskRow);
+    }
+
     appwriteOnline = true;
     appwriteDataLoaded = true;
     setDataStatus("Sistema en línea", "online");
   } catch (error) {
     appwriteOnline = false;
-    setDataStatus("Servicio no disponible", "offline");
+    setDataStatus(APPWRITE_PAUSED_MESSAGE, "offline");
     console.warn("Servicio de datos no disponible.", error);
     throw error;
   } finally {
@@ -279,6 +303,16 @@ async function initializeAppData() {
       const current = document.querySelector(".module-nav button.active");
       if (current) navigate(current.dataset.view, current.dataset.module, current.dataset.area, current.dataset.areaKey);
     }
+  }
+}
+
+function validateAppwriteConfig() {
+  if (!APPWRITE_CONFIG || !APPWRITE_CONFIG.endpoint || !APPWRITE_CONFIG.projectId || !APPWRITE_CONFIG.databaseId) {
+    throw new Error("Configuración Appwrite incompleta.");
+  }
+
+  if (APPWRITE_CONFIG.blockedProjectIds?.includes(APPWRITE_CONFIG.projectId)) {
+    throw new Error("Proyecto Appwrite temporal detectado.");
   }
 }
 
@@ -316,7 +350,7 @@ async function appwriteRequest(path, options = {}) {
     const data = text ? JSON.parse(text) : {};
 
     if (!response.ok) {
-      throw new Error(data.message || `Error Appwrite ${response.status}`);
+      throw appwriteError(response.status, data.message);
     }
 
     return data;
@@ -353,10 +387,10 @@ function xhrRequest(url, method, headers, body) {
       if (xhr.status >= 200 && xhr.status < 300) {
         resolve(data);
       } else {
-        reject(new Error(data.message || `Error Appwrite ${xhr.status}`));
+        reject(appwriteError(xhr.status, data.message));
       }
     };
-    xhr.onerror = () => reject(new Error("No se pudo conectar con Appwrite."));
+    xhr.onerror = () => reject(appwriteError(0, APPWRITE_PAUSED_MESSAGE));
     xhr.send(body);
   });
 }
@@ -366,17 +400,62 @@ async function listRows(tableId) {
   return data.rows || [];
 }
 
-async function createRow(tableId, rowId, data, permissions = permissionsForRow(tableId, data)) {
+async function listRowsOptional(tableId) {
+  if (!tableId) return [];
+
+  try {
+    return await listRows(tableId);
+  } catch (error) {
+    if (error.status === 404) {
+      console.warn(`Tabla opcional no encontrada: ${tableId}`);
+      return [];
+    }
+    throw error;
+  }
+}
+
+async function ensureAppwriteWriteReady() {
+  if (appwriteOnline) return true;
+
+  try {
+    validateAppwriteConfig();
+    await listRows(TABLES.gerencias);
+    appwriteOnline = true;
+    setDataStatus("Sistema en línea", "online");
+    return true;
+  } catch (error) {
+    appwriteOnline = false;
+    setDataStatus(APPWRITE_PAUSED_MESSAGE, "offline");
+    console.warn("No se pudo confirmar conexión de escritura.", error);
+    return false;
+  }
+}
+
+function appwriteError(status, message = "") {
+  const error = new Error(message || `Error Appwrite ${status}`);
+  error.status = status;
+  error.isAppwriteUnavailable = [0, 401, 403, 404, 429, 500, 502, 503, 504].includes(Number(status));
+  if (error.isAppwriteUnavailable) error.message = APPWRITE_PAUSED_MESSAGE;
+  return error;
+}
+
+async function createRow(tableId, rowId, data, permissions = clientWritePermissions()) {
+  const body = { rowId, data };
+  if (permissions?.length) body.permissions = permissions;
+
   return appwriteRequest(`/tablesdb/${APPWRITE_CONFIG.databaseId}/tables/${tableId}/rows`, {
     method: "POST",
-    body: { rowId, data, permissions },
+    body,
   });
 }
 
-async function updateRow(tableId, rowId, data, permissions = permissionsForRow(tableId, data)) {
+async function updateRow(tableId, rowId, data, permissions = null) {
+  const body = { data };
+  if (permissions?.length) body.permissions = permissions;
+
   return appwriteRequest(`/tablesdb/${APPWRITE_CONFIG.databaseId}/tables/${tableId}/rows/${rowId}`, {
     method: "PATCH",
-    body: { data, permissions },
+    body,
   });
 }
 
@@ -387,7 +466,7 @@ async function uploadEvidenceFile(file, area) {
   const formData = new FormData();
   formData.append("fileId", fileId);
   formData.append("file", file);
-  permissionsForArea(area).forEach((permission) => formData.append("permissions[]", permission));
+  clientWritePermissions().forEach((permission) => formData.append("permissions[]", permission));
 
   const data = await appwriteUpload(`/storage/buckets/${STORAGE.evidencias}/files`, formData);
   return `${data.$id}|${file.name}`;
@@ -494,6 +573,10 @@ function permissionsForRow(tableId, data) {
     return permissionsForArea(areaKeyFromLabel(data.gerencia), { adminOnlyUpdate: true });
   }
 
+  if (tableId === TABLES.jefaturas) {
+    return permissionsForArea(areaKeyFromLabel(data.area || data.jefatura), { adminOnlyUpdate: true });
+  }
+
   if (tableId === TABLES.bitacora) {
     return uniquePermissions([
       ...readPermissions(ADMIN_USER_IDS),
@@ -503,6 +586,10 @@ function permissionsForRow(tableId, data) {
   }
 
   return permissionsForArea(areaKeyFromLabel(data.gerencia));
+}
+
+function clientWritePermissions() {
+  return ['read("users")', 'update("users")', 'delete("users")'];
 }
 
 function permissionsForArea(area, options = {}) {
@@ -565,6 +652,46 @@ function mapAuditRow(row) {
   };
 }
 
+function mapJefaturaRow(row) {
+  return {
+    rowId: row.$id,
+    name: row.nombre || "",
+    photo: row.fotografia || "",
+    position: row.puesto || "",
+    area: areaKeyFromLabel(row.area || row.jefatura),
+    leadership: row.jefatura || row.area || "",
+    email: row.correo || "",
+    phone: row.telefono || "",
+    whatsapp: row.whatsapp || row.telefono || "",
+    boss: row.jefeDirecto || "",
+    user: row.usuario || row.correo || "",
+    role: row.rol || "Jefatura",
+    status: row.estatus || "Activo",
+    monthlyGoal: row.objetivoMensual || "",
+    quarterlyGoal: row.objetivoTrimestral || "",
+    annualGoal: row.objetivoAnual || "",
+    mainKpi: row.kpiPrincipal || "",
+    secondaryKpis: row.kpisSecundarios || "",
+    budget: Number(row.presupuestoAsignado || 0),
+    spent: Number(row.gastoAcumulado || 0),
+    carmenComments: row.comentariosCarmen || "",
+    directionComments: row.comentariosDireccion || "",
+  };
+}
+
+function mapTaskRow(row) {
+  return {
+    rowId: row.$id,
+    title: row.titulo || "",
+    area: areaKeyFromLabel(row.gerencia),
+    responsible: row.responsable || "",
+    priority: normalizePlainText(row.prioridad),
+    status: normalizePlainText(row.estatus),
+    due: formatDate(row.vencimiento),
+    reportId: row.reporteId || "",
+  };
+}
+
 function reportToAppwriteData(report) {
   return {
     fecha: toIsoDate(report.date),
@@ -595,6 +722,92 @@ function managementToAppwriteData(item) {
     presupuesto: Number(item.budget || 0),
     gastoActual: 0,
   };
+}
+
+function leadershipToAppwriteData(item) {
+  return {
+    nombre: item.name,
+    fotografia: item.photo || "",
+    puesto: item.position,
+    area: labelForArea(item.area),
+    jefatura: item.leadership,
+    correo: item.email,
+    telefono: item.phone,
+    whatsapp: item.whatsapp,
+    jefeDirecto: item.boss,
+    usuario: item.user,
+    rol: item.role,
+    estatus: item.status,
+    objetivoMensual: item.monthlyGoal,
+    objetivoTrimestral: item.quarterlyGoal,
+    objetivoAnual: item.annualGoal,
+    kpiPrincipal: item.mainKpi,
+    kpisSecundarios: item.secondaryKpis,
+    presupuestoAsignado: Number(item.budget || 0),
+    gastoAcumulado: Number(item.spent || 0),
+    comentariosCarmen: item.carmenComments || "",
+    comentariosDireccion: item.directionComments || "",
+  };
+}
+
+async function editLeadership(target) {
+  if (!hasFullAccess()) return;
+  const item = jefaturas.find((entry) => entry.rowId === target);
+  if (!item) return;
+
+  const name = window.prompt("Nombre", item.name);
+  if (!name) return;
+  const position = window.prompt("Puesto", item.position) || item.position;
+  const email = window.prompt("Correo", item.email) || item.email;
+  const phone = window.prompt("Teléfono", item.phone) || item.phone;
+  const budget = Number(window.prompt("Presupuesto asignado", item.budget) || item.budget || 0);
+  const nextItem = { ...item, name, position, email, phone, whatsapp: phone, budget };
+  const index = jefaturas.findIndex((entry) => entry.rowId === target);
+
+  if (appwriteOnline && TABLES.jefaturas) {
+    await updateRow(TABLES.jefaturas, nextItem.rowId, leadershipToAppwriteData(nextItem));
+  }
+
+  jefaturas[index] = nextItem;
+  await logAudit("editar jefatura", null, `Jefatura actualizada: ${nextItem.name}.`);
+  renderLeadershipPanel();
+}
+
+async function toggleLeadership(target) {
+  if (!hasFullAccess()) return;
+  const item = jefaturas.find((entry) => entry.rowId === target);
+  if (!item) return;
+
+  const nextStatus = item.status === "Activo" ? "Inactivo" : "Activo";
+  const nextItem = { ...item, status: nextStatus };
+  const index = jefaturas.findIndex((entry) => entry.rowId === target);
+
+  if (appwriteOnline && TABLES.jefaturas) {
+    await updateRow(TABLES.jefaturas, nextItem.rowId, leadershipToAppwriteData(nextItem));
+  }
+
+  jefaturas[index] = nextItem;
+  await logAudit("estatus jefatura", null, `${nextItem.name}: ${nextStatus}.`);
+  renderLeadershipPanel();
+}
+
+async function runQuickAction(quickAction, target) {
+  if (!hasFullAccess()) return;
+  const report = reports.find((item) => String(item.id) === String(target));
+  const leadership = jefaturas.find((item) => item.rowId === target);
+  const label = report ? `${labelForArea(report.area)} / ${report.responsible}` : leadership ? `${leadership.leadership} / ${leadership.name}` : target;
+  const actionLabel = {
+    reminder: "Enviar recordatorio",
+    evidence: "Solicitar evidencia",
+    carmen: "Escalar a Carmen",
+    direction: "Escalar a Dirección",
+    reassign: "Reasignar responsable",
+    date: "Modificar fecha",
+    repeat: "Marcar reincidencia",
+  }[quickAction] || "Acción rápida";
+
+  await logAudit("acción rápida", report || null, `${actionLabel}: ${label}.`);
+  notify(`${actionLabel} registrado en bitácora.`);
 }
 
 function areaKeyFromLabel(label) {
@@ -633,6 +846,16 @@ function normalizePlainText(value) {
 function formatDate(value) {
   if (!value) return "";
   return String(value).slice(0, 10);
+}
+
+function todayIsoDate() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function addDaysIso(days) {
+  const date = new Date();
+  date.setDate(date.getDate() + Number(days || 0));
+  return date.toISOString().slice(0, 10);
 }
 
 function formatDateTime(value) {
@@ -805,17 +1028,19 @@ async function registerDailyHeartbeat() {
   if (!appwriteOnline || !activeUser) return;
 
   const today = new Date().toISOString().slice(0, 10);
-  const storageKey = `${DAILY_HEARTBEAT_PREFIX}:${activeUser.email}:${today}`;
+  const alreadyLogged = auditLogs.some((item) => (
+    item.action === "actividad diaria"
+    && item.user === activeUser.name
+    && String(item.date).includes(formatDate(today))
+  ));
 
-  if (window.localStorage.getItem(storageKey)) return;
+  if (alreadyLogged) return;
 
   await logAudit(
     "actividad diaria",
     null,
     `Validación automática de sesión activa para ${activeUser.name}.`
   );
-
-  window.localStorage.setItem(storageKey, "ok");
 }
 
 function openReportEditModal(report) {
@@ -848,7 +1073,7 @@ function openReportEditModal(report) {
 
     try {
       if (!appwriteOnline || !report.rowId) {
-        throw new Error("Servicio no disponible.");
+        throw appwriteError(0, APPWRITE_PAUSED_MESSAGE);
       }
 
       const nextReport = {
@@ -867,7 +1092,7 @@ function openReportEditModal(report) {
       notify(`Reporte ${report.id} editado correctamente.`);
       refreshCurrentView();
     } catch (error) {
-      notify("No se pudo guardar el reporte.");
+      notify(error.isAppwriteUnavailable ? APPWRITE_PAUSED_MESSAGE : "No se pudo guardar el reporte.");
       console.warn(error);
       submitButton.disabled = false;
       submitButton.textContent = "Guardar cambios";
@@ -903,7 +1128,7 @@ function openStatusModal(report, status) {
 
     try {
       if (!appwriteOnline || !report.rowId) {
-        throw new Error("Servicio no disponible.");
+        throw appwriteError(0, APPWRITE_PAUSED_MESSAGE);
       }
 
       const nextReport = {
@@ -962,6 +1187,7 @@ function applyVisibilityRules() {
       button.dataset.area = activeUser.access === "executive" ? "Consulta ejecutiva" : "Reportes";
     }
     if (button.dataset.view === "kanban") button.hidden = activeUser.access === "executive";
+    if (button.dataset.view === "central") button.hidden = false;
     if (button.dataset.view === "executive" && activeUser.access === "area") button.hidden = true;
     if (button.dataset.view === "area" && activeUser.access === "executive") button.hidden = true;
     if (button.dataset.view === "area" && activeUser.access === "area") {
@@ -991,6 +1217,9 @@ function navigate(view, title, area, areaKey) {
   if (view === "capture") renderCaptureForm(areaKey);
   if (view === "kanban") renderKanban();
   if (view === "calendar") renderCalendar();
+  if (view === "central") renderCentralBoard();
+  if (view === "admin") renderAdminPanel();
+  if (view === "leadership") renderLeadershipPanel();
   if (view === "management") renderManagementPanel();
   if (view === "audit") renderAuditPanel();
   if (view === "area") renderAreaModule(areaKey);
@@ -1003,6 +1232,16 @@ function hasFullAccess() {
 function visibleReports() {
   if (!activeUser || activeUser.access === "all" || activeUser.access === "executive") return reports;
   return reports.filter((report) => report.area === activeUser.area);
+}
+
+function visibleLeadership() {
+  if (!activeUser || activeUser.access === "all" || activeUser.access === "executive") return jefaturas;
+  return jefaturas.filter((item) => item.area === activeUser.area);
+}
+
+function visibleTasks() {
+  if (!activeUser || activeUser.access === "all" || activeUser.access === "executive") return tasks;
+  return tasks.filter((task) => task.area === activeUser.area);
 }
 
 function areaReports(area) {
@@ -1142,7 +1381,7 @@ function printExecutiveDashboard() {
     ["Gastos por gerencia", formatCurrency(sum(items.filter((item) => item.type === "gasto"), "amount"))],
     ["Ahorro generado", formatCurrency(sum(items.filter((item) => item.type === "ahorro"), "amount"))],
     ["Incidencias abiertas", items.filter((item) => item.type === "incidencia" && !["cerrado", "rechazado"].includes(item.status)).length],
-    ["Reportes vencidos", items.filter((item) => item.status === "pendiente" && item.due < "2026-06-04").length],
+    ["Reportes vencidos", items.filter((item) => item.status === "pendiente" && item.due < todayIsoDate()).length],
     ["Solicitudes pendientes", items.filter((item) => item.type === "solicitud" && ["pendiente", "en revision"].includes(item.status)).length],
   ];
 
@@ -1245,7 +1484,7 @@ function renderExecutiveDashboard() {
   const budgetTotal = gerencias.reduce((total, item) => total + item.budget, 0);
   const savings = sum(items.filter((item) => item.type === "ahorro"), "amount");
   const openIncidents = items.filter((item) => item.type === "incidencia" && !["cerrado", "rechazado"].includes(item.status)).length;
-  const overdueReports = items.filter((item) => item.status === "pendiente" && item.due < "2026-06-04").length;
+  const overdueReports = items.filter((item) => item.status === "pendiente" && item.due < todayIsoDate()).length;
   const pendingRequests = items.filter((item) => item.type === "solicitud" && ["pendiente", "en revision"].includes(item.status)).length;
 
   appContent.innerHTML = `
@@ -1277,15 +1516,17 @@ function renderExecutiveDashboard() {
 function renderCarmenPanel(filters = {}) {
   const baseItems = visibleReports();
   const items = filterReports(baseItems, filters);
+  const redLeadership = visibleLeadership().filter((item) => leadershipTrafficLight(item).level === "rojo").length;
   appContent.innerHTML = `
     ${sectionHeading("Panel Carmen", "Control ejecutivo de autorizaciones", scopeText())}
     <section class="executive-grid">
+      ${metricCard("Jefaturas en rojo", redLeadership)}
       ${metricCard("Reportes pendientes", items.filter((item) => item.status === "pendiente").length)}
       ${metricCard("Solicitudes por aprobar", items.filter((item) => item.type === "solicitud" && ["pendiente", "en revision"].includes(item.status)).length)}
       ${metricCard("Gastos fuera de presupuesto", items.filter((item) => item.type === "gasto" && item.amount > 90000).length)}
       ${metricCard("Incidencias críticas", items.filter((item) => item.type === "incidencia" && item.priority === "alta").length)}
       ${metricCard("Evidencias faltantes", items.filter((item) => !item.evidence || item.status === "falta evidencia").length)}
-      ${metricCard("Tareas vencidas", items.filter((item) => item.due < "2026-06-04" && !["cerrado", "aprobado"].includes(item.status)).length)}
+      ${metricCard("Tareas vencidas", items.filter((item) => item.due < todayIsoDate() && !["cerrado", "aprobado"].includes(item.status)).length)}
     </section>
     <section class="content-card">
       <div class="section-heading section-heading-compact"><div><p class="eyebrow">Autorizaciones</p><h3>Bandeja de autorización</h3></div><span class="scope-pill">${items.length} reportes</span></div>
@@ -1298,6 +1539,242 @@ function renderCarmenPanel(filters = {}) {
   `;
 
   bindReportFilters("carmen", renderCarmenPanel);
+}
+
+function renderCentralBoard() {
+  const items = visibleReports();
+  const leadership = visibleLeadership();
+  const taskItems = visibleTasks();
+  const redItems = leadership.filter((item) => leadershipTrafficLight(item).level === "rojo").length;
+  const pendingEvidence = items.filter((item) => !item.evidence || item.status === "falta evidencia").length;
+  const overBudget = leadership.filter((item) => Number(item.spent || 0) > Number(item.budget || 0)).length;
+  const overdue = [
+    ...items.filter((item) => item.due < todayIsoDate() && !["cerrado", "aprobado"].includes(item.status)),
+    ...taskItems.filter((item) => item.due < todayIsoDate() && !["cerrada", "cerrado", "validado", "completado"].includes(item.status)),
+  ].length;
+
+  appContent.innerHTML = `
+    ${sectionHeading("Tablero central", "Centro operativo-financiero de alta dirección", scopeText())}
+    <section class="executive-grid">
+      ${metricCard("Jefaturas", leadership.length)}
+      ${metricCard("Jefaturas en rojo", redItems)}
+      ${metricCard("Evidencias pendientes", pendingEvidence)}
+      ${metricCard("Presupuestos excedidos", overBudget)}
+      ${metricCard("Actividades vencidas", overdue)}
+      ${metricCard("Tareas abiertas", taskItems.filter((item) => !["cerrada", "cerrado", "validado", "completado"].includes(item.status)).length)}
+      ${metricCard("Reportes activos", items.filter((item) => !["cerrado", "rechazado"].includes(item.status)).length)}
+    </section>
+    <section class="content-card">
+      <div class="section-heading section-heading-compact"><div><p class="eyebrow">Vistas de control</p><h3>Operación por prioridad, semáforo y presupuesto</h3></div><span class="scope-pill">${items.length} registros</span></div>
+      <div class="view-strip">
+        ${["Dashboard", "Tabla", "Lista", "Kanban", "Calendario", "Timeline", "Pipeline", "Gantt", "Usuario", "Jefatura", "Área", "Prioridad", "Semáforo", "Presupuesto", "Vencimientos"].map((item) => `<span>${item}</span>`).join("")}
+      </div>
+      ${renderTable(["Jefatura", "Área", "Responsable", "Semáforo", "Presupuesto", "Gasto", "Saldo", "Cumplimiento", "Alertas"], leadership.map((item) => {
+        const signal = leadershipTrafficLight(item);
+        const rows = reports.filter((report) => report.area === item.area);
+        return [
+          item.leadership,
+          labelForArea(item.area),
+          item.name,
+          trafficBadge(signal.level, signal.label),
+          formatCurrency(item.budget),
+          formatCurrency(item.spent),
+          formatCurrency((item.budget || 0) - (item.spent || 0)),
+          `${leadershipCompliance(item)}%`,
+          rows.filter((report) => !report.evidence || report.due < todayIsoDate()).length,
+        ];
+      }))}
+    </section>
+    <section class="content-card">
+      <div class="section-heading section-heading-compact"><div><p class="eyebrow">Tareas</p><h3>Vencimientos operativos</h3></div><span class="scope-pill">${taskItems.length} tareas</span></div>
+      ${renderTable(["Tarea", "Área", "Responsable", "Prioridad", "Estatus", "Compromiso"], taskItems.map((item) => [
+        item.title,
+        labelForArea(item.area),
+        item.responsible,
+        priorityBadge(item.priority),
+        statusBadge(item.status),
+        item.due,
+      ]))}
+    </section>
+  `;
+}
+
+function renderAdminPanel() {
+  if (!hasFullAccess()) {
+    renderCentralBoard();
+    return;
+  }
+
+  const items = visibleReports();
+  const leadership = visibleLeadership();
+  const taskItems = visibleTasks();
+  const overdue = items.filter((item) => item.due < todayIsoDate() && !["cerrado", "aprobado"].includes(item.status));
+  const missingEvidence = items.filter((item) => !item.evidence || item.status === "falta evidencia");
+  const overBudgetReports = items.filter((item) => item.type === "gasto" && item.amount > 90000);
+  const redLeadership = leadership.filter((item) => leadershipTrafficLight(item).level === "rojo");
+  const repeatUsers = topBy(items.filter((item) => item.due < todayIsoDate()), "responsible").slice(0, 5);
+
+  appContent.innerHTML = `
+    ${sectionHeading("Panel administrador", "Control total de incumplimientos, alertas y acciones rápidas", appwriteOnline ? "Appwrite activo" : "Appwrite pausado")}
+    <section class="executive-grid">
+      ${metricCard("Usuarios incumplidos", uniqueValues(overdue.map((item) => item.responsible)).length)}
+      ${metricCard("Usuarios reincidentes", repeatUsers.length)}
+      ${metricCard("Actividades vencidas", overdue.length + taskItems.filter((item) => item.due < todayIsoDate()).length)}
+      ${metricCard("Reportes pendientes", items.filter((item) => item.status === "pendiente").length)}
+      ${metricCard("Evidencias faltantes", missingEvidence.length)}
+      ${metricCard("Gastos fuera de presupuesto", overBudgetReports.length)}
+      ${metricCard("Jefaturas en rojo", redLeadership.length)}
+      ${metricCard("Última actividad", auditLogs[0]?.date || "Sin bitácora")}
+    </section>
+    <section class="content-card">
+      <div class="section-heading section-heading-compact"><div><p class="eyebrow">Acciones rápidas</p><h3>Alertas críticas</h3></div><span class="scope-pill">${overdue.length + missingEvidence.length + overBudgetReports.length} focos</span></div>
+      ${renderTable(["Tipo", "Responsable", "Área", "Detalle", "Prioridad", "Acción"], buildAdminAlerts().map((item) => [
+        item.type,
+        item.responsible,
+        item.area,
+        item.detail,
+        item.priority,
+        quickActionButtons(item.target)
+      ]))}
+    </section>
+    <section class="content-card">
+      <div class="section-heading section-heading-compact"><div><p class="eyebrow">Reincidencia</p><h3>Top responsables</h3></div></div>
+      ${renderTable(["Responsable", "Eventos vencidos"], repeatUsers.map((item) => [item.label, item.count]))}
+    </section>
+  `;
+}
+
+function renderGlobalSearch(query) {
+  const needle = normalizePlainText(query);
+  const results = [
+    ...visibleReports().map((item) => ({
+      type: "Reporte",
+      title: `${labelForArea(item.area)} - ${item.type}`,
+      owner: item.responsible,
+      area: labelForArea(item.area),
+      status: statusBadge(item.status),
+      detail: `${item.description} ${item.evidence || ""}`,
+    })),
+    ...visibleLeadership().map((item) => ({
+      type: "Jefatura",
+      title: item.name,
+      owner: item.position,
+      area: labelForArea(item.area),
+      status: trafficBadge(leadershipTrafficLight(item).level, leadershipTrafficLight(item).label),
+      detail: `${item.email} ${item.phone} ${item.mainKpi} ${item.leadership}`,
+    })),
+    ...gerencias.map((item) => ({
+      type: "Gerencia",
+      title: item.label,
+      owner: item.manager,
+      area: item.label,
+      status: statusBadge(item.status.toLowerCase()),
+      detail: `${item.email} ${item.role} ${item.frequency}`,
+    })),
+  ].filter((item) => normalizePlainText(`${item.type} ${item.title} ${item.owner} ${item.area} ${item.detail}`).includes(needle));
+
+  appContent.innerHTML = `
+    ${sectionHeading("Buscador global", `Resultados para "${escapeHtml(query)}"`, `${results.length} coincidencias`)}
+    <section class="content-card">
+      ${renderTable(["Tipo", "Título", "Responsable", "Área", "Estatus", "Detalle"], results.map((item) => [
+        item.type,
+        item.title,
+        item.owner,
+        item.area,
+        item.status,
+        item.detail,
+      ]))}
+    </section>
+  `;
+}
+
+function buildAdminAlerts() {
+  const alerts = [];
+  visibleTasks().forEach((item) => {
+    if (item.due < todayIsoDate() && !["cerrada", "cerrado", "validado", "completado"].includes(item.status)) {
+      alerts.push({ type: "Tarea vencida", responsible: item.responsible, area: labelForArea(item.area), detail: item.title, priority: priorityBadge(item.priority), target: item.rowId });
+    }
+  });
+
+  visibleReports().forEach((item) => {
+    if (item.due < todayIsoDate() && !["cerrado", "aprobado"].includes(item.status)) {
+      alerts.push({ type: "Vencimiento", responsible: item.responsible, area: labelForArea(item.area), detail: item.description, priority: priorityBadge(item.priority), target: item.id });
+    }
+    if (!item.evidence || item.status === "falta evidencia") {
+      alerts.push({ type: "Evidencia", responsible: item.responsible, area: labelForArea(item.area), detail: "Evidencia faltante o incompleta", priority: priorityBadge(item.priority), target: item.id });
+    }
+    if (item.type === "gasto" && item.amount > 90000) {
+      alerts.push({ type: "Presupuesto", responsible: item.responsible, area: labelForArea(item.area), detail: `${formatCurrency(item.amount)} fuera de umbral`, priority: priorityBadge("alta"), target: item.id });
+    }
+  });
+
+  visibleLeadership().forEach((item) => {
+    const signal = leadershipTrafficLight(item);
+    if (signal.level === "rojo") {
+      alerts.push({ type: "Jefatura en rojo", responsible: item.name, area: labelForArea(item.area), detail: signal.label, priority: priorityBadge("alta"), target: item.rowId });
+    }
+  });
+
+  return alerts.slice(0, 30);
+}
+
+function quickActionButtons(target) {
+  return `
+    <div class="row-actions">
+      <button class="secondary-button" type="button" data-action="quick-action" data-quick="reminder" data-target="${target}">Recordatorio</button>
+      <button class="secondary-button" type="button" data-action="quick-action" data-quick="evidence" data-target="${target}">Evidencia</button>
+      <button class="secondary-button" type="button" data-action="quick-action" data-quick="carmen" data-target="${target}">Carmen</button>
+      <button class="secondary-button" type="button" data-action="quick-action" data-quick="direction" data-target="${target}">Dirección</button>
+    </div>
+  `;
+}
+
+function topBy(items, key) {
+  const counts = items.reduce((acc, item) => {
+    const label = item[key] || "Sin responsable";
+    acc[label] = (acc[label] || 0) + 1;
+    return acc;
+  }, {});
+
+  return Object.entries(counts)
+    .map(([label, count]) => ({ label, count }))
+    .sort((a, b) => b.count - a.count);
+}
+
+function renderLeadershipPanel() {
+  if (!hasFullAccess()) {
+    renderCentralBoard();
+    return;
+  }
+
+  appContent.innerHTML = `
+    ${sectionHeading("Jefaturas 360", "Administración editable de responsables, KPIs, presupuesto y cumplimiento", "Control total")}
+    <section class="content-card">
+      <div class="section-heading section-heading-compact"><div><p class="eyebrow">Jefaturas</p><h3>Directorio operativo-financiero</h3></div><span class="scope-pill">${jefaturas.length} registros</span></div>
+      ${renderTable(["Nombre", "Puesto", "Área", "Jefatura", "Correo", "Teléfono", "Jefe directo", "Rol", "Estatus", "Objetivo mensual", "KPI principal", "Presupuesto", "Gasto", "Saldo", "Semáforo", "Cumplimiento", "Acción"], jefaturas.map((item) => {
+        const signal = leadershipTrafficLight(item);
+        return [
+          item.name,
+          item.position,
+          labelForArea(item.area),
+          item.leadership,
+          item.email,
+          item.phone,
+          item.boss,
+          item.role,
+          statusBadge(item.status.toLowerCase()),
+          item.monthlyGoal,
+          item.mainKpi,
+          formatCurrency(item.budget),
+          formatCurrency(item.spent),
+          formatCurrency((item.budget || 0) - (item.spent || 0)),
+          trafficBadge(signal.level, signal.label),
+          `${leadershipCompliance(item)}%`,
+          `<div class="row-actions"><button class="secondary-button" type="button" data-action="edit-leadership" data-target="${item.rowId}">Editar</button><button class="secondary-button" type="button" data-action="toggle-leadership" data-target="${item.rowId}">${item.status === "Activo" ? "Desactivar" : "Activar"}</button></div>`
+        ];
+      }), "management-table")}
+    </section>
+  `;
 }
 
 function renderManagementPanel() {
@@ -1441,7 +1918,7 @@ function renderCaptureForm() {
     <section class="content-card">
       <div class="section-heading section-heading-compact"><div><p class="eyebrow">Captura</p><h3>Formulario general de reportes</h3></div></div>
       <form class="report-form" id="report-form">
-        ${inputField("Fecha", "date", "report-date", "2026-06-04")}
+        ${inputField("Fecha", "date", "report-date", todayIsoDate())}
         <label>Gerencia<select id="report-area">${availableAreas.map((item) => `<option value="${item.area}">${item.label}</option>`).join("")}</select></label>
         <label>Responsable<input id="report-responsible" type="text" value="${activeUser.name}"></label>
         <label>Frecuencia<select id="report-frequency"><option>semanal</option><option>quincenal</option><option>mensual</option></select></label>
@@ -1469,7 +1946,7 @@ function renderCaptureForm() {
     submitButton.disabled = true;
     submitButton.textContent = "Guardando...";
 
-    if (!appwriteOnline) {
+    if (!(await ensureAppwriteWriteReady())) {
       submitButton.disabled = false;
       submitButton.textContent = "Guardar reporte";
       notify("No se puede guardar sin conexión al sistema.");
@@ -1502,7 +1979,7 @@ function renderCaptureForm() {
       description: document.querySelector("#report-description").value,
       evidence: evidenceValue,
       comments: document.querySelector("#report-comments").value,
-      due: "2026-06-10",
+      due: addDaysIso(6),
     };
 
     try {
@@ -1606,6 +2083,30 @@ function sectionHeading(kicker, title, pill) {
 
 function metricCard(label, value) {
   return `<article class="metric-card"><span>${label}</span><strong>${value}</strong></article>`;
+}
+
+function leadershipCompliance(item) {
+  const rows = reports.filter((report) => report.area === item.area);
+  if (!rows.length) return 100;
+  const closed = rows.filter((report) => ["aprobado", "cerrado"].includes(report.status)).length;
+  const evidenceScore = rows.filter((report) => report.evidence).length / rows.length;
+  return Math.max(0, Math.min(100, Math.round(((closed / rows.length) * 70) + (evidenceScore * 30))));
+}
+
+function leadershipTrafficLight(item) {
+  const rows = reports.filter((report) => report.area === item.area);
+  const hasOverdue = rows.some((report) => report.due < todayIsoDate() && !["aprobado", "cerrado"].includes(report.status));
+  const missingEvidence = rows.some((report) => !report.evidence || report.status === "falta evidencia");
+  const overBudget = Number(item.spent || 0) > Number(item.budget || 0);
+  const compliance = leadershipCompliance(item);
+
+  if (hasOverdue || overBudget || compliance < 60) return { level: "rojo", label: "Riesgo crítico" };
+  if (missingEvidence || compliance < 80) return { level: "amarillo", label: "Atención" };
+  return { level: "verde", label: "En control" };
+}
+
+function trafficBadge(level, label) {
+  return `<span class="traffic-badge traffic-${level}">${label}</span>`;
 }
 
 function reportActions(report) {

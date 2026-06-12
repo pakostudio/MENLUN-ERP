@@ -348,6 +348,26 @@ h2 {
   min-width: 0;
 }
 
+.global-search {
+  width: min(320px, 28vw);
+  min-height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 12px;
+  background: var(--gray);
+  color: var(--navy);
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  outline: none;
+}
+
+.global-search:focus {
+  border-color: rgba(0, 167, 216, 0.65);
+  background: var(--white);
+  box-shadow: 0 0 0 3px rgba(0, 167, 216, 0.12);
+}
+
 .status-pill,
 .user-chip {
   border: 1px solid var(--line);
@@ -688,6 +708,50 @@ tbody tr:hover {
   border: 1px solid var(--line);
   background: var(--gray);
   color: var(--muted);
+}
+
+.traffic-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  border-radius: 8px;
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.traffic-verde {
+  background: rgba(0, 167, 216, 0.12);
+  color: var(--navy);
+}
+
+.traffic-amarillo {
+  border: 1px solid rgba(11, 42, 74, 0.18);
+  background: #fff7d6;
+  color: var(--navy);
+}
+
+.traffic-rojo {
+  background: var(--navy);
+  color: var(--white);
+}
+
+.view-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.view-strip span {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: var(--gray);
+  color: var(--navy);
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .content-card {
@@ -1031,6 +1095,15 @@ tbody tr:hover {
 
   .topbar-title,
   .topbar-actions {
+    width: 100%;
+  }
+
+  .topbar-actions {
+    align-items: stretch;
+    flex-wrap: wrap;
+  }
+
+  .global-search {
     width: 100%;
   }
 

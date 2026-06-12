@@ -183,6 +183,91 @@ const tables = [
     ]
   },
   {
+    id: "jefaturas",
+    name: "Jefaturas 360",
+    columns: [
+      string("nombre", 120, true),
+      string("fotografia", 180, false),
+      string("puesto", 120, true),
+      string("area", 80, true),
+      string("jefatura", 80, true),
+      email("correo", true),
+      string("telefono", 40, false),
+      string("whatsapp", 40, false),
+      string("jefeDirecto", 120, false),
+      string("usuario", 120, false),
+      string("rol", 80, true),
+      string("estatus", 30, true),
+      text("objetivoMensual", false),
+      text("objetivoTrimestral", false),
+      text("objetivoAnual", false),
+      string("kpiPrincipal", 120, false),
+      text("kpisSecundarios", false),
+      float("presupuestoAsignado", false),
+      float("gastoAcumulado", false),
+      text("comentariosCarmen", false),
+      text("comentariosDireccion", false)
+    ],
+    rows: [
+      row("jef-moises-prado", { nombre: "Moisés Prado", fotografia: "", puesto: "Supervisor de Almacén", area: "Almacén", jefatura: "Almacén", correo: "supervisor.almacen@pmpsquimicos.com", telefono: "56 4007 0190", whatsapp: "56 4007 0190", jefeDirecto: "Carmen", usuario: "supervisor.almacen@pmpsquimicos.com", rol: "Jefatura", estatus: "Activo", objetivoMensual: "Inventario exacto y evidencias completas", objetivoTrimestral: "Reducir diferencias físicas", objetivoAnual: "Mejorar control operativo de almacén", kpiPrincipal: "Exactitud de inventario", kpisSecundarios: "Evidencias, reportes, cumplimiento", presupuestoAsignado: 410000, gastoAcumulado: 51000, comentariosCarmen: "Reforzar evidencia semanal.", comentariosDireccion: "Prioridad media." }),
+      row("jef-guillermo-nieto", { nombre: "Guillermo Nieto", fotografia: "", puesto: "Jefe de Logística", area: "Logística", jefatura: "Logística", correo: "logistica.lf21@gmail.com", telefono: "56 4000 5236", whatsapp: "56 4000 5236", jefeDirecto: "Carmen", usuario: "logistica.lf21@gmail.com", rol: "Jefatura", estatus: "Activo", objetivoMensual: "Optimizar rutas y comprobar viáticos", objetivoTrimestral: "Bajar costo por ruta", objetivoAnual: "Modelo logístico medible", kpiPrincipal: "Costo logístico", kpisSecundarios: "Rutas, viáticos, evidencias", presupuestoAsignado: 640000, gastoAcumulado: 87000, comentariosCarmen: "Revisar gastos fuera de presupuesto.", comentariosDireccion: "Foco en ROI." }),
+      row("jef-jose-luis-sanchez", { nombre: "José Luis Sánchez", fotografia: "", puesto: "Jefe de Mantenimiento", area: "Mantenimiento", jefatura: "Mantenimiento", correo: "mantto.operadora@gmail.com", telefono: "56 4001 1248", whatsapp: "56 4001 1248", jefeDirecto: "Carmen", usuario: "mantto.operadora@gmail.com", rol: "Jefatura", estatus: "Activo", objetivoMensual: "Cerrar correctivos críticos", objetivoTrimestral: "Reducir reincidencias", objetivoAnual: "Plan preventivo estable", kpiPrincipal: "Incidencias críticas", kpisSecundarios: "Preventivos, correctivos, reincidencias", presupuestoAsignado: 560000, gastoAcumulado: 69000, comentariosCarmen: "Prioridad alta por vencimientos.", comentariosDireccion: "Revisar compresor." }),
+      row("jef-jose-carlos-gonzalez", { nombre: "José Carlos González", fotografia: "", puesto: "Jefe de Ventas", area: "Ventas", jefatura: "Ventas", correo: "josecarlos.gonzalez@pmpsquimicos.com", telefono: "55 6784 5354", whatsapp: "55 6784 5354", jefeDirecto: "Dirección General", usuario: "josecarlos.gonzalez@pmpsquimicos.com", rol: "Jefatura", estatus: "Activo", objetivoMensual: "Controlar descuentos y rentabilidad", objetivoTrimestral: "Aumentar conversión", objetivoAnual: "Crecimiento rentable", kpiPrincipal: "Rentabilidad comercial", kpisSecundarios: "Solicitudes, ROI, ventas", presupuestoAsignado: 820000, gastoAcumulado: 96000, comentariosCarmen: "Validar descuentos especiales.", comentariosDireccion: "Foco comercial." })
+    ]
+  },
+  {
+    id: "gastos",
+    name: "Gastos",
+    columns: [
+      string("tipo", 80, true),
+      string("responsable", 120, true),
+      float("monto", true),
+      datetime("fecha", true),
+      string("evidencia", 180, false),
+      string("centroCosto", 80, false),
+      string("gerencia", 80, true),
+      string("estatus", 40, true)
+    ],
+    rows: []
+  },
+  {
+    id: "viaticos",
+    name: "Viaticos",
+    columns: [
+      string("cliente", 120, false),
+      string("prospecto", 120, false),
+      text("motivo", true),
+      string("responsable", 120, true),
+      datetime("fecha", true),
+      float("presupuesto", false),
+      float("montoSolicitado", false),
+      float("montoComprobado", false),
+      string("evidencia", 180, false),
+      float("roiEsperado", false),
+      float("roiReal", false),
+      string("estatus", 40, true),
+      string("gerencia", 80, true)
+    ],
+    rows: []
+  },
+  {
+    id: "mantenimientos",
+    name: "Mantenimientos",
+    columns: [
+      string("tipo", 40, true),
+      string("equipo", 120, true),
+      string("responsable", 120, true),
+      float("costo", false),
+      string("evidencia", 180, false),
+      datetime("fecha", true),
+      string("estatus", 40, true),
+      string("semaforo", 20, true),
+      integer("reincidencias", false),
+      string("gerencia", 80, true)
+    ],
+    rows: []
+  },
+  {
     id: "bitacora",
     name: "Bitacora",
     columns: [
@@ -232,6 +317,10 @@ function datetime(key, required = false) {
 
 function float(key, required = false) {
   return { type: "float", key, required };
+}
+
+function integer(key, required = false) {
+  return { type: "integer", key, required };
 }
 
 function row(id, data) {
@@ -342,7 +431,7 @@ function permissionsForRow(tableId, data, rowId = "") {
     ]);
   }
 
-  if (["reportes", "autorizaciones", "tareas", "evidencias"].includes(tableId)) {
+  if (["reportes", "autorizaciones", "tareas", "evidencias", "jefaturas", "gastos", "viaticos", "mantenimientos"].includes(tableId)) {
     const areaUserId = areaUserIds[data.gerencia] || areaUserIds[areaFromReport(data.reporteId)];
     return uniquePermissions([
       ...readForUsers([...adminUserIds, ...executiveUserIds, areaUserId]),
@@ -399,6 +488,9 @@ async function request(method, path, body, expectedSoftErrors = []) {
   const json = text ? JSON.parse(text) : {};
 
   if (!response.ok && !expectedSoftErrors.includes(response.status)) {
+    if (json.type === "project_paused" || String(json.message || "").toLowerCase().includes("project is paused")) {
+      throw new Error("Proyecto Appwrite pausado o sin conexión. Restaurar proyecto desde Appwrite Console antes de continuar.");
+    }
     throw new Error(`${method} ${path} -> ${response.status}: ${text}`);
   }
 

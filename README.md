@@ -68,8 +68,12 @@ Las contrasenas deben administrarse desde Appwrite Auth. No se publican contrase
 Proyecto Appwrite:
 
 - Project ID: `menlun-control-360`
+- Project name: `MENLUN Control 360`
 - Database ID: `menlun_control_360`
 - Endpoint: `https://nyc.cloud.appwrite.io/v1`
+- Configuracion frontend: `appwriteConfig.js`
+
+La fuente unica de configuracion del frontend es `appwriteConfig.js`.
 
 Tablas creadas:
 
@@ -80,6 +84,10 @@ Tablas creadas:
 - `tareas`
 - `evidencias`
 - `bitacora`
+- `jefaturas`
+- `gastos`
+- `viaticos`
+- `mantenimientos`
 
 Storage creado:
 
@@ -112,14 +120,15 @@ El archivo [scripts/setup-appwrite-storage.mjs](scripts/setup-appwrite-storage.m
 ## Consideraciones operativas
 
 - El frontend lee/escribe en Appwrite y valida sesion con Appwrite Auth.
-- Si Appwrite no responde, el sistema bloquea escrituras para evitar datos locales inconsistentes.
+- Si Appwrite no responde o el proyecto esta pausado, el sistema bloquea escrituras y muestra: `Proyecto Appwrite pausado o sin conexión. Restaurar proyecto desde Appwrite Console antes de continuar.`
 - Las tablas tienen seguridad por fila activa en Appwrite.
-- Las filas quedan con permisos por usuario: Pako/Carmen ven todo, Direccion consulta vistas ejecutivas y cada gerente accede solo a su gerencia.
-- Las acciones administrativas quedan limitadas a Pako/Carmen desde interfaz y permisos de fila.
+- Las filas base quedan con permisos por usuario. Las filas creadas desde el frontend puro usan permisos de usuarios autenticados para permitir escritura sin exponer una API key; la visibilidad por rol se aplica desde la interfaz.
+- Las acciones administrativas quedan limitadas a Pako/Carmen desde interfaz.
 - La carga de evidencias ya usa Appwrite Storage; falta versionar evidencias y agregar previsualizacion avanzada.
 - La bitacora registra cambios principales y ya cuenta con pantalla de consulta, filtros y exportacion.
 - Los reportes cuentan con filtros y exportacion en Panel Carmen, Reportes, Kanban y modulos por gerencia.
 - La app registra una actividad diaria por usuario autenticado para dejar evidencia de uso operativo sin saturar la bitacora.
+- No se usa `localStorage` para datos operativos; la trazabilidad se registra en Appwrite.
 
 ### Rutina temporal para Appwrite Free
 
@@ -142,6 +151,7 @@ Esta rutina ayuda a monitorear y generar actividad tecnica, pero no sustituye un
 
 ## Pendientes futuros
 
+- Migrar escrituras sensibles a Appwrite Functions o servidor propio para aplicar permisos finos por rol desde backend.
 - Migrar de permisos por usuario a Appwrite Teams si la plantilla de usuarios crece de forma masiva.
 - Agregar versionado de evidencias y previsualizacion avanzada.
 - Agregar permisos finos por accion.
@@ -154,6 +164,7 @@ Esta rutina ayuda a monitorear y generar actividad tecnica, pero no sustituye un
 2. Subir estos archivos al repositorio:
    - `index.html`
    - `styles.css`
+   - `appwriteConfig.js`
    - `app.js`
    - `assets/pmps-logo.png`
    - `assets/pmps-icon.png`
