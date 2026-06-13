@@ -16,6 +16,10 @@ const USER_IDS_BY_EMAIL = {
   "rh@menlun.com": "rh",
   "contabilidad@menlun.com": "contabilidad",
   "sistemas@menlun.com": "sistemas",
+  "supervisor.almacen@pmpsquimicos.com": "jef-moises-prado",
+  "logistica.lf21@gmail.com": "jef-guillermo-nieto",
+  "mantto.operadora@gmail.com": "jef-jose-luis-sanchez",
+  "josecarlos.gonzalez@pmpsquimicos.com": "jef-jose-carlos-gonzalez",
 };
 
 const USER_IDS_BY_AREA = {
@@ -36,9 +40,9 @@ const EXECUTIVE_USER_IDS = ["direccion"];
 const APPWRITE_PAUSED_MESSAGE = "Proyecto Appwrite pausado o sin conexión. Restaurar proyecto desde Appwrite Console antes de continuar.";
 
 const SYSTEM_USERS = [
-  { name: "Pako", role: "Administrador General", email: "pako@menlun.com", userId: "pako", access: "all" },
-  { name: "Carmen", role: "Acceso Total Operativo", email: "carmen@menlun.com", userId: "carmen", access: "all" },
-  { name: "Direccion General", role: "Vista Ejecutiva", email: "direccion@menlun.com", userId: "direccion", access: "executive" },
+  { name: "Pako", role: "Administrador General", email: "pako@menlun.com", userId: "pako", access: "all", phone: "", whatsapp: "", pin: "" },
+  { name: "Carmen", role: "Acceso Total Operativo", email: "carmen@menlun.com", userId: "carmen", access: "all", phone: "", whatsapp: "", pin: "" },
+  { name: "Direccion General", role: "Vista Ejecutiva", email: "direccion@menlun.com", userId: "direccion", access: "executive", phone: "", whatsapp: "", pin: "" },
 ];
 
 let appwriteOnline = false;
@@ -102,7 +106,7 @@ const calendarEvents = [
 ];
 
 const loginForm = document.querySelector("#login-form");
-const emailInput = document.querySelector("#email");
+const userSelect = document.querySelector("#user-select");
 const passwordInput = document.querySelector("#password");
 const loginError = document.querySelector("#login-error");
 const logoImages = document.querySelectorAll("[data-logo]");
@@ -129,11 +133,17 @@ logoImages.forEach((logo) => {
 });
 
 setDataStatus("Inicia sesión", "loading");
+populateLoginUsers();
 
 loginForm.addEventListener("submit", async (event) => {
   event.preventDefault();
-  const email = emailInput.value.trim().toLowerCase();
+  const email = userSelect.value.trim().toLowerCase();
   const secret = passwordInput.value.trim();
+
+  if (!email) {
+    loginError.textContent = "Selecciona un usuario o jefatura.";
+    return;
+  }
 
   try {
     await loginWithAppwrite(email, secret);
@@ -172,7 +182,7 @@ logoutButton.addEventListener("click", async () => {
   await logoutFromAppwrite();
 
   activeUser = null;
-  emailInput.value = "";
+  populateLoginUsers();
   passwordInput.value = "";
   loginError.textContent = "";
   userChip.textContent = "Sin sesión";
@@ -224,6 +234,10 @@ appContent.addEventListener("click", async (event) => {
     if (action === "disable-management") await disableManagement(target);
     if (action === "edit-leadership") await editLeadership(target);
     if (action === "toggle-leadership") await toggleLeadership(target);
+    if (action === "new-user") await openUserForm();
+    if (action === "edit-user") await openUserForm(target);
+    if (action === "disable-user") await toggleUserStatus(target);
+    if (action === "delete-user") await deleteUserProfile(target);
     if (action === "quick-action") await runQuickAction(button.dataset.quick, target);
     if (action === "edit-report") await editReport(target);
     if (action === "approve-report") await changeReportStatus(target, "aprobado");
@@ -256,9 +270,11 @@ async function initializeAppData() {
     }
 
     if (remoteUsers.length) {
+      const remoteProfiles = remoteUsers.map(mapUserRow);
+      const remoteEmails = new Set(remoteProfiles.map((item) => item.email.toLowerCase()));
       userProfiles = [
-        ...remoteUsers.map(mapUserRow),
-        ...gerencias.map((item) => ({
+        ...remoteProfiles,
+        ...gerencias.filter((item) => !remoteEmails.has(item.email.toLowerCase())).map((item) => ({
           name: item.manager,
           role: item.role,
           email: item.email,
@@ -266,6 +282,9 @@ async function initializeAppData() {
           access: "area",
           area: item.area,
           status: item.status,
+          phone: item.phone || "",
+          whatsapp: item.whatsapp || "",
+          pin: item.pin || "",
         })),
       ];
     } else {
@@ -291,6 +310,7 @@ async function initializeAppData() {
     appwriteOnline = true;
     appwriteDataLoaded = true;
     setDataStatus("Sistema en línea", "online");
+    populateLoginUsers();
   } catch (error) {
     appwriteOnline = false;
     setDataStatus(APPWRITE_PAUSED_MESSAGE, "offline");
@@ -326,12 +346,52 @@ function buildUsers() {
       userId: USER_IDS_BY_EMAIL[item.email.toLowerCase()],
       access: "area",
       area: item.area,
+      phone: item.phone || "",
+      whatsapp: item.whatsapp || "",
+      pin: item.pin || "",
+      status: item.status,
     })),
   ];
 }
 
 function findUserProfile(email) {
   return userProfiles.find((item) => item.email.toLowerCase() === email.toLowerCase() && item.status !== "Inactivo");
+}
+
+function populateLoginUsers() {
+  if (!userSelect) return;
+
+  const selected = userSelect.value;
+  const entries = loginDirectory();
+  userSelect.innerHTML = entries.map((item) => `
+    <option value="${escapeHtml(item.email)}">${escapeHtml(item.name)} - ${escapeHtml(item.role)}${item.area ? ` / ${escapeHtml(labelForArea(item.area))}` : ""}</option>
+  `).join("");
+
+  if (selected && entries.some((item) => item.email === selected)) {
+    userSelect.value = selected;
+  }
+}
+
+function loginDirectory() {
+  const baseUsers = userProfiles.length ? userProfiles : buildUsers();
+  const leadershipUsers = jefaturas.map((item) => ({
+    name: item.name,
+    role: item.role || "Jefatura",
+    email: item.user || item.email,
+    userId: USER_IDS_BY_EMAIL[String(item.user || item.email).toLowerCase()] || item.rowId,
+    access: "area",
+    area: item.area,
+    status: item.status,
+    phone: item.phone,
+    whatsapp: item.whatsapp,
+    pin: "",
+  }));
+
+  const directory = [...baseUsers, ...leadershipUsers]
+    .filter((item) => item.email && item.status !== "Inactivo");
+
+  return Array.from(new Map(directory.map((item) => [item.email.toLowerCase(), item])).values())
+    .sort((a, b) => a.name.localeCompare(b.name, "es"));
 }
 
 async function appwriteRequest(path, options = {}) {
@@ -459,6 +519,12 @@ async function updateRow(tableId, rowId, data, permissions = null) {
   });
 }
 
+async function deleteRow(tableId, rowId) {
+  return appwriteRequest(`/tablesdb/${APPWRITE_CONFIG.databaseId}/tables/${tableId}/rows/${rowId}`, {
+    method: "DELETE",
+  });
+}
+
 async function uploadEvidenceFile(file, area) {
   if (!file) return "";
 
@@ -549,13 +615,31 @@ function mapUserRow(row) {
 
   return {
     rowId: row.$id,
-    name: row.nombre || row.email,
+    name: row.nombreCompleto || row.nombre || row.email,
     role,
     email: row.email,
     userId: USER_IDS_BY_EMAIL[String(row.email || "").toLowerCase()] || row.$id,
     access,
     area,
     status: row.estatus || "Activo",
+    phone: row.telefono || "",
+    whatsapp: row.whatsapp || "",
+    pin: row.claveAcceso || row.pin || "",
+  };
+}
+
+function userToAppwriteData(user) {
+  return {
+    nombre: user.name,
+    nombreCompleto: user.name,
+    email: user.email,
+    rol: user.role,
+    gerencia: user.access === "all" ? "Todas" : user.access === "executive" ? "Dirección" : labelForArea(user.area),
+    pin: user.pin || "",
+    claveAcceso: user.pin || "",
+    telefono: user.phone || "",
+    whatsapp: user.whatsapp || "",
+    estatus: user.status || "Activo",
   };
 }
 
@@ -972,6 +1056,153 @@ async function disableManagement(label) {
 
   notify(`${label} cambió a ${item.status}.`);
   renderManagementPanel();
+}
+
+async function openUserForm(target = "") {
+  if (!hasFullAccess()) return;
+  const user = target ? userProfiles.find((item) => item.email === target || item.rowId === target) : null;
+  const title = user ? "Editar usuario" : "Nuevo usuario";
+  const areaOptions = [
+    ["", "Sin gerencia"],
+    ["Todas", "Todas"],
+    ["Dirección", "Dirección"],
+    ...gerencias.map((item) => [item.label, item.label]),
+  ];
+  const roleValue = user?.role || "Jefatura";
+  const areaValue = user?.access === "all" ? "Todas" : user?.access === "executive" ? "Dirección" : labelForArea(user?.area || "");
+
+  openModal(`
+    <form class="modal-form" id="user-form">
+      <div class="modal-header">
+        <div><p class="eyebrow">Usuarios</p><h3>${title}</h3></div>
+        <button class="icon-button" type="button" data-modal-close>×</button>
+      </div>
+      <label>Nombre completo<input id="user-name" type="text" value="${escapeHtml(user?.name || "")}" required></label>
+      <label>Correo electrónico<input id="user-email" type="email" value="${escapeHtml(user?.email || "")}" ${user ? "readonly" : ""} required></label>
+      <label>Teléfono<input id="user-phone" type="tel" value="${escapeHtml(user?.phone || "")}"></label>
+      <label>WhatsApp<input id="user-whatsapp" type="tel" value="${escapeHtml(user?.whatsapp || "")}"></label>
+      <label>Rol
+        <select id="user-role">
+          ${["Administrador General", "Acceso Total Operativo", "Vista Ejecutiva", "Gerente de Producción", "Gerente de Calidad", "Gerente de Compras", "Gerente de Almacén", "Gerente de Logística", "Gerente de Mantenimiento", "Gerente Comercial", "Gerente de Recursos Humanos", "Gerente de Contabilidad", "Gerente de Sistemas", "Jefatura"].map((role) => `<option ${role === roleValue ? "selected" : ""}>${role}</option>`).join("")}
+        </select>
+      </label>
+      <label>Gerencia
+        <select id="user-area">
+          ${areaOptions.map(([value, label]) => `<option value="${escapeHtml(value)}" ${value === areaValue ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}
+        </select>
+      </label>
+      <label>Clave / PIN de acceso<input id="user-pin" type="text" value="${escapeHtml(user?.pin || "")}" placeholder="Clave interna o PIN"></label>
+      <label>Estatus
+        <select id="user-status">
+          ${["Activo", "Inactivo"].map((status) => `<option ${status === (user?.status || "Activo") ? "selected" : ""}>${status}</option>`).join("")}
+        </select>
+      </label>
+      <p class="muted-copy field-wide">La clave/PIN se administra en el directorio operativo. Para cambiar la contraseña real de Appwrite Auth, ejecuta el script de sincronización backend.</p>
+      <div class="modal-actions field-wide">
+        <button class="secondary-button" type="button" data-modal-close>Cancelar</button>
+        <button class="primary-button" type="submit">${user ? "Guardar cambios" : "Crear usuario"}</button>
+      </div>
+    </form>
+  `);
+
+  document.querySelector("#user-form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const submitButton = event.submitter;
+    submitButton.disabled = true;
+    submitButton.textContent = "Guardando...";
+
+    const nextUser = buildUserFromForm(user);
+
+    try {
+      if (user?.rowId) {
+        await updateRow(TABLES.usuarios, user.rowId, userToAppwriteData(nextUser));
+        Object.assign(user, nextUser);
+      } else {
+        const rowId = createRowId("usr");
+        nextUser.rowId = rowId;
+        await createRow(TABLES.usuarios, rowId, userToAppwriteData(nextUser));
+        userProfiles.push(nextUser);
+      }
+
+      populateLoginUsers();
+      await logAudit(user ? "editar usuario" : "crear usuario", null, `${nextUser.name} / ${nextUser.email}.`);
+      closeModal();
+      notify(user ? "Usuario actualizado correctamente." : "Usuario creado correctamente.");
+      renderAdminPanel();
+    } catch (error) {
+      notify("No se pudo guardar el usuario.");
+      console.warn(error);
+      submitButton.disabled = false;
+      submitButton.textContent = user ? "Guardar cambios" : "Crear usuario";
+    }
+  });
+}
+
+function buildUserFromForm(previous = null) {
+  const role = document.querySelector("#user-role").value;
+  const gerencia = document.querySelector("#user-area").value;
+  let access = "area";
+  let area = areaKeyFromLabel(gerencia);
+
+  if (role.includes("Administrador") || role.includes("Acceso Total") || gerencia === "Todas") {
+    access = "all";
+    area = "";
+  }
+
+  if (role.includes("Vista Ejecutiva") || gerencia === "Dirección") {
+    access = "executive";
+    area = "";
+  }
+
+  return {
+    ...(previous || {}),
+    name: document.querySelector("#user-name").value.trim(),
+    email: document.querySelector("#user-email").value.trim().toLowerCase(),
+    role,
+    access,
+    area,
+    status: document.querySelector("#user-status").value,
+    phone: document.querySelector("#user-phone").value.trim(),
+    whatsapp: document.querySelector("#user-whatsapp").value.trim(),
+    pin: document.querySelector("#user-pin").value.trim(),
+    userId: USER_IDS_BY_EMAIL[document.querySelector("#user-email").value.trim().toLowerCase()] || previous?.userId || createRowId("auth"),
+  };
+}
+
+async function toggleUserStatus(target) {
+  if (!hasFullAccess()) return;
+  const user = userProfiles.find((item) => item.email === target || item.rowId === target);
+  if (!user?.rowId) {
+    notify("Este usuario base se administra desde gerencias o configuración inicial.");
+    return;
+  }
+
+  const nextUser = { ...user, status: user.status === "Activo" ? "Inactivo" : "Activo" };
+  await updateRow(TABLES.usuarios, user.rowId, userToAppwriteData(nextUser));
+  Object.assign(user, nextUser);
+  populateLoginUsers();
+  await logAudit("estatus usuario", null, `${user.name}: ${user.status}.`);
+  notify(`Usuario ${user.status.toLowerCase()}.`);
+  renderAdminPanel();
+}
+
+async function deleteUserProfile(target) {
+  if (!hasFullAccess()) return;
+  const user = userProfiles.find((item) => item.email === target || item.rowId === target);
+  if (!user?.rowId) {
+    notify("Este usuario base no puede eliminarse desde la interfaz.");
+    return;
+  }
+
+  const confirmed = window.confirm(`Eliminar usuario ${user.name}?`);
+  if (!confirmed) return;
+
+  await deleteRow(TABLES.usuarios, user.rowId);
+  userProfiles = userProfiles.filter((item) => item !== user);
+  populateLoginUsers();
+  await logAudit("eliminar usuario", null, `${user.name} / ${user.email}.`);
+  notify("Usuario eliminado correctamente.");
+  renderAdminPanel();
 }
 
 async function editReport(target) {
@@ -1641,6 +1872,23 @@ function renderAdminPanel() {
       <div class="section-heading section-heading-compact"><div><p class="eyebrow">Reincidencia</p><h3>Top responsables</h3></div></div>
       ${renderTable(["Responsable", "Eventos vencidos"], repeatUsers.map((item) => [item.label, item.count]))}
     </section>
+    <section class="content-card">
+      <div class="section-heading section-heading-compact">
+        <div><p class="eyebrow">Usuarios</p><h3>Administración de accesos</h3></div>
+        <button class="primary-button" type="button" data-action="new-user">Nuevo usuario</button>
+      </div>
+      ${renderTable(["Nombre completo", "Correo", "Teléfono", "WhatsApp", "Rol", "Gerencia", "Clave/PIN", "Estatus", "Acción"], userProfiles.map((item) => [
+        escapeHtml(item.name),
+        escapeHtml(item.email),
+        escapeHtml(item.phone || ""),
+        escapeHtml(item.whatsapp || ""),
+        escapeHtml(item.role),
+        escapeHtml(item.access === "all" ? "Todas" : item.access === "executive" ? "Dirección" : labelForArea(item.area)),
+        escapeHtml(item.pin || ""),
+        statusBadge(item.status || "Activo"),
+        userActionButtons(item),
+      ]))}
+    </section>
   `;
 }
 
@@ -1725,6 +1973,18 @@ function quickActionButtons(target) {
       <button class="secondary-button" type="button" data-action="quick-action" data-quick="evidence" data-target="${target}">Evidencia</button>
       <button class="secondary-button" type="button" data-action="quick-action" data-quick="carmen" data-target="${target}">Carmen</button>
       <button class="secondary-button" type="button" data-action="quick-action" data-quick="direction" data-target="${target}">Dirección</button>
+    </div>
+  `;
+}
+
+function userActionButtons(user) {
+  const target = escapeHtml(user.rowId || user.email);
+  const nextLabel = (user.status || "Activo") === "Activo" ? "Desactivar" : "Reactivar";
+  return `
+    <div class="row-actions">
+      <button class="secondary-button" type="button" data-action="edit-user" data-target="${target}">Editar</button>
+      <button class="secondary-button" type="button" data-action="disable-user" data-target="${target}">${nextLabel}</button>
+      <button class="secondary-button danger-button" type="button" data-action="delete-user" data-target="${target}">Eliminar</button>
     </div>
   `;
 }

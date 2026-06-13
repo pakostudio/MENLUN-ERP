@@ -34,6 +34,10 @@ const users = [
   ["rh", "Claudia Rios", "rh@menlun.com"],
   ["contabilidad", "Hector Silva", "contabilidad@menlun.com"],
   ["sistemas", "Natalia Flores", "sistemas@menlun.com"],
+  ["jef-moises-prado", "Moisés Prado", "supervisor.almacen@pmpsquimicos.com"],
+  ["jef-guillermo-nieto", "Guillermo Nieto", "logistica.lf21@gmail.com"],
+  ["jef-jose-luis-sanchez", "José Luis Sánchez", "mantto.operadora@gmail.com"],
+  ["jef-jose-carlos-gonzalez", "José Carlos González", "josecarlos.gonzalez@pmpsquimicos.com"],
 ];
 
 for (const [userId, name, email] of users) {

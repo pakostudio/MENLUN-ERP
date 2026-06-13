@@ -28,7 +28,11 @@ const userIds = {
   "ventas@menlun.com": "ventas",
   "rh@menlun.com": "rh",
   "contabilidad@menlun.com": "contabilidad",
-  "sistemas@menlun.com": "sistemas"
+  "sistemas@menlun.com": "sistemas",
+  "supervisor.almacen@pmpsquimicos.com": "jef-moises-prado",
+  "logistica.lf21@gmail.com": "jef-guillermo-nieto",
+  "mantto.operadora@gmail.com": "jef-jose-luis-sanchez",
+  "josecarlos.gonzalez@pmpsquimicos.com": "jef-jose-carlos-gonzalez"
 };
 
 const areaUserIds = {
@@ -86,16 +90,34 @@ const tables = [
     name: "Usuarios",
     columns: [
       string("nombre", 120, true),
+      string("nombreCompleto", 160, false),
       email("email", true),
       string("rol", 100, true),
       string("gerencia", 80, false),
       string("pin", 12, false),
+      string("claveAcceso", 40, false),
+      string("telefono", 40, false),
+      string("whatsapp", 40, false),
       string("estatus", 30, true)
     ],
     rows: [
-      row("pako", { nombre: "Pako", email: "pako@menlun.com", rol: "Administrador General", gerencia: "Todas", pin: "", estatus: "Activo" }),
-      row("carmen", { nombre: "Carmen", email: "carmen@menlun.com", rol: "Acceso Total Operativo", gerencia: "Todas", pin: "", estatus: "Activo" }),
-      row("direccion", { nombre: "Dirección General", email: "direccion@menlun.com", rol: "Vista Ejecutiva", gerencia: "Dirección", pin: "", estatus: "Activo" })
+      row("pako", { nombre: "Pako", nombreCompleto: "Pako", email: "pako@menlun.com", rol: "Administrador General", gerencia: "Todas", pin: "", claveAcceso: "", telefono: "", whatsapp: "", estatus: "Activo" }),
+      row("carmen", { nombre: "Carmen", nombreCompleto: "Carmen", email: "carmen@menlun.com", rol: "Acceso Total Operativo", gerencia: "Todas", pin: "", claveAcceso: "", telefono: "", whatsapp: "", estatus: "Activo" }),
+      row("direccion", { nombre: "Dirección General", nombreCompleto: "Dirección General", email: "direccion@menlun.com", rol: "Vista Ejecutiva", gerencia: "Dirección", pin: "", claveAcceso: "", telefono: "", whatsapp: "", estatus: "Activo" }),
+      row("produccion", { nombre: "Luis Ortega", nombreCompleto: "Luis Ortega", email: "produccion@menlun.com", rol: "Gerente de Producción", gerencia: "Producción", pin: "2401", claveAcceso: "2401", telefono: "", whatsapp: "", estatus: "Activo" }),
+      row("calidad", { nombre: "Mariana Ruiz", nombreCompleto: "Mariana Ruiz", email: "calidad@menlun.com", rol: "Gerente de Calidad", gerencia: "Calidad", pin: "2402", claveAcceso: "2402", telefono: "", whatsapp: "", estatus: "Activo" }),
+      row("compras", { nombre: "Rafael Torres", nombreCompleto: "Rafael Torres", email: "compras@menlun.com", rol: "Gerente de Compras", gerencia: "Compras", pin: "2403", claveAcceso: "2403", telefono: "", whatsapp: "", estatus: "Activo" }),
+      row("almacen", { nombre: "Sofia Campos", nombreCompleto: "Sofia Campos", email: "almacen@menlun.com", rol: "Gerente de Almacén", gerencia: "Almacén", pin: "2404", claveAcceso: "2404", telefono: "", whatsapp: "", estatus: "Activo" }),
+      row("logistica", { nombre: "Jorge Vidal", nombreCompleto: "Jorge Vidal", email: "logistica@menlun.com", rol: "Gerente de Logística", gerencia: "Logística", pin: "2405", claveAcceso: "2405", telefono: "", whatsapp: "", estatus: "Activo" }),
+      row("mantenimiento", { nombre: "Elena Ponce", nombreCompleto: "Elena Ponce", email: "mantenimiento@menlun.com", rol: "Gerente de Mantenimiento", gerencia: "Mantenimiento", pin: "2406", claveAcceso: "2406", telefono: "", whatsapp: "", estatus: "Activo" }),
+      row("ventas", { nombre: "Pablo Ibarra", nombreCompleto: "Pablo Ibarra", email: "ventas@menlun.com", rol: "Gerente Comercial", gerencia: "Ventas", pin: "2407", claveAcceso: "2407", telefono: "", whatsapp: "", estatus: "Activo" }),
+      row("rh", { nombre: "Claudia Rios", nombreCompleto: "Claudia Rios", email: "rh@menlun.com", rol: "Gerente de Recursos Humanos", gerencia: "Recursos Humanos", pin: "2408", claveAcceso: "2408", telefono: "", whatsapp: "", estatus: "Activo" }),
+      row("contabilidad", { nombre: "Hector Silva", nombreCompleto: "Hector Silva", email: "contabilidad@menlun.com", rol: "Gerente de Contabilidad", gerencia: "Contabilidad", pin: "2409", claveAcceso: "2409", telefono: "", whatsapp: "", estatus: "Activo" }),
+      row("sistemas", { nombre: "Natalia Flores", nombreCompleto: "Natalia Flores", email: "sistemas@menlun.com", rol: "Gerente de Sistemas", gerencia: "Sistemas", pin: "2410", claveAcceso: "2410", telefono: "", whatsapp: "", estatus: "Activo" }),
+      row("jef-moises-prado-user", { nombre: "Moisés Prado", nombreCompleto: "Moisés Prado", email: "supervisor.almacen@pmpsquimicos.com", rol: "Jefatura", gerencia: "Almacén", pin: "3401", claveAcceso: "3401", telefono: "56 4007 0190", whatsapp: "56 4007 0190", estatus: "Activo" }),
+      row("jef-guillermo-nieto-user", { nombre: "Guillermo Nieto", nombreCompleto: "Guillermo Nieto", email: "logistica.lf21@gmail.com", rol: "Jefatura", gerencia: "Logística", pin: "3402", claveAcceso: "3402", telefono: "56 4000 5236", whatsapp: "56 4000 5236", estatus: "Activo" }),
+      row("jef-jose-luis-sanchez-user", { nombre: "José Luis Sánchez", nombreCompleto: "José Luis Sánchez", email: "mantto.operadora@gmail.com", rol: "Jefatura", gerencia: "Mantenimiento", pin: "3403", claveAcceso: "3403", telefono: "56 4001 1248", whatsapp: "56 4001 1248", estatus: "Activo" }),
+      row("jef-jose-carlos-gonzalez-user", { nombre: "José Carlos González", nombreCompleto: "José Carlos González", email: "josecarlos.gonzalez@pmpsquimicos.com", rol: "Jefatura", gerencia: "Ventas", pin: "3404", claveAcceso: "3404", telefono: "55 6784 5354", whatsapp: "55 6784 5354", estatus: "Activo" })
     ]
   },
   {
