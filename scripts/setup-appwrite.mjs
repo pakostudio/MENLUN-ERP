@@ -101,7 +101,7 @@ const tables = [
       string("estatus", 30, true)
     ],
     rows: [
-      row("pako", { nombre: "Pako", nombreCompleto: "Pako", email: "pako@menlun.com", rol: "Administrador General", gerencia: "Todas", pin: "", claveAcceso: "", telefono: "", whatsapp: "", estatus: "Activo" }),
+      row("pako", { nombre: "Administrador General", nombreCompleto: "Administrador General", email: "pako@menlun.com", rol: "Administrador General", gerencia: "Todas", pin: "0000", claveAcceso: "0000", telefono: "", whatsapp: "", estatus: "Activo" }),
       row("carmen", { nombre: "Carmen", nombreCompleto: "Carmen", email: "carmen@menlun.com", rol: "Acceso Total Operativo", gerencia: "Todas", pin: "", claveAcceso: "", telefono: "", whatsapp: "", estatus: "Activo" }),
       row("direccion", { nombre: "Dirección General", nombreCompleto: "Dirección General", email: "direccion@menlun.com", rol: "Vista Ejecutiva", gerencia: "Dirección", pin: "", claveAcceso: "", telefono: "", whatsapp: "", estatus: "Activo" }),
       row("produccion", { nombre: "Luis Ortega", nombreCompleto: "Luis Ortega", email: "produccion@menlun.com", rol: "Gerente de Producción", gerencia: "Producción", pin: "2401", claveAcceso: "2401", telefono: "", whatsapp: "", estatus: "Activo" }),
@@ -114,10 +114,10 @@ const tables = [
       row("rh", { nombre: "Claudia Rios", nombreCompleto: "Claudia Rios", email: "rh@menlun.com", rol: "Gerente de Recursos Humanos", gerencia: "Recursos Humanos", pin: "2408", claveAcceso: "2408", telefono: "", whatsapp: "", estatus: "Activo" }),
       row("contabilidad", { nombre: "Hector Silva", nombreCompleto: "Hector Silva", email: "contabilidad@menlun.com", rol: "Gerente de Contabilidad", gerencia: "Contabilidad", pin: "2409", claveAcceso: "2409", telefono: "", whatsapp: "", estatus: "Activo" }),
       row("sistemas", { nombre: "Natalia Flores", nombreCompleto: "Natalia Flores", email: "sistemas@menlun.com", rol: "Gerente de Sistemas", gerencia: "Sistemas", pin: "2410", claveAcceso: "2410", telefono: "", whatsapp: "", estatus: "Activo" }),
-      row("jef-moises-prado-user", { nombre: "Moisés Prado", nombreCompleto: "Moisés Prado", email: "supervisor.almacen@pmpsquimicos.com", rol: "Jefatura", gerencia: "Almacén", pin: "3401", claveAcceso: "3401", telefono: "56 4007 0190", whatsapp: "56 4007 0190", estatus: "Activo" }),
-      row("jef-guillermo-nieto-user", { nombre: "Guillermo Nieto", nombreCompleto: "Guillermo Nieto", email: "logistica.lf21@gmail.com", rol: "Jefatura", gerencia: "Logística", pin: "3402", claveAcceso: "3402", telefono: "56 4000 5236", whatsapp: "56 4000 5236", estatus: "Activo" }),
-      row("jef-jose-luis-sanchez-user", { nombre: "José Luis Sánchez", nombreCompleto: "José Luis Sánchez", email: "mantto.operadora@gmail.com", rol: "Jefatura", gerencia: "Mantenimiento", pin: "3403", claveAcceso: "3403", telefono: "56 4001 1248", whatsapp: "56 4001 1248", estatus: "Activo" }),
-      row("jef-jose-carlos-gonzalez-user", { nombre: "José Carlos González", nombreCompleto: "José Carlos González", email: "josecarlos.gonzalez@pmpsquimicos.com", rol: "Jefatura", gerencia: "Ventas", pin: "3404", claveAcceso: "3404", telefono: "55 6784 5354", whatsapp: "55 6784 5354", estatus: "Activo" })
+      row("jef-moises-prado-user", { nombre: "Moisés Prado", nombreCompleto: "Moisés Prado", email: "supervisor.almacen@pmpsquimicos.com", rol: "Jefatura", gerencia: "Almacén", pin: "0001", claveAcceso: "0001", telefono: "56 4007 0190", whatsapp: "56 4007 0190", estatus: "Activo" }),
+      row("jef-guillermo-nieto-user", { nombre: "Guillermo Nieto", nombreCompleto: "Guillermo Nieto", email: "logistica.lf21@gmail.com", rol: "Jefatura", gerencia: "Logística", pin: "0002", claveAcceso: "0002", telefono: "56 4000 5236", whatsapp: "56 4000 5236", estatus: "Activo" }),
+      row("jef-jose-luis-sanchez-user", { nombre: "José Luis Sánchez", nombreCompleto: "José Luis Sánchez", email: "mantto.operadora@gmail.com", rol: "Jefatura", gerencia: "Mantenimiento", pin: "0003", claveAcceso: "0003", telefono: "56 4001 1248", whatsapp: "56 4001 1248", estatus: "Activo" }),
+      row("jef-jose-carlos-gonzalez-user", { nombre: "José Carlos González", nombreCompleto: "José Carlos González", email: "josecarlos.gonzalez@pmpsquimicos.com", rol: "Jefatura", gerencia: "Ventas", pin: "0004", claveAcceso: "0004", telefono: "55 6784 5354", whatsapp: "55 6784 5354", estatus: "Activo" })
     ]
   },
   {

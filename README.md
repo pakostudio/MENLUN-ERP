@@ -4,27 +4,27 @@ MENLUN Control 360 es una app web estatica para operar y supervisar reportes int
 
 El sistema usa identidad visual PMPS: Arial, azul marino `#0B2A4A`, cyan `#00A7D8`, blanco `#FFFFFF` y gris claro `#F4F7FA`.
 
-## Usuarios iniciales
+## Accesos iniciales
 
-| Usuario | Email | Rol | Acceso |
-| --- | --- | --- | --- |
-| Pako | `pako@menlun.com` | Administrador General | Acceso total |
-| Carmen | `carmen@menlun.com` | Acceso Total Operativo | Acceso total |
-| Direccion General | `direccion@menlun.com` | Vista Ejecutiva | Dashboard, calendario y reportes |
-| Produccion | `produccion@menlun.com` | Gerente de Produccion | Solo Produccion |
+| Usuario visible | Rol | Clave |
+| --- | --- | --- |
+| Administrador General | Acceso total | `0000` |
+| Moisés Prado / Almacén | Jefatura | `0001` |
+| Guillermo Nieto / Logística | Jefatura | `0002` |
+| José Luis Sánchez / Mantenimiento | Jefatura | `0003` |
+| José Carlos González / Ventas | Jefatura | `0004` |
 
-Las contrasenas deben administrarse desde Appwrite Auth. No se publican contrasenas en el frontend ni en este documento.
+Appwrite Auth requiere contrasenas tecnicas de minimo 8 caracteres. La interfaz de MENLUN Control 360 valida claves cortas de operacion (`0000`, `0001`, etc.) y mantiene la sesion real en Appwrite.
 
 ## Roles
 
 - **Administrador General:** ve todos los modulos, gerencias, reportes, autorizaciones y dashboards.
-- **Acceso Total Operativo:** ve todos los modulos operativos y administrativos.
 - **Direccion General:** consulta informacion ejecutiva y reportes, sin edicion.
-- **Gerente de area:** ve solo su gerencia, sus reportes, sus tareas, captura, kanban y calendario.
+- **Jefatura:** ve solo su area, sus reportes, sus tareas, captura, kanban y calendario.
 
 ## Modulos incluidos
 
-- Login por email y contrasena real de Appwrite Auth.
+- Login por selector de Administrador General y jefaturas con clave corta.
 - Cierre de sesion conectado a Appwrite Auth.
 - Dashboard ejecutivo.
 - Panel Carmen.
@@ -52,13 +52,13 @@ Las contrasenas deben administrarse desde Appwrite Auth. No se publican contrase
 
 1. La app intenta conectar con Appwrite y cargar gerencias/reportes.
 2. Si el servicio responde, el indicador superior muestra `Sistema en línea`.
-3. El usuario inicia sesion con email y contrasena real. La sesion se valida contra Appwrite Auth.
+3. El usuario selecciona Administrador General o su jefatura e ingresa su clave corta. La sesion se valida contra Appwrite Auth.
 4. El sistema muestra solo los modulos permitidos para su rol.
-5. Pako y Carmen pueden revisar el dashboard ejecutivo, Panel Carmen, Gerencias, reportes, kanban y calendario.
+5. Administrador General puede revisar el dashboard ejecutivo, Panel Carmen, Gerencias, reportes, kanban y calendario.
 6. Direccion General puede consultar dashboard ejecutivo, reportes y calendario, sin edicion.
-7. Cada gerente puede capturar reportes y revisar informacion de su propia area.
+7. Cada jefatura puede capturar reportes y revisar informacion de su propia area.
 8. Los reportes capturados se guardan en Appwrite y alimentan tarjetas, tablas, bandejas de autorizacion, kanban y vistas por gerencia.
-9. Pako y Carmen pueden editar reportes, aprobar, rechazar, cerrar o marcar falta de evidencia.
+9. Administrador General puede editar reportes, aprobar, rechazar, cerrar o marcar falta de evidencia.
 10. Cada cambio relevante queda registrado en la tabla `bitacora` y puede consultarse desde el modulo Bitacora.
 11. Los reportes y bitacora pueden filtrarse y exportarse a CSV o enviarse a PDF/imprimir desde la interfaz.
 12. El usuario puede cerrar sesion desde el header superior.

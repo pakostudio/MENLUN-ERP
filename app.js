@@ -38,9 +38,10 @@ const USER_IDS_BY_AREA = {
 const ADMIN_USER_IDS = ["pako", "carmen"];
 const EXECUTIVE_USER_IDS = ["direccion"];
 const APPWRITE_PAUSED_MESSAGE = "Proyecto Appwrite pausado o sin conexión. Restaurar proyecto desde Appwrite Console antes de continuar.";
+const APPWRITE_AUTH_PASSWORD = "PMPS-Control360-2026!";
 
 const SYSTEM_USERS = [
-  { name: "Pako", role: "Administrador General", email: "pako@menlun.com", userId: "pako", access: "all", phone: "", whatsapp: "", pin: "" },
+  { name: "Administrador General", role: "Administrador General", email: "pako@menlun.com", userId: "pako", access: "all", phone: "", whatsapp: "", pin: "0000" },
   { name: "Carmen", role: "Acceso Total Operativo", email: "carmen@menlun.com", userId: "carmen", access: "all", phone: "", whatsapp: "", pin: "" },
   { name: "Direccion General", role: "Vista Ejecutiva", email: "direccion@menlun.com", userId: "direccion", access: "executive", phone: "", whatsapp: "", pin: "" },
 ];
@@ -139,17 +140,25 @@ loginForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const email = userSelect.value.trim().toLowerCase();
   const secret = passwordInput.value.trim();
+  const accessEntry = loginDirectory().find((item) => item.email.toLowerCase() === email);
 
   if (!email) {
     loginError.textContent = "Selecciona un usuario o jefatura.";
     return;
   }
 
+  if (!accessEntry || secret !== accessEntry.pin) {
+    loginError.textContent = "Clave de acceso incorrecta.";
+    passwordInput.value = "";
+    passwordInput.focus();
+    return;
+  }
+
   try {
-    await loginWithAppwrite(email, secret);
+    await loginWithAppwrite(email, APPWRITE_AUTH_PASSWORD);
     await initializeAppData();
   } catch (error) {
-    loginError.textContent = error.isAppwriteUnavailable ? APPWRITE_PAUSED_MESSAGE : "Usuario o contraseña incorrectos.";
+    loginError.textContent = error.isAppwriteUnavailable ? APPWRITE_PAUSED_MESSAGE : "No se pudo iniciar sesión. Verifica conexión o cuenta activa.";
     passwordInput.value = "";
     passwordInput.focus();
     console.warn(error);
@@ -355,7 +364,9 @@ function buildUsers() {
 }
 
 function findUserProfile(email) {
-  return userProfiles.find((item) => item.email.toLowerCase() === email.toLowerCase() && item.status !== "Inactivo");
+  const normalizedEmail = email.toLowerCase();
+  return userProfiles.find((item) => item.email.toLowerCase() === normalizedEmail && item.status !== "Inactivo")
+    || loginDirectory().find((item) => item.email.toLowerCase() === normalizedEmail && item.status !== "Inactivo");
 }
 
 function populateLoginUsers() {
@@ -364,7 +375,7 @@ function populateLoginUsers() {
   const selected = userSelect.value;
   const entries = loginDirectory();
   userSelect.innerHTML = entries.map((item) => `
-    <option value="${escapeHtml(item.email)}">${escapeHtml(item.name)} - ${escapeHtml(item.role)}${item.area ? ` / ${escapeHtml(labelForArea(item.area))}` : ""}</option>
+    <option value="${escapeHtml(item.email)}">${escapeHtml(item.name)}${item.area ? ` / ${escapeHtml(labelForArea(item.area))}` : ""} - Clave ${escapeHtml(item.pin)}</option>
   `).join("");
 
   if (selected && entries.some((item) => item.email === selected)) {
@@ -373,8 +384,20 @@ function populateLoginUsers() {
 }
 
 function loginDirectory() {
-  const baseUsers = userProfiles.length ? userProfiles : buildUsers();
-  const leadershipUsers = jefaturas.map((item) => ({
+  const adminUser = {
+    name: "Administrador General",
+    role: "Administrador General",
+    email: "pako@menlun.com",
+    userId: "pako",
+    access: "all",
+    area: "",
+    status: "Activo",
+    phone: "",
+    whatsapp: "",
+    pin: "0000",
+  };
+
+  const leadershipUsers = jefaturas.map((item, index) => ({
     name: item.name,
     role: item.role || "Jefatura",
     email: item.user || item.email,
@@ -384,14 +407,13 @@ function loginDirectory() {
     status: item.status,
     phone: item.phone,
     whatsapp: item.whatsapp,
-    pin: "",
+    pin: String(index + 1).padStart(4, "0"),
   }));
 
-  const directory = [...baseUsers, ...leadershipUsers]
+  const directory = [adminUser, ...leadershipUsers]
     .filter((item) => item.email && item.status !== "Inactivo");
 
-  return Array.from(new Map(directory.map((item) => [item.email.toLowerCase(), item])).values())
-    .sort((a, b) => a.name.localeCompare(b.name, "es"));
+  return Array.from(new Map(directory.map((item) => [item.email.toLowerCase(), item])).values());
 }
 
 async function appwriteRequest(path, options = {}) {
@@ -1877,7 +1899,7 @@ function renderAdminPanel() {
         <div><p class="eyebrow">Usuarios</p><h3>Administración de accesos</h3></div>
         <button class="primary-button" type="button" data-action="new-user">Nuevo usuario</button>
       </div>
-      ${renderTable(["Nombre completo", "Correo", "Teléfono", "WhatsApp", "Rol", "Gerencia", "Clave/PIN", "Estatus", "Acción"], userProfiles.map((item) => [
+      ${renderTable(["Nombre completo", "Correo", "Teléfono", "WhatsApp", "Rol", "Gerencia", "Clave/PIN", "Estatus", "Acción"], loginDirectory().map((item) => [
         escapeHtml(item.name),
         escapeHtml(item.email),
         escapeHtml(item.phone || ""),
