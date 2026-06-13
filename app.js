@@ -35,15 +35,14 @@ const USER_IDS_BY_AREA = {
   Sistemas: "sistemas",
 };
 
-const ADMIN_USER_IDS = ["pako", "carmen"];
+const ADMIN_USER_IDS = ["pako"];
 const EXECUTIVE_USER_IDS = ["direccion"];
 const APPWRITE_PAUSED_MESSAGE = "Proyecto Appwrite pausado o sin conexión. Restaurar proyecto desde Appwrite Console antes de continuar.";
 const APPWRITE_AUTH_PASSWORD = "PMPS-Control360-2026!";
 
 const SYSTEM_USERS = [
   { name: "Administrador General", role: "Administrador General", email: "pako@menlun.com", userId: "pako", access: "all", phone: "", whatsapp: "", pin: "0000" },
-  { name: "Carmen", role: "Acceso Total Operativo", email: "carmen@menlun.com", userId: "carmen", access: "all", phone: "", whatsapp: "", pin: "" },
-  { name: "Direccion General", role: "Vista Ejecutiva", email: "direccion@menlun.com", userId: "direccion", access: "executive", phone: "", whatsapp: "", pin: "" },
+  { name: "Dirección General", role: "Vista Ejecutiva", email: "direccion@menlun.com", userId: "direccion", access: "executive", phone: "", whatsapp: "", pin: "0099" },
 ];
 
 let appwriteOnline = false;
@@ -87,6 +86,68 @@ let auditLogs = [
 let tasks = [
   { rowId: "task-001", title: "Cargar evidencia de desviación", area: "Calidad", responsible: "Mariana Ruiz", priority: "alta", status: "vencida", due: "2026-06-04", reportId: "rep-002" },
   { rowId: "task-002", title: "Validar gasto de refacciones", area: "Produccion", responsible: "Luis Ortega", priority: "alta", status: "pendiente", due: "2026-06-06", reportId: "rep-001" },
+];
+
+const diagnosticBase = [
+  { section: "Organigrama", area: "Dirección", detail: "Estructura operativa con jefaturas funcionales y dependencia directa de Carmen para control operativo.", owner: "Administrador General", evidence: "organigrama-pmps.pdf", status: "en revision" },
+  { section: "Puestos", area: "Almacen", detail: "Roles operativos con responsabilidades mezcladas entre inventario, surtido y evidencias.", owner: "Moisés Prado", evidence: "descriptivos-almacen.docx", status: "pendiente" },
+  { section: "Procesos", area: "Logistica", detail: "Rutas y viáticos se capturan fuera de un flujo único de autorización.", owner: "Guillermo Nieto", evidence: "rutas-actuales.xlsx", status: "falta evidencia" },
+  { section: "Indicadores actuales", area: "Mantenimiento", detail: "Se mide cierre correctivo, pero no reincidencia ni tiempo muerto acumulado.", owner: "José Luis Sánchez", evidence: "indicadores-mantto.xlsx", status: "en revision" },
+  { section: "Problemas identificados", area: "Ventas", detail: "Descuentos especiales no siempre se conectan con rentabilidad final.", owner: "José Carlos González", evidence: "casos-comerciales.pdf", status: "pendiente" },
+];
+
+const interviews = [
+  { date: "2026-06-03", interviewed: "Moisés Prado", area: "Almacen", position: "Supervisor de Almacén", responsible: "Administrador General", functions: "Control de entradas, salidas, evidencias e inventario físico.", responsibilities: "Surtido correcto y conteos cíclicos.", problems: "Diferencias físicas y evidencias tardías.", risks: "Inventario incorrecto para compras y producción.", opportunities: "Tablero de diferencias y evidencia por movimiento.", ideas: "Escaneo móvil de evidencias.", needs: "Stock real, diferencias, pendientes.", automations: "Alertas por evidencia faltante.", golden: "Eliminar capturas duplicadas, evidencia manual y falta de visibilidad de diferencias." },
+  { date: "2026-06-04", interviewed: "Guillermo Nieto", area: "Logistica", position: "Jefe de Logística", responsible: "Administrador General", functions: "Programación de rutas, viáticos, entregas y comprobación.", responsibilities: "Cumplir entregas con costo controlado.", problems: "Gastos fuera de presupuesto y comprobaciones tardías.", risks: "Sobrecostos y reclamos de clientes.", opportunities: "Control por ruta y costo por entrega.", ideas: "Flujo de autorización de gastos extraordinarios.", needs: "Viáticos, rutas, evidencias, costo.", automations: "Recordatorio de comprobación.", golden: "Eliminar rutas urgentes sin autorización, evidencias incompletas y falta de presupuesto visible." },
+  { date: "2026-06-05", interviewed: "José Luis Sánchez", area: "Mantenimiento", position: "Jefe de Mantenimiento", responsible: "Administrador General", functions: "Atención correctiva, preventivos y proveedores.", responsibilities: "Reducir paros y reincidencias.", problems: "Correctivos críticos sin evidencia completa.", risks: "Paro operativo y costos urgentes.", opportunities: "Matriz de criticidad y plan preventivo.", ideas: "Bitácora por equipo.", needs: "Reincidencia, costo, tiempo muerto.", automations: "Alertas de vencimiento preventivo.", golden: "Eliminar urgencias repetidas, falta de refacciones y reportes sin diagnóstico." },
+  { date: "2026-06-06", interviewed: "José Carlos González", area: "Ventas", position: "Jefe de Ventas", responsible: "Administrador General", functions: "Seguimiento comercial, descuentos y clientes clave.", responsibilities: "Vender con rentabilidad.", problems: "Solicitudes comerciales no conectadas a margen.", risks: "Descuentos que erosionan utilidad.", opportunities: "Aprobación por impacto financiero.", ideas: "Semáforo de rentabilidad por solicitud.", needs: "Margen, descuentos, volumen, autorización.", automations: "Ruta de aprobación comercial.", golden: "Eliminar descuentos sin trazabilidad, tiempos largos de respuesta y falta de impacto financiero." },
+];
+
+const painMap = [
+  { category: "Procesos", description: "Evidencias operativas se cargan tarde o incompletas.", area: "Almacen", impact: "Afecta control de inventario y auditoría.", frequency: "Alta", priority: "alta", owner: "Moisés Prado", signal: "rojo" },
+  { category: "Finanzas", description: "Gastos logísticos extraordinarios sin presupuesto visible.", area: "Logistica", impact: "Eleva costo por ruta.", frequency: "Media", priority: "alta", owner: "Guillermo Nieto", signal: "rojo" },
+  { category: "Operación", description: "Correctivos críticos se atienden sin causa raíz documentada.", area: "Mantenimiento", impact: "Riesgo de reincidencia.", frequency: "Alta", priority: "alta", owner: "José Luis Sánchez", signal: "rojo" },
+  { category: "Comunicación", description: "Acuerdos de reunión no siempre llegan a seguimiento formal.", area: "Dirección", impact: "Pérdida de trazabilidad.", frequency: "Media", priority: "media", owner: "Administrador General", signal: "amarillo" },
+  { category: "Tecnología", description: "Información clave está dispersa en archivos y mensajes.", area: "Todas", impact: "Retrasa decisiones de Carmen y Dirección.", frequency: "Alta", priority: "alta", owner: "Administrador General", signal: "rojo" },
+];
+
+const executiveFindings = [
+  { finding: "Control operativo disperso", rootCause: "No existe tablero único de compromisos, evidencias y riesgos.", risk: "Dirección decide con información incompleta.", impact: "Alto", area: "Todas", priority: "alta", owner: "Administrador General" },
+  { finding: "Evidencias faltantes", rootCause: "La comprobación no está integrada al seguimiento.", risk: "Auditoría débil y retrasos.", impact: "Alto", area: "Almacen", priority: "alta", owner: "Moisés Prado" },
+  { finding: "Gasto extraordinario reactivo", rootCause: "Autorización posterior al evento.", risk: "Sobrecosto no controlado.", impact: "Alto", area: "Logistica", priority: "alta", owner: "Guillermo Nieto" },
+  { finding: "Mantenimiento sin causa raíz", rootCause: "Se registra la atención, no el diagnóstico.", risk: "Reincidencia de fallas críticas.", impact: "Alto", area: "Mantenimiento", priority: "alta", owner: "José Luis Sánchez" },
+];
+
+const strategies = [
+  { objective: "Centralizar control de evidencias", expected: "100% de reportes críticos con evidencia", owner: "Administrador General", kpi: "Evidencias completas", start: "2026-06-10", end: "2026-07-10", budget: 0, finding: "Evidencias faltantes" },
+  { objective: "Reducir gasto extraordinario logístico", expected: "Bajar 15% gasto fuera de presupuesto", owner: "Guillermo Nieto", kpi: "Costo por ruta", start: "2026-06-12", end: "2026-07-30", budget: 35000, finding: "Gasto extraordinario reactivo" },
+  { objective: "Diagnosticar fallas críticas con causa raíz", expected: "Cero correctivos críticos sin diagnóstico", owner: "José Luis Sánchez", kpi: "Reincidencia crítica", start: "2026-06-14", end: "2026-08-01", budget: 50000, finding: "Mantenimiento sin causa raíz" },
+];
+
+const workPlan = [
+  { action: "Definir checklist de evidencia por área", owner: "Administrador General", start: "2026-06-10", due: "2026-06-17", priority: "alta", evidence: "checklist-evidencias.xlsx", status: "en revision", view: "Kanban" },
+  { action: "Mapear ruta de autorización de viáticos", owner: "Guillermo Nieto", start: "2026-06-12", due: "2026-06-20", priority: "alta", evidence: "", status: "pendiente", view: "Timeline" },
+  { action: "Crear bitácora de causa raíz por equipo crítico", owner: "José Luis Sánchez", start: "2026-06-14", due: "2026-06-22", priority: "alta", evidence: "", status: "falta evidencia", view: "Gantt" },
+  { action: "Validar semáforo comercial de descuentos", owner: "José Carlos González", start: "2026-06-16", due: "2026-06-28", priority: "media", evidence: "matriz-descuentos.xlsx", status: "en ejecucion", view: "Lista" },
+];
+
+const agreements = [
+  { agreement: "Toda evidencia crítica debe cargarse antes del cierre semanal.", owner: "Moisés Prado", due: "2026-06-17", evidence: "", status: "pendiente" },
+  { agreement: "Los gastos extraordinarios requieren justificación previa.", owner: "Guillermo Nieto", due: "2026-06-20", evidence: "formato-viaticos.pdf", status: "en revision" },
+  { agreement: "Cada falla crítica debe incluir causa raíz y acción preventiva.", owner: "José Luis Sánchez", due: "2026-06-22", evidence: "", status: "falta evidencia" },
+];
+
+const riskRegister = [
+  { risk: "Pausa de Appwrite Free por inactividad o política de plan", probability: "Media", impact: "Alto", mitigation: "Heartbeat reforzado y plan de migración/pago aprobado", owner: "Administrador General" },
+  { risk: "Evidencias pendientes en cierres semanales", probability: "Alta", impact: "Alto", mitigation: "Recordatorios y escalamiento automático", owner: "Moisés Prado" },
+  { risk: "Sobrecostos de logística no autorizados", probability: "Media", impact: "Alto", mitigation: "Ruta de autorización y presupuesto por ruta", owner: "Guillermo Nieto" },
+  { risk: "Reincidencia de fallas críticas", probability: "Alta", impact: "Alto", mitigation: "Causa raíz obligatoria y revisión de preventivos", owner: "José Luis Sánchez" },
+];
+
+const benefits = [
+  { saving: 42000, timeReduction: "8 horas semanales", incidentReduction: "12%", improvements: "Checklist de evidencias y tablero de seguimiento", financialImpact: 42000 },
+  { saving: 18000, timeReduction: "3 horas semanales", incidentReduction: "7%", improvements: "Control inicial de retrabajo en calidad", financialImpact: 18000 },
+  { saving: 65000, timeReduction: "10 horas mensuales", incidentReduction: "15%", improvements: "Visibilidad de gasto extraordinario por ruta", financialImpact: 65000 },
 ];
 
 let jefaturas = [
@@ -202,7 +263,7 @@ logoutButton.addEventListener("click", async () => {
   document.body.classList.remove("is-app");
   document.body.classList.add("is-login");
   navButtons.forEach((item) => item.classList.remove("active"));
-  document.querySelector('[data-view="executive"]')?.classList.add("active");
+  document.querySelector('[data-view="diagnostic-base"]')?.classList.add("active");
   logoutButton.disabled = false;
 });
 
@@ -375,7 +436,7 @@ function populateLoginUsers() {
   const selected = userSelect.value;
   const entries = loginDirectory();
   userSelect.innerHTML = entries.map((item) => `
-    <option value="${escapeHtml(item.email)}">${escapeHtml(item.name)}${item.area ? ` / ${escapeHtml(labelForArea(item.area))}` : ""} - Clave ${escapeHtml(item.pin)}</option>
+    <option value="${escapeHtml(item.email)}">${escapeHtml(loginOptionLabel(item))}</option>
   `).join("");
 
   if (selected && entries.some((item) => item.email === selected)) {
@@ -397,6 +458,19 @@ function loginDirectory() {
     pin: "0000",
   };
 
+  const directionUser = {
+    name: "Dirección General",
+    role: "Vista Ejecutiva",
+    email: "direccion@menlun.com",
+    userId: "direccion",
+    access: "executive",
+    area: "",
+    status: "Activo",
+    phone: "",
+    whatsapp: "",
+    pin: "0099",
+  };
+
   const leadershipUsers = jefaturas.map((item, index) => ({
     name: item.name,
     role: item.role || "Jefatura",
@@ -410,10 +484,16 @@ function loginDirectory() {
     pin: String(index + 1).padStart(4, "0"),
   }));
 
-  const directory = [adminUser, ...leadershipUsers]
+  const directory = [adminUser, directionUser, ...leadershipUsers]
     .filter((item) => item.email && item.status !== "Inactivo");
 
   return Array.from(new Map(directory.map((item) => [item.email.toLowerCase(), item])).values());
+}
+
+function loginOptionLabel(item) {
+  if (item.access === "all") return "Administrador General";
+  if (item.access === "executive") return "Dirección General";
+  return `${item.name} / ${labelForArea(item.area)}`;
 }
 
 async function appwriteRequest(path, options = {}) {
@@ -1432,7 +1512,10 @@ function applyVisibilityRules() {
   });
 
   navButtons.forEach((button) => {
-    if (button.dataset.view === "carmen") button.hidden = !hasFullAccess();
+    button.hidden = false;
+    if (button.hasAttribute("data-admin-only") && !hasFullAccess()) button.hidden = true;
+    if (button.dataset.view === "carmen") button.hidden = !(hasFullAccess() || activeUser.access === "executive");
+    if (button.dataset.view === "direction-dashboard") button.hidden = activeUser.access === "area";
     if (button.dataset.view === "capture") {
       button.hidden = false;
       button.textContent = activeUser.access === "executive" ? "Reportes" : "Captura de reportes";
@@ -1440,20 +1523,26 @@ function applyVisibilityRules() {
       button.dataset.area = activeUser.access === "executive" ? "Consulta ejecutiva" : "Reportes";
     }
     if (button.dataset.view === "kanban") button.hidden = activeUser.access === "executive";
-    if (button.dataset.view === "central") button.hidden = false;
     if (button.dataset.view === "executive" && activeUser.access === "area") button.hidden = true;
     if (button.dataset.view === "area" && activeUser.access === "executive") button.hidden = true;
     if (button.dataset.view === "area" && activeUser.access === "area") {
       button.hidden = button.dataset.areaKey !== activeUser.area;
     }
+    if (["diagnostic-base", "interviews", "pain-map", "executive-diagnosis", "strategy", "work-plan", "follow-up", "agreements", "risks", "benefits"].includes(button.dataset.view) && activeUser.access === "area") {
+      button.hidden = false;
+    }
   });
 }
 
 function navigateInitialView() {
-  let target = document.querySelector('[data-view="executive"]');
+  let target = document.querySelector('[data-view="diagnostic-base"]');
 
   if (activeUser.access === "area") {
-    target = document.querySelector(`[data-view="area"][data-area-key="${activeUser.area}"]`);
+    target = document.querySelector('[data-view="follow-up"]');
+  }
+
+  if (activeUser.access === "executive") {
+    target = document.querySelector('[data-view="direction-dashboard"]');
   }
 
   navButtons.forEach((item) => item.classList.remove("active"));
@@ -1465,6 +1554,17 @@ function navigate(view, title, area, areaKey) {
   moduleTitle.textContent = title;
   moduleArea.textContent = area;
 
+  if (view === "diagnostic-base") renderDiagnosticBase();
+  if (view === "interviews") renderInterviews();
+  if (view === "pain-map") renderPainMap();
+  if (view === "executive-diagnosis") renderExecutiveDiagnosis();
+  if (view === "strategy") renderStrategy();
+  if (view === "work-plan") renderWorkPlan();
+  if (view === "follow-up") renderFollowUp();
+  if (view === "agreements") renderAgreements();
+  if (view === "risks") renderRisks();
+  if (view === "benefits") renderBenefits();
+  if (view === "direction-dashboard") renderDirectionDashboard();
   if (view === "executive") renderExecutiveDashboard();
   if (view === "carmen") renderCarmenPanel();
   if (view === "capture") renderCaptureForm(areaKey);
@@ -1495,6 +1595,24 @@ function visibleLeadership() {
 function visibleTasks() {
   if (!activeUser || activeUser.access === "all" || activeUser.access === "executive") return tasks;
   return tasks.filter((task) => task.area === activeUser.area);
+}
+
+function visibleWorkPlan() {
+  if (!activeUser || activeUser.access === "all" || activeUser.access === "executive") return workPlan;
+  const leadership = jefaturas.find((item) => item.area === activeUser.area);
+  return workPlan.filter((item) => item.owner === activeUser.name || item.owner === leadership?.name);
+}
+
+function visibleAgreements() {
+  if (!activeUser || activeUser.access === "all" || activeUser.access === "executive") return agreements;
+  const leadership = jefaturas.find((item) => item.area === activeUser.area);
+  return agreements.filter((item) => item.owner === activeUser.name || item.owner === leadership?.name);
+}
+
+function visibleRisks() {
+  if (!activeUser || activeUser.access === "all" || activeUser.access === "executive") return riskRegister;
+  const leadership = jefaturas.find((item) => item.area === activeUser.area);
+  return riskRegister.filter((item) => item.owner === activeUser.name || item.owner === leadership?.name);
 }
 
 function areaReports(area) {
@@ -1731,6 +1849,292 @@ function dateStamp() {
   return new Date().toISOString().slice(0, 10);
 }
 
+function visibleByArea(items, areaKey = "area") {
+  if (!activeUser || activeUser.access !== "area") return items;
+  return items.filter((item) => item[areaKey] === activeUser.area || item[areaKey] === labelForArea(activeUser.area) || item[areaKey] === "Todas");
+}
+
+function renderDiagnosticBase() {
+  const items = visibleByArea(diagnosticBase);
+  appContent.innerHTML = `
+    ${sectionHeading("Diagnóstico base", "Situación actual documentada", scopeText())}
+    <section class="executive-grid">
+      ${metricCard("Elementos documentados", items.length)}
+      ${metricCard("Problemas identificados", diagnosticBase.filter((item) => item.section === "Problemas identificados").length)}
+      ${metricCard("Evidencias adjuntas", items.filter((item) => item.evidence).length)}
+      ${metricCard("Pendientes", items.filter((item) => item.status === "pendiente" || item.status === "falta evidencia").length)}
+    </section>
+    <section class="content-card">
+      <div class="section-heading section-heading-compact"><div><p class="eyebrow">Levantamiento</p><h3>Organigrama, puestos, procesos, reportes e indicadores</h3></div></div>
+      ${renderTable(["Bloque", "Área", "Situación actual / observaciones", "Responsable", "Adjunto", "Estatus"], items.map((item) => [
+        item.section,
+        labelForArea(areaKeyFromLabel(item.area)),
+        item.detail,
+        item.owner,
+        evidenceCell(item.evidence),
+        statusBadge(item.status),
+      ]))}
+    </section>
+  `;
+}
+
+function renderInterviews() {
+  const items = visibleByArea(interviews);
+  appContent.innerHTML = `
+    ${sectionHeading("Entrevistas", "Levantamiento con jefaturas y responsables", scopeText())}
+    <section class="executive-grid">
+      ${metricCard("Entrevistas", items.length)}
+      ${metricCard("Áreas cubiertas", uniqueValues(items.map((item) => item.area)).length)}
+      ${metricCard("Riesgos levantados", items.filter((item) => item.risks).length)}
+      ${metricCard("Automatizaciones sugeridas", items.filter((item) => item.automations).length)}
+    </section>
+    <section class="content-card">
+      ${renderTable(["Fecha", "Entrevistado", "Área", "Puesto", "Responsable", "Funciones", "Problemas", "Riesgos", "Oportunidades", "Pregunta de oro"], items.map((item) => [
+        item.date,
+        item.interviewed,
+        labelForArea(areaKeyFromLabel(item.area)),
+        item.position,
+        item.responsible,
+        item.functions,
+        item.problems,
+        item.risks,
+        item.opportunities,
+        item.golden,
+      ]), "wide-table")}
+    </section>
+  `;
+}
+
+function renderPainMap() {
+  const items = visibleByArea(painMap);
+  appContent.innerHTML = `
+    ${sectionHeading("Mapa de dolor", "Problemas estructurados desde entrevistas", scopeText())}
+    <section class="executive-grid">
+      ${metricCard("Dolores registrados", items.length)}
+      ${metricCard("Focos rojos", items.filter((item) => item.signal === "rojo").length)}
+      ${metricCard("Procesos", items.filter((item) => item.category === "Procesos").length)}
+      ${metricCard("Tecnología", items.filter((item) => item.category === "Tecnología").length)}
+    </section>
+    <section class="content-card">
+      ${renderTable(["Clasificación", "Descripción", "Área afectada", "Impacto", "Frecuencia", "Prioridad", "Responsable", "Semáforo"], items.map((item) => [
+        item.category,
+        item.description,
+        labelForArea(areaKeyFromLabel(item.area)),
+        item.impact,
+        item.frequency,
+        priorityBadge(item.priority),
+        item.owner,
+        trafficBadge(item.signal, titleCase(item.signal)),
+      ]))}
+    </section>
+  `;
+}
+
+function renderExecutiveDiagnosis() {
+  const items = visibleByArea(executiveFindings);
+  appContent.innerHTML = `
+    ${sectionHeading("Diagnóstico ejecutivo", "Hallazgos, causas raíz e impacto", scopeText())}
+    <section class="executive-grid">
+      ${metricCard("Hallazgos", items.length)}
+      ${metricCard("Prioridad alta", items.filter((item) => item.priority === "alta").length)}
+      ${metricCard("Riesgos críticos", riskRegister.filter((item) => riskSignal(item) === "rojo").length)}
+      ${metricCard("Áreas impactadas", uniqueValues(items.map((item) => item.area)).length)}
+    </section>
+    <section class="content-card">
+      ${renderTable(["Hallazgo", "Causa raíz", "Riesgo", "Impacto", "Área", "Prioridad", "Responsable"], items.map((item) => [
+        item.finding,
+        item.rootCause,
+        item.risk,
+        item.impact,
+        labelForArea(areaKeyFromLabel(item.area)),
+        priorityBadge(item.priority),
+        item.owner,
+      ]))}
+    </section>
+  `;
+}
+
+function renderStrategy() {
+  const leadership = jefaturas.find((item) => item.area === activeUser?.area);
+  const visible = activeUser.access === "area"
+    ? strategies.filter((item) => item.owner === activeUser.name || item.owner === leadership?.name)
+    : strategies;
+  appContent.innerHTML = `
+    ${sectionHeading("Estrategia", "Cada hallazgo convertido en objetivo, KPI y presupuesto", scopeText())}
+    <section class="executive-grid">
+      ${metricCard("Estrategias", visible.length)}
+      ${metricCard("Presupuesto", formatCurrency(sum(visible, "budget")))}
+      ${metricCard("KPIs definidos", visible.filter((item) => item.kpi).length)}
+      ${metricCard("En ejecución", visible.filter((item) => item.start <= todayIsoDate()).length)}
+    </section>
+    <section class="content-card">
+      ${renderTable(["Hallazgo", "Objetivo", "Resultado esperado", "Responsable", "KPI", "Inicio", "Fin", "Presupuesto"], visible.map((item) => [
+        item.finding,
+        item.objective,
+        item.expected,
+        item.owner,
+        item.kpi,
+        item.start,
+        item.end,
+        formatCurrency(item.budget),
+      ]))}
+    </section>
+  `;
+}
+
+function renderWorkPlan() {
+  const items = visibleWorkPlan();
+  const columns = ["pendiente", "en revision", "falta evidencia", "en ejecucion", "cerrado"];
+  appContent.innerHTML = `
+    ${sectionHeading("Plan de trabajo", "Acciones derivadas de la estrategia", scopeText())}
+    <section class="executive-grid">
+      ${metricCard("Acciones", items.length)}
+      ${metricCard("Vencidas", items.filter((item) => item.due < todayIsoDate() && !["cerrado", "aprobado"].includes(item.status)).length)}
+      ${metricCard("Sin evidencia", items.filter((item) => !item.evidence).length)}
+      ${metricCard("Críticas", items.filter((item) => item.priority === "alta").length)}
+    </section>
+    <section class="content-card">
+      <div class="view-strip">${["Kanban", "Calendario", "Timeline", "Gantt", "Lista"].map((item) => `<span>${item}</span>`).join("")}</div>
+      ${renderTable(["Acción", "Responsable", "Inicio", "Compromiso", "Prioridad", "Evidencia", "Estado", "Vista"], items.map((item) => [
+        item.action,
+        item.owner,
+        item.start,
+        item.due,
+        priorityBadge(item.priority),
+        evidenceCell(item.evidence),
+        statusBadge(item.status),
+        item.view,
+      ]))}
+    </section>
+    <section class="kanban-board">
+      ${columns.map((status) => `
+        <article class="kanban-column">
+          <h3>${titleCase(status)}</h3>
+          ${items.filter((item) => item.status === status).map((item) => `<div class="kanban-card"><strong>${item.action}</strong><span>${item.owner}</span><small>${priorityBadge(item.priority)} ${item.due}</small></div>`).join("") || `<p class="muted-copy">Sin registros</p>`}
+        </article>
+      `).join("")}
+    </section>
+  `;
+}
+
+function renderFollowUp() {
+  const planItems = visibleWorkPlan();
+  const agreementItems = visibleAgreements();
+  const overdue = [...planItems, ...agreementItems].filter((item) => item.due < todayIsoDate() && !["cerrado", "aprobado"].includes(item.status));
+  const next = [...planItems, ...agreementItems].filter((item) => item.due >= todayIsoDate() && item.due <= addDaysIso(7));
+  const missingEvidence = [...planItems, ...agreementItems].filter((item) => !item.evidence || item.status === "falta evidencia");
+  appContent.innerHTML = `
+    ${sectionHeading("Seguimiento", "Control de ejecución y vencimientos", scopeText())}
+    <section class="executive-grid">
+      ${metricCard("Actividades vencidas", overdue.length)}
+      ${metricCard("Próximas a vencer", next.length)}
+      ${metricCard("Críticas", planItems.filter((item) => item.priority === "alta").length)}
+      ${metricCard("Terminadas", planItems.filter((item) => ["cerrado", "aprobado"].includes(item.status)).length)}
+      ${metricCard("Sin evidencia", missingEvidence.length)}
+    </section>
+    <section class="content-card">
+      ${renderTable(["Tipo", "Actividad / acuerdo", "Responsable", "Compromiso", "Prioridad", "Evidencia", "Estado"], [
+        ...planItems.map((item) => ["Plan", item.action, item.owner, item.due, priorityBadge(item.priority), evidenceCell(item.evidence), statusBadge(item.status)]),
+        ...agreementItems.map((item) => ["Acuerdo", item.agreement, item.owner, item.due, priorityBadge("media"), evidenceCell(item.evidence), statusBadge(item.status)]),
+      ])}
+    </section>
+  `;
+}
+
+function renderAgreements() {
+  const items = visibleAgreements();
+  appContent.innerHTML = `
+    ${sectionHeading("Acuerdos", "Compromisos integrados al seguimiento", scopeText())}
+    <section class="executive-grid">
+      ${metricCard("Acuerdos", items.length)}
+      ${metricCard("Pendientes", items.filter((item) => item.status === "pendiente").length)}
+      ${metricCard("Sin evidencia", items.filter((item) => !item.evidence).length)}
+      ${metricCard("Vencidos", items.filter((item) => item.due < todayIsoDate() && item.status !== "cerrado").length)}
+    </section>
+    <section class="content-card">
+      ${renderTable(["Acuerdo", "Responsable", "Fecha compromiso", "Evidencia", "Estado"], items.map((item) => [
+        item.agreement,
+        item.owner,
+        item.due,
+        evidenceCell(item.evidence),
+        statusBadge(item.status),
+      ]))}
+    </section>
+  `;
+}
+
+function renderRisks() {
+  const items = visibleRisks();
+  appContent.innerHTML = `
+    ${sectionHeading("Riesgos", "Probabilidad, impacto y mitigación", scopeText())}
+    <section class="executive-grid">
+      ${metricCard("Riesgos", items.length)}
+      ${metricCard("Críticos", items.filter((item) => riskSignal(item) === "rojo").length)}
+      ${metricCard("Medios", items.filter((item) => riskSignal(item) === "amarillo").length)}
+      ${metricCard("Mitigados", items.filter((item) => item.mitigation).length)}
+    </section>
+    <section class="content-card">
+      ${renderTable(["Riesgo", "Probabilidad", "Impacto", "Plan de mitigación", "Responsable", "Semáforo"], items.map((item) => [
+        item.risk,
+        item.probability,
+        item.impact,
+        item.mitigation,
+        item.owner,
+        trafficBadge(riskSignal(item), titleCase(riskSignal(item))),
+      ]))}
+    </section>
+  `;
+}
+
+function renderBenefits() {
+  const totalSavings = sum(benefits, "saving");
+  const totalImpact = sum(benefits, "financialImpact");
+  appContent.innerHTML = `
+    ${sectionHeading("Beneficios obtenidos", "Impacto financiero y operativo generado", scopeText())}
+    <section class="executive-grid">
+      ${metricCard("Ahorro generado", formatCurrency(totalSavings))}
+      ${metricCard("Impacto financiero", formatCurrency(totalImpact))}
+      ${metricCard("Mejoras implementadas", benefits.length)}
+      ${metricCard("Reducción de incidencias", "Hasta 15%")}
+    </section>
+    <section class="content-card">
+      ${renderTable(["Ahorro generado", "Reducción de tiempos", "Reducción de incidencias", "Mejoras implementadas", "Impacto financiero"], benefits.map((item) => [
+        formatCurrency(item.saving),
+        item.timeReduction,
+        item.incidentReduction,
+        item.improvements,
+        formatCurrency(item.financialImpact),
+      ]))}
+    </section>
+  `;
+}
+
+function renderDirectionDashboard() {
+  const planItems = workPlan;
+  const compliance = planItems.length ? Math.round((planItems.filter((item) => ["cerrado", "aprobado"].includes(item.status)).length / planItems.length) * 100) : 0;
+  appContent.innerHTML = `
+    ${sectionHeading("Dashboard Dirección", "Cumplimiento general, riesgos, avance y beneficios", "Vista ejecutiva")}
+    <section class="executive-grid">
+      ${metricCard("Cumplimiento general", `${compliance}%`)}
+      ${metricCard("KPIs activos", strategies.length)}
+      ${metricCard("Riesgos críticos", riskRegister.filter((item) => riskSignal(item) === "rojo").length)}
+      ${metricCard("Avance del plan", `${planItems.filter((item) => item.status === "en ejecucion").length}/${planItems.length}`)}
+      ${metricCard("Beneficios", formatCurrency(sum(benefits, "financialImpact")))}
+      ${metricCard("Focos rojos", painMap.filter((item) => item.signal === "rojo").length)}
+    </section>
+    <section class="content-card">
+      <div class="section-heading section-heading-compact"><div><p class="eyebrow">Resumen ejecutivo</p><h3>Hallazgos prioritarios</h3></div></div>
+      ${renderTable(["Hallazgo", "Causa raíz", "Impacto", "Responsable", "Prioridad"], executiveFindings.map((item) => [
+        item.finding,
+        item.rootCause,
+        item.impact,
+        item.owner,
+        priorityBadge(item.priority),
+      ]))}
+    </section>
+  `;
+}
+
 function renderExecutiveDashboard() {
   const items = visibleReports();
   const budgetUsed = sum(items.filter((item) => item.type === "gasto"), "amount");
@@ -1770,28 +2174,55 @@ function renderCarmenPanel(filters = {}) {
   const baseItems = visibleReports();
   const items = filterReports(baseItems, filters);
   const redLeadership = visibleLeadership().filter((item) => leadershipTrafficLight(item).level === "rojo").length;
+  const planItems = visibleWorkPlan();
+  const agreementItems = visibleAgreements();
+  const riskItems = visibleRisks();
+  const overdueActivities = [
+    ...planItems.filter((item) => item.due < todayIsoDate() && !["cerrado", "aprobado"].includes(item.status)),
+    ...agreementItems.filter((item) => item.due < todayIsoDate() && !["cerrado", "aprobado"].includes(item.status)),
+  ];
+  const missingEvidence = [
+    ...items.filter((item) => !item.evidence || item.status === "falta evidencia"),
+    ...planItems.filter((item) => !item.evidence || item.status === "falta evidencia"),
+    ...agreementItems.filter((item) => !item.evidence || item.status === "falta evidencia"),
+  ];
   appContent.innerHTML = `
-    ${sectionHeading("Panel Carmen", "Control ejecutivo de autorizaciones", scopeText())}
+    ${sectionHeading("Dashboard Carmen", "Focos rojos, vencimientos, riesgos y evidencias", scopeText())}
     <section class="executive-grid">
-      ${metricCard("Jefaturas en rojo", redLeadership)}
-      ${metricCard("Reportes pendientes", items.filter((item) => item.status === "pendiente").length)}
-      ${metricCard("Solicitudes por aprobar", items.filter((item) => item.type === "solicitud" && ["pendiente", "en revision"].includes(item.status)).length)}
+      ${metricCard("Focos rojos", painMap.filter((item) => item.signal === "rojo").length + redLeadership)}
+      ${metricCard("Actividades vencidas", overdueActivities.length)}
+      ${metricCard("Riesgos críticos", riskItems.filter((item) => riskSignal(item) === "rojo").length)}
+      ${metricCard("Jefaturas incumplidas", redLeadership)}
       ${metricCard("Gastos fuera de presupuesto", items.filter((item) => item.type === "gasto" && item.amount > 90000).length)}
-      ${metricCard("Incidencias críticas", items.filter((item) => item.type === "incidencia" && item.priority === "alta").length)}
-      ${metricCard("Evidencias faltantes", items.filter((item) => !item.evidence || item.status === "falta evidencia").length)}
-      ${metricCard("Tareas vencidas", items.filter((item) => item.due < todayIsoDate() && !["cerrado", "aprobado"].includes(item.status)).length)}
+      ${metricCard("Evidencias pendientes", missingEvidence.length)}
     </section>
     <section class="content-card">
-      <div class="section-heading section-heading-compact"><div><p class="eyebrow">Autorizaciones</p><h3>Bandeja de autorización</h3></div><span class="scope-pill">${items.length} reportes</span></div>
-      ${exportActions("reports", filters)}
-      ${renderReportFilters("carmen", filters)}
-      ${renderTable(["Fecha", "Gerencia", "Responsable", "Tipo", "Monto", "Prioridad", "Estatus", "Acción"], items.map((item) => [
-        item.date, labelForArea(item.area), item.responsible, item.type, formatCurrency(item.amount), priorityBadge(item.priority), statusBadge(item.status), reportActions(item)
+      <div class="section-heading section-heading-compact"><div><p class="eyebrow">Control operativo</p><h3>Bandeja de focos críticos</h3></div><span class="scope-pill">${buildCarmenFocusRows(items).length} alertas</span></div>
+      ${renderTable(["Tipo", "Responsable", "Área", "Detalle", "Prioridad", "Estatus", "Acción"], buildCarmenFocusRows(items).map((item) => [
+        item.type, item.responsible, item.area, item.detail, item.priority, item.status, item.action
       ]))}
     </section>
   `;
+}
 
-  bindReportFilters("carmen", renderCarmenPanel);
+function buildCarmenFocusRows(items) {
+  const rows = [];
+  visibleLeadership().filter((item) => leadershipTrafficLight(item).level === "rojo").forEach((item) => {
+    rows.push({ type: "Jefatura incumplida", responsible: item.name, area: labelForArea(item.area), detail: leadershipTrafficLight(item).label, priority: priorityBadge("alta"), status: trafficBadge("rojo", "Rojo"), action: quickActionButtons(item.rowId) });
+  });
+  visibleRisks().filter((item) => riskSignal(item) === "rojo").forEach((item) => {
+    rows.push({ type: "Riesgo crítico", responsible: item.owner, area: "Control", detail: item.risk, priority: priorityBadge("alta"), status: trafficBadge("rojo", "Rojo"), action: quickActionButtons(item.owner) });
+  });
+  visibleWorkPlan().filter((item) => item.due < todayIsoDate() || !item.evidence).forEach((item) => {
+    rows.push({ type: item.due < todayIsoDate() ? "Actividad vencida" : "Evidencia pendiente", responsible: item.owner, area: "Plan", detail: item.action, priority: priorityBadge(item.priority), status: statusBadge(item.status), action: quickActionButtons(item.owner) });
+  });
+  items.filter((item) => item.type === "gasto" && item.amount > 90000).forEach((item) => {
+    rows.push({ type: "Gasto fuera de presupuesto", responsible: item.responsible, area: labelForArea(item.area), detail: `${item.description} / ${formatCurrency(item.amount)}`, priority: priorityBadge("alta"), status: statusBadge(item.status), action: reportActions(item) });
+  });
+  items.filter((item) => !item.evidence || item.status === "falta evidencia").forEach((item) => {
+    rows.push({ type: "Evidencia pendiente", responsible: item.responsible, area: labelForArea(item.area), detail: item.description, priority: priorityBadge(item.priority), status: statusBadge(item.status), action: reportActions(item) });
+  });
+  return rows.slice(0, 40);
 }
 
 function renderCentralBoard() {
@@ -1866,13 +2297,20 @@ function renderAdminPanel() {
   const overBudgetReports = items.filter((item) => item.type === "gasto" && item.amount > 90000);
   const redLeadership = leadership.filter((item) => leadershipTrafficLight(item).level === "rojo");
   const repeatUsers = topBy(items.filter((item) => item.due < todayIsoDate()), "responsible").slice(0, 5);
+  const noReport = leadership.filter((item) => {
+    const areaRows = reports.filter((report) => report.area === item.area);
+    return !areaRows.length || !areaRows.some((report) => report.date >= "2026-06-01");
+  });
+  const pendingAgreements = visibleAgreements().filter((item) => item.status !== "cerrado");
 
   appContent.innerHTML = `
     ${sectionHeading("Panel administrador", "Control total de incumplimientos, alertas y acciones rápidas", appwriteOnline ? "Appwrite activo" : "Appwrite pausado")}
     <section class="executive-grid">
       ${metricCard("Usuarios incumplidos", uniqueValues(overdue.map((item) => item.responsible)).length)}
+      ${metricCard("Sin reporte reciente", noReport.length)}
       ${metricCard("Usuarios reincidentes", repeatUsers.length)}
       ${metricCard("Actividades vencidas", overdue.length + taskItems.filter((item) => item.due < todayIsoDate()).length)}
+      ${metricCard("Acuerdos pendientes", pendingAgreements.length)}
       ${metricCard("Reportes pendientes", items.filter((item) => item.status === "pendiente").length)}
       ${metricCard("Evidencias faltantes", missingEvidence.length)}
       ${metricCard("Gastos fuera de presupuesto", overBudgetReports.length)}
@@ -1893,6 +2331,13 @@ function renderAdminPanel() {
     <section class="content-card">
       <div class="section-heading section-heading-compact"><div><p class="eyebrow">Reincidencia</p><h3>Top responsables</h3></div></div>
       ${renderTable(["Responsable", "Eventos vencidos"], repeatUsers.map((item) => [item.label, item.count]))}
+    </section>
+    <section class="content-card">
+      <div class="section-heading section-heading-compact"><div><p class="eyebrow">Control administrativo</p><h3>Quién no ha reportado y acuerdos pendientes</h3></div></div>
+      ${renderTable(["Tipo", "Responsable", "Área", "Detalle", "Acción"], [
+        ...noReport.map((item) => ["Sin reporte", item.name, labelForArea(item.area), "No existe reporte reciente del mes en curso.", quickActionButtons(item.rowId)]),
+        ...pendingAgreements.map((item) => ["Acuerdo pendiente", item.owner, "Seguimiento", `${item.agreement} / vence ${item.due}`, quickActionButtons(item.owner)]),
+      ])}
     </section>
     <section class="content-card">
       <div class="section-heading section-heading-compact">
@@ -2385,6 +2830,14 @@ function leadershipTrafficLight(item) {
   if (hasOverdue || overBudget || compliance < 60) return { level: "rojo", label: "Riesgo crítico" };
   if (missingEvidence || compliance < 80) return { level: "amarillo", label: "Atención" };
   return { level: "verde", label: "En control" };
+}
+
+function riskSignal(item) {
+  const probability = normalizePlainText(item.probability);
+  const impact = normalizePlainText(item.impact);
+  if (impact === "alto" && ["alta", "media"].includes(probability)) return "rojo";
+  if (impact === "alto" || probability === "alta") return "amarillo";
+  return "verde";
 }
 
 function trafficBadge(level, label) {

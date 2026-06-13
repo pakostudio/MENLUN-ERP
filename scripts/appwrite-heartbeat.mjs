@@ -6,19 +6,20 @@ const config = {
   apiKey: process.env.APPWRITE_API_KEY,
 };
 
-const adminPermissions = [
+const runMeta = {
+  repository: process.env.GITHUB_REPOSITORY || "local",
+  runId: process.env.GITHUB_RUN_ID || "local",
+  attempt: process.env.GITHUB_RUN_ATTEMPT || "1",
+};
+
+const heartbeatPermissions = [
   'read("user:pako")',
-  'read("user:carmen")',
   'update("user:pako")',
-  'update("user:carmen")',
   'delete("user:pako")',
-  'delete("user:carmen")',
 ];
 
 function requireEnv(value, name) {
-  if (!value) {
-    throw new Error(`Falta configurar ${name}.`);
-  }
+  if (!value) throw new Error(`Falta configurar ${name}.`);
 }
 
 async function appwriteRequest(path, options = {}) {
@@ -37,46 +38,84 @@ async function appwriteRequest(path, options = {}) {
   const data = text ? JSON.parse(text) : {};
 
   if (!response.ok) {
-    throw new Error(data.message || `Error Appwrite ${response.status}`);
+    const error = new Error(data.message || `Error Appwrite ${response.status}`);
+    error.status = response.status;
+    error.type = data.type || "";
+    throw error;
   }
 
   return data;
 }
 
-async function main() {
-  requireEnv(config.apiKey, "APPWRITE_API_KEY");
+function heartbeatData(now, mode) {
+  return {
+    fecha: now.toISOString(),
+    usuario: "Sistema",
+    rol: "Rutina operativa",
+    accion: mode,
+    reporteId: runMeta.runId,
+    gerencia: "Todas",
+    detalle: `Control de salud MENLUN Control 360. Repo=${runMeta.repository}. Intento=${runMeta.attempt}.`,
+  };
+}
 
-  const now = new Date();
-  const rowId = `heartbeat-${now.toISOString().slice(0, 10)}`;
+async function assertProjectActive() {
+  const project = await appwriteRequest("/project");
+  if (project.status && project.status !== "active") {
+    throw new Error(`Proyecto Appwrite no activo. Estado actual: ${project.status}.`);
+  }
+  console.log(`Proyecto activo: ${project.name || config.projectId}`);
+}
 
+async function upsertLatest(now) {
+  const rowId = "heartbeat-latest";
+  const body = {
+    data: heartbeatData(now, "heartbeat-latest"),
+    permissions: heartbeatPermissions,
+  };
+
+  try {
+    await appwriteRequest(`/tablesdb/${config.databaseId}/tables/${config.tableId}/rows/${rowId}`, {
+      method: "PATCH",
+      body,
+    });
+    console.log("Heartbeat latest actualizado.");
+  } catch (error) {
+    if (Number(error.status) !== 404) throw error;
+    await appwriteRequest(`/tablesdb/${config.databaseId}/tables/${config.tableId}/rows`, {
+      method: "POST",
+      body: { rowId, ...body },
+    });
+    console.log("Heartbeat latest creado.");
+  }
+}
+
+async function createHistory(now) {
+  const rowId = `heartbeat-${Date.now().toString(36)}`;
   await appwriteRequest(`/tablesdb/${config.databaseId}/tables/${config.tableId}/rows`, {
     method: "POST",
     body: {
       rowId,
-      permissions: adminPermissions,
-      data: {
-        fecha: now.toISOString(),
-        usuario: "Sistema",
-        rol: "Rutina operativa",
-        accion: "heartbeat",
-        reporteId: "",
-        gerencia: "Todas",
-        detalle: "Rutina diaria de salud para MENLUN Control 360.",
-      },
+      permissions: heartbeatPermissions,
+      data: heartbeatData(now, "heartbeat"),
     },
   });
+  console.log(`Heartbeat histórico registrado: ${rowId}`);
+}
 
-  console.log(`Heartbeat registrado: ${rowId}`);
+async function main() {
+  requireEnv(config.apiKey, "APPWRITE_API_KEY");
+  const now = new Date();
+  await assertProjectActive();
+  await upsertLatest(now);
+  await createHistory(now);
 }
 
 main().catch((error) => {
-  const alreadyExists = String(error.message || "").toLowerCase().includes("already exists");
-
-  if (alreadyExists) {
-    console.log("Heartbeat diario ya estaba registrado.");
-    process.exit(0);
+  if (error.type === "project_paused" || String(error.message).toLowerCase().includes("paused")) {
+    console.error("El proyecto Appwrite está pausado. El heartbeat no puede reactivar un proyecto ya pausado desde Free.");
+  } else {
+    console.error(error.message);
   }
-
-  console.error(error.message);
   process.exit(1);
 });
