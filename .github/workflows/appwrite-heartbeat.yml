@@ -2,8 +2,15 @@ name: Appwrite heartbeat
 
 on:
   schedule:
-    - cron: "0 14 * * *"
+    - cron: "17 */6 * * *"
   workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: appwrite-heartbeat
+  cancel-in-progress: false
 
 jobs:
   heartbeat:
@@ -25,4 +32,5 @@ jobs:
           APPWRITE_ENDPOINT: https://nyc.cloud.appwrite.io/v1
           APPWRITE_PROJECT_ID: menlun-control-360
           APPWRITE_DATABASE_ID: menlun_control_360
+          APPWRITE_HEARTBEAT_TABLE_ID: bitacora
         run: node scripts/appwrite-heartbeat.mjs

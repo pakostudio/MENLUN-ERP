@@ -88,7 +88,7 @@ let tasks = [
   { rowId: "task-002", title: "Validar gasto de refacciones", area: "Produccion", responsible: "Luis Ortega", priority: "alta", status: "pendiente", due: "2026-06-06", reportId: "rep-001" },
 ];
 
-const diagnosticBase = [
+let diagnosticBase = [
   { section: "Organigrama", area: "Dirección", detail: "Estructura operativa con jefaturas funcionales y dependencia directa de Carmen para control operativo.", owner: "Administrador General", evidence: "organigrama-pmps.pdf", status: "en revision" },
   { section: "Puestos", area: "Almacen", detail: "Roles operativos con responsabilidades mezcladas entre inventario, surtido y evidencias.", owner: "Moisés Prado", evidence: "descriptivos-almacen.docx", status: "pendiente" },
   { section: "Procesos", area: "Logistica", detail: "Rutas y viáticos se capturan fuera de un flujo único de autorización.", owner: "Guillermo Nieto", evidence: "rutas-actuales.xlsx", status: "falta evidencia" },
@@ -96,14 +96,14 @@ const diagnosticBase = [
   { section: "Problemas identificados", area: "Ventas", detail: "Descuentos especiales no siempre se conectan con rentabilidad final.", owner: "José Carlos González", evidence: "casos-comerciales.pdf", status: "pendiente" },
 ];
 
-const interviews = [
+let interviews = [
   { date: "2026-06-03", interviewed: "Moisés Prado", area: "Almacen", position: "Supervisor de Almacén", responsible: "Administrador General", functions: "Control de entradas, salidas, evidencias e inventario físico.", responsibilities: "Surtido correcto y conteos cíclicos.", problems: "Diferencias físicas y evidencias tardías.", risks: "Inventario incorrecto para compras y producción.", opportunities: "Tablero de diferencias y evidencia por movimiento.", ideas: "Escaneo móvil de evidencias.", needs: "Stock real, diferencias, pendientes.", automations: "Alertas por evidencia faltante.", golden: "Eliminar capturas duplicadas, evidencia manual y falta de visibilidad de diferencias." },
   { date: "2026-06-04", interviewed: "Guillermo Nieto", area: "Logistica", position: "Jefe de Logística", responsible: "Administrador General", functions: "Programación de rutas, viáticos, entregas y comprobación.", responsibilities: "Cumplir entregas con costo controlado.", problems: "Gastos fuera de presupuesto y comprobaciones tardías.", risks: "Sobrecostos y reclamos de clientes.", opportunities: "Control por ruta y costo por entrega.", ideas: "Flujo de autorización de gastos extraordinarios.", needs: "Viáticos, rutas, evidencias, costo.", automations: "Recordatorio de comprobación.", golden: "Eliminar rutas urgentes sin autorización, evidencias incompletas y falta de presupuesto visible." },
   { date: "2026-06-05", interviewed: "José Luis Sánchez", area: "Mantenimiento", position: "Jefe de Mantenimiento", responsible: "Administrador General", functions: "Atención correctiva, preventivos y proveedores.", responsibilities: "Reducir paros y reincidencias.", problems: "Correctivos críticos sin evidencia completa.", risks: "Paro operativo y costos urgentes.", opportunities: "Matriz de criticidad y plan preventivo.", ideas: "Bitácora por equipo.", needs: "Reincidencia, costo, tiempo muerto.", automations: "Alertas de vencimiento preventivo.", golden: "Eliminar urgencias repetidas, falta de refacciones y reportes sin diagnóstico." },
   { date: "2026-06-06", interviewed: "José Carlos González", area: "Ventas", position: "Jefe de Ventas", responsible: "Administrador General", functions: "Seguimiento comercial, descuentos y clientes clave.", responsibilities: "Vender con rentabilidad.", problems: "Solicitudes comerciales no conectadas a margen.", risks: "Descuentos que erosionan utilidad.", opportunities: "Aprobación por impacto financiero.", ideas: "Semáforo de rentabilidad por solicitud.", needs: "Margen, descuentos, volumen, autorización.", automations: "Ruta de aprobación comercial.", golden: "Eliminar descuentos sin trazabilidad, tiempos largos de respuesta y falta de impacto financiero." },
 ];
 
-const painMap = [
+let painMap = [
   { category: "Procesos", description: "Evidencias operativas se cargan tarde o incompletas.", area: "Almacen", impact: "Afecta control de inventario y auditoría.", frequency: "Alta", priority: "alta", owner: "Moisés Prado", signal: "rojo" },
   { category: "Finanzas", description: "Gastos logísticos extraordinarios sin presupuesto visible.", area: "Logistica", impact: "Eleva costo por ruta.", frequency: "Media", priority: "alta", owner: "Guillermo Nieto", signal: "rojo" },
   { category: "Operación", description: "Correctivos críticos se atienden sin causa raíz documentada.", area: "Mantenimiento", impact: "Riesgo de reincidencia.", frequency: "Alta", priority: "alta", owner: "José Luis Sánchez", signal: "rojo" },
@@ -111,44 +111,57 @@ const painMap = [
   { category: "Tecnología", description: "Información clave está dispersa en archivos y mensajes.", area: "Todas", impact: "Retrasa decisiones de Carmen y Dirección.", frequency: "Alta", priority: "alta", owner: "Administrador General", signal: "rojo" },
 ];
 
-const executiveFindings = [
+let executiveFindings = [
   { finding: "Control operativo disperso", rootCause: "No existe tablero único de compromisos, evidencias y riesgos.", risk: "Dirección decide con información incompleta.", impact: "Alto", area: "Todas", priority: "alta", owner: "Administrador General" },
   { finding: "Evidencias faltantes", rootCause: "La comprobación no está integrada al seguimiento.", risk: "Auditoría débil y retrasos.", impact: "Alto", area: "Almacen", priority: "alta", owner: "Moisés Prado" },
   { finding: "Gasto extraordinario reactivo", rootCause: "Autorización posterior al evento.", risk: "Sobrecosto no controlado.", impact: "Alto", area: "Logistica", priority: "alta", owner: "Guillermo Nieto" },
   { finding: "Mantenimiento sin causa raíz", rootCause: "Se registra la atención, no el diagnóstico.", risk: "Reincidencia de fallas críticas.", impact: "Alto", area: "Mantenimiento", priority: "alta", owner: "José Luis Sánchez" },
 ];
 
-const strategies = [
+let strategies = [
   { objective: "Centralizar control de evidencias", expected: "100% de reportes críticos con evidencia", owner: "Administrador General", kpi: "Evidencias completas", start: "2026-06-10", end: "2026-07-10", budget: 0, finding: "Evidencias faltantes" },
+  { objective: "Cerrar diferencias de inventario con evidencia semanal", expected: "Reducir 20% diferencias físicas", owner: "Moisés Prado", kpi: "Exactitud de inventario", start: "2026-06-11", end: "2026-07-20", budget: 12000, finding: "Evidencias faltantes" },
   { objective: "Reducir gasto extraordinario logístico", expected: "Bajar 15% gasto fuera de presupuesto", owner: "Guillermo Nieto", kpi: "Costo por ruta", start: "2026-06-12", end: "2026-07-30", budget: 35000, finding: "Gasto extraordinario reactivo" },
   { objective: "Diagnosticar fallas críticas con causa raíz", expected: "Cero correctivos críticos sin diagnóstico", owner: "José Luis Sánchez", kpi: "Reincidencia crítica", start: "2026-06-14", end: "2026-08-01", budget: 50000, finding: "Mantenimiento sin causa raíz" },
+  { objective: "Controlar descuentos con impacto financiero", expected: "100% de descuentos especiales con margen documentado", owner: "José Carlos González", kpi: "Rentabilidad comercial", start: "2026-06-16", end: "2026-07-25", budget: 0, finding: "Control operativo disperso" },
 ];
 
-const workPlan = [
+let workPlan = [
   { action: "Definir checklist de evidencia por área", owner: "Administrador General", start: "2026-06-10", due: "2026-06-17", priority: "alta", evidence: "checklist-evidencias.xlsx", status: "en revision", view: "Kanban" },
+  { action: "Conciliar diferencias de inventario con evidencia fotográfica", owner: "Moisés Prado", start: "2026-06-11", due: "2026-06-18", priority: "alta", evidence: "", status: "pendiente", view: "Lista" },
   { action: "Mapear ruta de autorización de viáticos", owner: "Guillermo Nieto", start: "2026-06-12", due: "2026-06-20", priority: "alta", evidence: "", status: "pendiente", view: "Timeline" },
   { action: "Crear bitácora de causa raíz por equipo crítico", owner: "José Luis Sánchez", start: "2026-06-14", due: "2026-06-22", priority: "alta", evidence: "", status: "falta evidencia", view: "Gantt" },
   { action: "Validar semáforo comercial de descuentos", owner: "José Carlos González", start: "2026-06-16", due: "2026-06-28", priority: "media", evidence: "matriz-descuentos.xlsx", status: "en ejecucion", view: "Lista" },
 ];
 
-const agreements = [
+let agreements = [
   { agreement: "Toda evidencia crítica debe cargarse antes del cierre semanal.", owner: "Moisés Prado", due: "2026-06-17", evidence: "", status: "pendiente" },
   { agreement: "Los gastos extraordinarios requieren justificación previa.", owner: "Guillermo Nieto", due: "2026-06-20", evidence: "formato-viaticos.pdf", status: "en revision" },
   { agreement: "Cada falla crítica debe incluir causa raíz y acción preventiva.", owner: "José Luis Sánchez", due: "2026-06-22", evidence: "", status: "falta evidencia" },
 ];
 
-const riskRegister = [
+let riskRegister = [
   { risk: "Pausa de Appwrite Free por inactividad o política de plan", probability: "Media", impact: "Alto", mitigation: "Heartbeat reforzado y plan de migración/pago aprobado", owner: "Administrador General" },
   { risk: "Evidencias pendientes en cierres semanales", probability: "Alta", impact: "Alto", mitigation: "Recordatorios y escalamiento automático", owner: "Moisés Prado" },
   { risk: "Sobrecostos de logística no autorizados", probability: "Media", impact: "Alto", mitigation: "Ruta de autorización y presupuesto por ruta", owner: "Guillermo Nieto" },
   { risk: "Reincidencia de fallas críticas", probability: "Alta", impact: "Alto", mitigation: "Causa raíz obligatoria y revisión de preventivos", owner: "José Luis Sánchez" },
 ];
 
-const benefits = [
+let benefits = [
   { saving: 42000, timeReduction: "8 horas semanales", incidentReduction: "12%", improvements: "Checklist de evidencias y tablero de seguimiento", financialImpact: 42000 },
   { saving: 18000, timeReduction: "3 horas semanales", incidentReduction: "7%", improvements: "Control inicial de retrabajo en calidad", financialImpact: 18000 },
   { saving: 65000, timeReduction: "10 horas mensuales", incidentReduction: "15%", improvements: "Visibilidad de gasto extraordinario por ruta", financialImpact: 65000 },
 ];
+
+diagnosticBase = diagnosticBase.map((item, index) => ({ rowId: item.rowId || `diag-${index + 1}`, ...item }));
+interviews = interviews.map((item, index) => ({ rowId: item.rowId || `ent-${index + 1}`, ...item }));
+painMap = painMap.map((item, index) => ({ rowId: item.rowId || `dolor-${index + 1}`, ...item }));
+executiveFindings = executiveFindings.map((item, index) => ({ rowId: item.rowId || `hall-${index + 1}`, ...item }));
+strategies = strategies.map((item, index) => ({ rowId: item.rowId || `est-${index + 1}`, ...item }));
+workPlan = workPlan.map((item, index) => ({ rowId: item.rowId || `plan-${index + 1}`, ...item }));
+agreements = agreements.map((item, index) => ({ rowId: item.rowId || `acu-${index + 1}`, ...item }));
+riskRegister = riskRegister.map((item, index) => ({ rowId: item.rowId || `risk-${index + 1}`, ...item }));
+benefits = benefits.map((item, index) => ({ rowId: item.rowId || `ben-${index + 1}`, ...item }));
 
 let jefaturas = [
   { rowId: "jef-moises-prado", name: "Moisés Prado", photo: "", position: "Supervisor de Almacén", area: "Almacen", leadership: "Almacén", email: "supervisor.almacen@pmpsquimicos.com", phone: "56 4007 0190", whatsapp: "56 4007 0190", boss: "Carmen", user: "supervisor.almacen@pmpsquimicos.com", role: "Jefatura", status: "Activo", monthlyGoal: "Inventario exacto y evidencias completas", quarterlyGoal: "Reducir diferencias físicas", annualGoal: "Mejorar control operativo de almacén", mainKpi: "Exactitud de inventario", secondaryKpis: "Evidencias, reportes, cumplimiento", budget: 410000, spent: 51000, carmenComments: "Reforzar evidencia semanal.", directionComments: "Prioridad media." },
@@ -299,6 +312,9 @@ appContent.addEventListener("click", async (event) => {
     if (action === "export-audit") return exportAuditFromButton(button);
     if (action === "print-audit") return printAuditFromButton(button);
     if (action === "print-executive") return printExecutiveDashboard();
+    if (action === "new-transform") await openTransformForm(target);
+    if (action === "edit-transform") await openTransformForm(button.dataset.moduleKey, target);
+    if (action === "delete-transform") await deleteTransformRecord(button.dataset.moduleKey, target);
     if (action === "new-management") await createManagement();
     if (action === "edit-management") await editManagement(target);
     if (action === "disable-management") await disableManagement(target);
@@ -326,13 +342,38 @@ async function initializeAppData() {
   try {
     validateAppwriteConfig();
 
-    const [remoteGerencias, remoteUsers, remoteReports, remoteAuditLogs, remoteJefaturas, remoteTasks] = await Promise.all([
+    const [
+      remoteGerencias,
+      remoteUsers,
+      remoteReports,
+      remoteAuditLogs,
+      remoteJefaturas,
+      remoteTasks,
+      remoteDiagnosticBase,
+      remoteInterviews,
+      remotePainMap,
+      remoteExecutiveFindings,
+      remoteStrategies,
+      remoteWorkPlan,
+      remoteAgreements,
+      remoteRisks,
+      remoteBenefits,
+    ] = await Promise.all([
       listRows(TABLES.gerencias),
       listRows(TABLES.usuarios),
       listRows(TABLES.reportes),
       listRows(TABLES.bitacora),
       listRowsOptional(TABLES.jefaturas),
       listRowsOptional(TABLES.tareas),
+      listRowsOptional(TABLES.diagnosticoBase),
+      listRowsOptional(TABLES.entrevistas),
+      listRowsOptional(TABLES.mapaDolor),
+      listRowsOptional(TABLES.diagnosticoEjecutivo),
+      listRowsOptional(TABLES.estrategias),
+      listRowsOptional(TABLES.planTrabajo),
+      listRowsOptional(TABLES.acuerdos),
+      listRowsOptional(TABLES.riesgos),
+      listRowsOptional(TABLES.beneficios),
     ]);
 
     if (remoteGerencias.length) {
@@ -376,6 +417,16 @@ async function initializeAppData() {
     if (remoteTasks.length) {
       tasks = remoteTasks.map(mapTaskRow);
     }
+
+    if (remoteDiagnosticBase.length) diagnosticBase = remoteDiagnosticBase.map(mapDiagnosticBaseRow);
+    if (remoteInterviews.length) interviews = remoteInterviews.map(mapInterviewRow);
+    if (remotePainMap.length) painMap = remotePainMap.map(mapPainRow);
+    if (remoteExecutiveFindings.length) executiveFindings = remoteExecutiveFindings.map(mapExecutiveFindingRow);
+    if (remoteStrategies.length) strategies = remoteStrategies.map(mapStrategyRow);
+    if (remoteWorkPlan.length) workPlan = remoteWorkPlan.map(mapWorkPlanRow);
+    if (remoteAgreements.length) agreements = remoteAgreements.map(mapAgreementRow);
+    if (remoteRisks.length) riskRegister = remoteRisks.map(mapRiskRow);
+    if (remoteBenefits.length) benefits = remoteBenefits.map(mapBenefitRow);
 
     appwriteOnline = true;
     appwriteDataLoaded = true;
@@ -763,6 +814,19 @@ function permissionsForRow(tableId, data) {
     return permissionsForArea(areaKeyFromLabel(data.area || data.jefatura), { adminOnlyUpdate: true });
   }
 
+  if ([TABLES.diagnosticoBase, TABLES.entrevistas, TABLES.mapaDolor, TABLES.diagnosticoEjecutivo].includes(tableId)) {
+    return permissionsForArea(areaKeyFromLabel(data.area || data.areaAfectada), { adminOnlyUpdate: true });
+  }
+
+  if ([TABLES.estrategias, TABLES.planTrabajo, TABLES.acuerdos, TABLES.riesgos, TABLES.beneficios].includes(tableId)) {
+    const ownerId = userIdForResponsible(data.responsable);
+    return uniquePermissions([
+      ...readPermissions([...ADMIN_USER_IDS, ...EXECUTIVE_USER_IDS, ownerId]),
+      ...updatePermissions([...ADMIN_USER_IDS, ownerId]),
+      ...deletePermissions(ADMIN_USER_IDS),
+    ]);
+  }
+
   if (tableId === TABLES.bitacora) {
     return uniquePermissions([
       ...readPermissions(ADMIN_USER_IDS),
@@ -803,6 +867,132 @@ function deletePermissions(ids) {
 
 function uniquePermissions(permissions) {
   return Array.from(new Set(permissions));
+}
+
+function userIdForResponsible(name) {
+  const normalized = normalizePlainText(name);
+  const leadership = jefaturas.find((item) => normalizePlainText(item.name) === normalized);
+  if (leadership) return leadership.rowId;
+  const user = userProfiles.find((item) => normalizePlainText(item.name) === normalized);
+  return user?.userId || "";
+}
+
+function transformModules() {
+  return {
+    diagnosticBase: { table: TABLES.diagnosticoBase, data: () => diagnosticBase, set: (items) => { diagnosticBase = items; }, render: renderDiagnosticBase, prefix: "diag", label: "diagnóstico", fields: [["section", "Bloque", "text"], ["area", "Área", "area"], ["detail", "Detalle / observaciones", "textarea"], ["owner", "Responsable", "text"], ["evidence", "Evidencia", "text"], ["status", "Estatus", "status"]] },
+    interviews: { table: TABLES.entrevistas, data: () => interviews, set: (items) => { interviews = items; }, render: renderInterviews, prefix: "ent", label: "entrevista", fields: [["date", "Fecha", "date"], ["interviewed", "Entrevistado", "text"], ["area", "Área", "area"], ["position", "Puesto", "text"], ["responsible", "Responsable entrevista", "text"], ["functions", "Funciones actuales", "textarea"], ["responsibilities", "Responsabilidades", "textarea"], ["problems", "Problemas detectados", "textarea"], ["risks", "Riesgos", "textarea"], ["opportunities", "Oportunidades", "textarea"], ["ideas", "Ideas de mejora", "textarea"], ["needs", "Necesidades de información", "textarea"], ["automations", "Automatizaciones sugeridas", "textarea"], ["golden", "Pregunta de oro", "textarea"]] },
+    painMap: { table: TABLES.mapaDolor, data: () => painMap, set: (items) => { painMap = items; }, render: renderPainMap, prefix: "dolor", label: "dolor", fields: [["category", "Clasificación", "text"], ["description", "Descripción", "textarea"], ["area", "Área afectada", "area"], ["impact", "Impacto", "text"], ["frequency", "Frecuencia", "text"], ["priority", "Prioridad", "priority"], ["owner", "Responsable", "text"], ["signal", "Semáforo", "traffic"]] },
+    executiveFindings: { table: TABLES.diagnosticoEjecutivo, data: () => executiveFindings, set: (items) => { executiveFindings = items; }, render: renderExecutiveDiagnosis, prefix: "hall", label: "hallazgo", fields: [["finding", "Hallazgo", "textarea"], ["rootCause", "Causa raíz", "textarea"], ["risk", "Riesgo", "textarea"], ["impact", "Impacto", "text"], ["area", "Área", "area"], ["priority", "Prioridad", "priority"], ["owner", "Responsable", "text"]] },
+    strategies: { table: TABLES.estrategias, data: () => strategies, set: (items) => { strategies = items; }, render: renderStrategy, prefix: "est", label: "estrategia", fields: [["finding", "Hallazgo", "text"], ["objective", "Objetivo", "textarea"], ["expected", "Resultado esperado", "textarea"], ["owner", "Responsable", "text"], ["kpi", "KPI", "text"], ["start", "Fecha inicio", "date"], ["end", "Fecha fin", "date"], ["budget", "Presupuesto", "number"]] },
+    workPlan: { table: TABLES.planTrabajo, data: () => workPlan, set: (items) => { workPlan = items; }, render: renderWorkPlan, prefix: "plan", label: "acción", fields: [["action", "Acción", "textarea"], ["owner", "Responsable", "text"], ["start", "Fecha inicio", "date"], ["due", "Fecha compromiso", "date"], ["priority", "Prioridad", "priority"], ["evidence", "Evidencia", "text"], ["status", "Estado", "status"], ["view", "Vista", "text"]] },
+    agreements: { table: TABLES.acuerdos, data: () => agreements, set: (items) => { agreements = items; }, render: renderAgreements, prefix: "acu", label: "acuerdo", fields: [["agreement", "Acuerdo", "textarea"], ["owner", "Responsable", "text"], ["due", "Fecha compromiso", "date"], ["evidence", "Evidencia", "text"], ["status", "Estado", "status"]] },
+    risks: { table: TABLES.riesgos, data: () => riskRegister, set: (items) => { riskRegister = items; }, render: renderRisks, prefix: "risk", label: "riesgo", fields: [["risk", "Riesgo", "textarea"], ["probability", "Probabilidad", "text"], ["impact", "Impacto", "text"], ["mitigation", "Plan de mitigación", "textarea"], ["owner", "Responsable", "text"]] },
+    benefits: { table: TABLES.beneficios, data: () => benefits, set: (items) => { benefits = items; }, render: renderBenefits, prefix: "ben", label: "beneficio", fields: [["saving", "Ahorro generado", "number"], ["timeReduction", "Reducción de tiempos", "text"], ["incidentReduction", "Reducción de incidencias", "text"], ["improvements", "Mejoras implementadas", "textarea"], ["financialImpact", "Impacto financiero", "number"]] },
+  };
+}
+
+function transformActions(moduleKey, rowId) {
+  if (activeUser?.access === "executive") return `<span class="muted-copy table-note">Solo lectura</span>`;
+  return `
+    <div class="row-actions">
+      <button class="secondary-button" type="button" data-action="edit-transform" data-module-key="${moduleKey}" data-target="${rowId}">Editar</button>
+      <button class="secondary-button danger-button" type="button" data-action="delete-transform" data-module-key="${moduleKey}" data-target="${rowId}">Eliminar</button>
+    </div>
+  `;
+}
+
+function transformToolbar(moduleKey) {
+  const config = transformModules()[moduleKey];
+  if (!config || activeUser?.access === "executive") return "";
+  return `<div class="export-actions export-actions-top"><button class="primary-button" type="button" data-action="new-transform" data-target="${moduleKey}">Nuevo ${config.label}</button></div>`;
+}
+
+async function openTransformForm(moduleKey, rowId = "") {
+  const config = transformModules()[moduleKey];
+  if (!config || activeUser?.access === "executive") return;
+  const current = rowId ? config.data().find((item) => item.rowId === rowId) : null;
+
+  openModal(`
+    <form class="modal-form" id="transform-form">
+      <div class="modal-header">
+        <div><p class="eyebrow">Control de gestión</p><h3>${current ? "Editar registro" : "Nuevo registro"}</h3></div>
+        <button class="icon-button" type="button" data-modal-close>×</button>
+      </div>
+      ${config.fields.map(([key, label, type]) => transformFieldHtml(config.prefix, key, label, type, current?.[key])).join("")}
+      <div class="modal-actions field-wide">
+        <button class="secondary-button" type="button" data-modal-close>Cancelar</button>
+        <button class="primary-button" type="submit">Guardar</button>
+      </div>
+    </form>
+  `);
+
+  document.querySelector("#transform-form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const submitButton = event.submitter || document.querySelector("#transform-form .primary-button");
+    submitButton.disabled = true;
+    submitButton.textContent = "Guardando...";
+    const nextItem = { ...(current || {}), rowId: current?.rowId || createRowId(config.prefix) };
+
+    config.fields.forEach(([key, , type]) => {
+      const value = document.querySelector(`#${config.prefix}-${key}`).value.trim();
+      nextItem[key] = type === "number" ? Number(value || 0) : value;
+    });
+
+    try {
+      if (!(await ensureAppwriteWriteReady())) throw appwriteError(0, APPWRITE_PAUSED_MESSAGE);
+      const data = transformToAppwriteData(moduleKey, nextItem);
+      if (current) {
+        await updateRow(config.table, current.rowId, data);
+        config.set(config.data().map((item) => item.rowId === current.rowId ? nextItem : item));
+      } else {
+        await createRow(config.table, nextItem.rowId, data);
+        config.set([nextItem, ...config.data()]);
+      }
+      await logAudit(current ? "editar registro" : "crear registro", null, `${moduleKey}: ${recordLabel(nextItem)}.`);
+      closeModal();
+      notify("Registro guardado correctamente.");
+      config.render();
+    } catch (error) {
+      notify(error.isAppwriteUnavailable ? APPWRITE_PAUSED_MESSAGE : "No se pudo guardar el registro.");
+      console.warn(error);
+      submitButton.disabled = false;
+      submitButton.textContent = "Guardar";
+    }
+  });
+}
+
+async function deleteTransformRecord(moduleKey, rowId) {
+  const config = transformModules()[moduleKey];
+  if (!config || activeUser?.access === "executive") return;
+  const item = config.data().find((record) => record.rowId === rowId);
+  if (!item) return;
+  if (!window.confirm(`Eliminar registro: ${recordLabel(item)}?`)) return;
+
+  try {
+    if (!(await ensureAppwriteWriteReady())) throw appwriteError(0, APPWRITE_PAUSED_MESSAGE);
+    await deleteRow(config.table, rowId);
+    config.set(config.data().filter((record) => record.rowId !== rowId));
+    await logAudit("eliminar registro", null, `${moduleKey}: ${recordLabel(item)}.`);
+    notify("Registro eliminado correctamente.");
+    config.render();
+  } catch (error) {
+    notify(error.isAppwriteUnavailable ? APPWRITE_PAUSED_MESSAGE : "No se pudo eliminar el registro.");
+    console.warn(error);
+  }
+}
+
+function transformFieldHtml(prefix, key, label, type, value = "") {
+  const id = `${prefix}-${key}`;
+  if (type === "textarea") return `<label class="field-wide">${label}<textarea id="${id}" required>${escapeHtml(value || "")}</textarea></label>`;
+  if (type === "area") return `<label>${label}<select id="${id}">${gerencias.map((item) => `<option value="${item.area}" ${item.area === value ? "selected" : ""}>${item.label}</option>`).join("")}<option value="Todas" ${value === "Todas" ? "selected" : ""}>Todas</option></select></label>`;
+  if (type === "priority") return `<label>${label}<select id="${id}">${["alta", "media", "baja"].map((item) => `<option value="${item}" ${item === value ? "selected" : ""}>${titleCase(item)}</option>`).join("")}</select></label>`;
+  if (type === "status") return `<label>${label}<select id="${id}">${["pendiente", "en revision", "falta evidencia", "aprobado", "rechazado", "en ejecucion", "cerrado"].map((item) => `<option value="${item}" ${item === value ? "selected" : ""}>${titleCase(item)}</option>`).join("")}</select></label>`;
+  if (type === "traffic") return `<label>${label}<select id="${id}">${["verde", "amarillo", "rojo"].map((item) => `<option value="${item}" ${item === value ? "selected" : ""}>${titleCase(item)}</option>`).join("")}</select></label>`;
+  return `<label>${label}<input id="${id}" type="${type}" value="${escapeHtml(value || "")}" required></label>`;
+}
+
+function recordLabel(item) {
+  return item.finding || item.objective || item.action || item.agreement || item.risk || item.description || item.detail || item.interviewed || item.section || item.improvements || "registro";
 }
 
 function mapReportRow(row) {
@@ -878,6 +1068,42 @@ function mapTaskRow(row) {
   };
 }
 
+function mapDiagnosticBaseRow(row) {
+  return { rowId: row.$id, section: row.bloque || "", area: areaKeyFromLabel(row.area), detail: row.detalle || "", owner: row.responsable || "", evidence: row.evidencia || "", status: normalizeStatus(row.estatus || "pendiente") };
+}
+
+function mapInterviewRow(row) {
+  return { rowId: row.$id, date: formatDate(row.fecha), interviewed: row.entrevistado || "", area: areaKeyFromLabel(row.area), position: row.puesto || "", responsible: row.responsableEntrevista || "", functions: row.funcionesActuales || "", responsibilities: row.responsabilidades || "", problems: row.problemasDetectados || "", risks: row.riesgos || "", opportunities: row.oportunidades || "", ideas: row.ideasMejora || "", needs: row.necesidadesInformacion || "", automations: row.automatizacionesSugeridas || "", golden: row.preguntaOro || "" };
+}
+
+function mapPainRow(row) {
+  return { rowId: row.$id, category: row.clasificacion || "", description: row.descripcion || "", area: areaKeyFromLabel(row.areaAfectada), impact: row.impacto || "", frequency: row.frecuencia || "", priority: normalizePlainText(row.prioridad || "media"), owner: row.responsable || "", signal: normalizePlainText(row.semaforo || "amarillo") };
+}
+
+function mapExecutiveFindingRow(row) {
+  return { rowId: row.$id, finding: row.hallazgo || "", rootCause: row.causaRaiz || "", risk: row.riesgo || "", impact: row.impacto || "", area: areaKeyFromLabel(row.area), priority: normalizePlainText(row.prioridad || "media"), owner: row.responsable || "" };
+}
+
+function mapStrategyRow(row) {
+  return { rowId: row.$id, finding: row.hallazgo || "", objective: row.objetivo || "", expected: row.resultadoEsperado || "", owner: row.responsable || "", kpi: row.kpi || "", start: formatDate(row.fechaInicio), end: formatDate(row.fechaFin), budget: Number(row.presupuesto || 0) };
+}
+
+function mapWorkPlanRow(row) {
+  return { rowId: row.$id, action: row.accion || "", owner: row.responsable || "", start: formatDate(row.fechaInicio), due: formatDate(row.fechaCompromiso), priority: normalizePlainText(row.prioridad || "media"), evidence: row.evidencia || "", status: normalizeStatus(row.estado || "pendiente"), view: row.vista || "Lista" };
+}
+
+function mapAgreementRow(row) {
+  return { rowId: row.$id, agreement: row.acuerdo || "", owner: row.responsable || "", due: formatDate(row.fechaCompromiso), evidence: row.evidencia || "", status: normalizeStatus(row.estado || "pendiente") };
+}
+
+function mapRiskRow(row) {
+  return { rowId: row.$id, risk: row.riesgo || "", probability: row.probabilidad || "", impact: row.impacto || "", mitigation: row.planMitigacion || "", owner: row.responsable || "" };
+}
+
+function mapBenefitRow(row) {
+  return { rowId: row.$id, saving: Number(row.ahorroGenerado || 0), timeReduction: row.reduccionTiempos || "", incidentReduction: row.reduccionIncidencias || "", improvements: row.mejorasImplementadas || "", financialImpact: Number(row.impactoFinanciero || 0) };
+}
+
 function reportToAppwriteData(report) {
   return {
     fecha: toIsoDate(report.date),
@@ -893,6 +1119,21 @@ function reportToAppwriteData(report) {
     comentarios: report.comments,
     vencimiento: toIsoDate(report.due),
   };
+}
+
+function transformToAppwriteData(moduleKey, item) {
+  const map = {
+    diagnosticBase: { bloque: item.section, area: labelForArea(item.area), detalle: item.detail, responsable: item.owner, evidencia: item.evidence, estatus: item.status },
+    interviews: { fecha: toIsoDate(item.date), entrevistado: item.interviewed, area: labelForArea(item.area), puesto: item.position, responsableEntrevista: item.responsible, funcionesActuales: item.functions, responsabilidades: item.responsibilities, problemasDetectados: item.problems, riesgos: item.risks, oportunidades: item.opportunities, ideasMejora: item.ideas, necesidadesInformacion: item.needs, automatizacionesSugeridas: item.automations, preguntaOro: item.golden },
+    painMap: { clasificacion: item.category, descripcion: item.description, areaAfectada: labelForArea(item.area), impacto: item.impact, frecuencia: item.frequency, prioridad: item.priority, responsable: item.owner, semaforo: item.signal },
+    executiveFindings: { hallazgo: item.finding, causaRaiz: item.rootCause, riesgo: item.risk, impacto: item.impact, area: labelForArea(item.area), prioridad: item.priority, responsable: item.owner },
+    strategies: { hallazgo: item.finding, objetivo: item.objective, resultadoEsperado: item.expected, responsable: item.owner, kpi: item.kpi, fechaInicio: toIsoDate(item.start), fechaFin: toIsoDate(item.end), presupuesto: Number(item.budget || 0) },
+    workPlan: { accion: item.action, responsable: item.owner, fechaInicio: toIsoDate(item.start), fechaCompromiso: toIsoDate(item.due), prioridad: item.priority, evidencia: item.evidence, estado: item.status, vista: item.view },
+    agreements: { acuerdo: item.agreement, responsable: item.owner, fechaCompromiso: toIsoDate(item.due), evidencia: item.evidence, estado: item.status },
+    risks: { riesgo: item.risk, probabilidad: item.probability, impacto: item.impact, planMitigacion: item.mitigation, responsable: item.owner },
+    benefits: { ahorroGenerado: Number(item.saving || 0), reduccionTiempos: item.timeReduction, reduccionIncidencias: item.incidentReduction, mejorasImplementadas: item.improvements, impactoFinanciero: Number(item.financialImpact || 0) },
+  };
+  return map[moduleKey];
 }
 
 function managementToAppwriteData(item) {
@@ -1514,7 +1755,7 @@ function applyVisibilityRules() {
   navButtons.forEach((button) => {
     button.hidden = false;
     if (button.hasAttribute("data-admin-only") && !hasFullAccess()) button.hidden = true;
-    if (button.dataset.view === "carmen") button.hidden = !(hasFullAccess() || activeUser.access === "executive");
+    if (button.dataset.view === "carmen") button.hidden = !hasFullAccess();
     if (button.dataset.view === "direction-dashboard") button.hidden = activeUser.access === "area";
     if (button.dataset.view === "capture") {
       button.hidden = false;
@@ -1858,6 +2099,7 @@ function renderDiagnosticBase() {
   const items = visibleByArea(diagnosticBase);
   appContent.innerHTML = `
     ${sectionHeading("Diagnóstico base", "Situación actual documentada", scopeText())}
+    ${transformToolbar("diagnosticBase")}
     <section class="executive-grid">
       ${metricCard("Elementos documentados", items.length)}
       ${metricCard("Problemas identificados", diagnosticBase.filter((item) => item.section === "Problemas identificados").length)}
@@ -1866,13 +2108,14 @@ function renderDiagnosticBase() {
     </section>
     <section class="content-card">
       <div class="section-heading section-heading-compact"><div><p class="eyebrow">Levantamiento</p><h3>Organigrama, puestos, procesos, reportes e indicadores</h3></div></div>
-      ${renderTable(["Bloque", "Área", "Situación actual / observaciones", "Responsable", "Adjunto", "Estatus"], items.map((item) => [
+      ${renderTable(["Bloque", "Área", "Situación actual / observaciones", "Responsable", "Adjunto", "Estatus", "Acción"], items.map((item) => [
         item.section,
         labelForArea(areaKeyFromLabel(item.area)),
         item.detail,
         item.owner,
         evidenceCell(item.evidence),
         statusBadge(item.status),
+        transformActions("diagnosticBase", item.rowId),
       ]))}
     </section>
   `;
@@ -1882,6 +2125,7 @@ function renderInterviews() {
   const items = visibleByArea(interviews);
   appContent.innerHTML = `
     ${sectionHeading("Entrevistas", "Levantamiento con jefaturas y responsables", scopeText())}
+    ${transformToolbar("interviews")}
     <section class="executive-grid">
       ${metricCard("Entrevistas", items.length)}
       ${metricCard("Áreas cubiertas", uniqueValues(items.map((item) => item.area)).length)}
@@ -1889,7 +2133,7 @@ function renderInterviews() {
       ${metricCard("Automatizaciones sugeridas", items.filter((item) => item.automations).length)}
     </section>
     <section class="content-card">
-      ${renderTable(["Fecha", "Entrevistado", "Área", "Puesto", "Responsable", "Funciones", "Problemas", "Riesgos", "Oportunidades", "Pregunta de oro"], items.map((item) => [
+      ${renderTable(["Fecha", "Entrevistado", "Área", "Puesto", "Responsable", "Funciones", "Problemas", "Riesgos", "Oportunidades", "Pregunta de oro", "Acción"], items.map((item) => [
         item.date,
         item.interviewed,
         labelForArea(areaKeyFromLabel(item.area)),
@@ -1900,6 +2144,7 @@ function renderInterviews() {
         item.risks,
         item.opportunities,
         item.golden,
+        transformActions("interviews", item.rowId),
       ]), "wide-table")}
     </section>
   `;
@@ -1909,6 +2154,7 @@ function renderPainMap() {
   const items = visibleByArea(painMap);
   appContent.innerHTML = `
     ${sectionHeading("Mapa de dolor", "Problemas estructurados desde entrevistas", scopeText())}
+    ${transformToolbar("painMap")}
     <section class="executive-grid">
       ${metricCard("Dolores registrados", items.length)}
       ${metricCard("Focos rojos", items.filter((item) => item.signal === "rojo").length)}
@@ -1916,7 +2162,7 @@ function renderPainMap() {
       ${metricCard("Tecnología", items.filter((item) => item.category === "Tecnología").length)}
     </section>
     <section class="content-card">
-      ${renderTable(["Clasificación", "Descripción", "Área afectada", "Impacto", "Frecuencia", "Prioridad", "Responsable", "Semáforo"], items.map((item) => [
+      ${renderTable(["Clasificación", "Descripción", "Área afectada", "Impacto", "Frecuencia", "Prioridad", "Responsable", "Semáforo", "Acción"], items.map((item) => [
         item.category,
         item.description,
         labelForArea(areaKeyFromLabel(item.area)),
@@ -1925,6 +2171,7 @@ function renderPainMap() {
         priorityBadge(item.priority),
         item.owner,
         trafficBadge(item.signal, titleCase(item.signal)),
+        transformActions("painMap", item.rowId),
       ]))}
     </section>
   `;
@@ -1934,6 +2181,7 @@ function renderExecutiveDiagnosis() {
   const items = visibleByArea(executiveFindings);
   appContent.innerHTML = `
     ${sectionHeading("Diagnóstico ejecutivo", "Hallazgos, causas raíz e impacto", scopeText())}
+    ${transformToolbar("executiveFindings")}
     <section class="executive-grid">
       ${metricCard("Hallazgos", items.length)}
       ${metricCard("Prioridad alta", items.filter((item) => item.priority === "alta").length)}
@@ -1941,7 +2189,7 @@ function renderExecutiveDiagnosis() {
       ${metricCard("Áreas impactadas", uniqueValues(items.map((item) => item.area)).length)}
     </section>
     <section class="content-card">
-      ${renderTable(["Hallazgo", "Causa raíz", "Riesgo", "Impacto", "Área", "Prioridad", "Responsable"], items.map((item) => [
+      ${renderTable(["Hallazgo", "Causa raíz", "Riesgo", "Impacto", "Área", "Prioridad", "Responsable", "Acción"], items.map((item) => [
         item.finding,
         item.rootCause,
         item.risk,
@@ -1949,6 +2197,7 @@ function renderExecutiveDiagnosis() {
         labelForArea(areaKeyFromLabel(item.area)),
         priorityBadge(item.priority),
         item.owner,
+        transformActions("executiveFindings", item.rowId),
       ]))}
     </section>
   `;
@@ -1961,6 +2210,7 @@ function renderStrategy() {
     : strategies;
   appContent.innerHTML = `
     ${sectionHeading("Estrategia", "Cada hallazgo convertido en objetivo, KPI y presupuesto", scopeText())}
+    ${transformToolbar("strategies")}
     <section class="executive-grid">
       ${metricCard("Estrategias", visible.length)}
       ${metricCard("Presupuesto", formatCurrency(sum(visible, "budget")))}
@@ -1968,7 +2218,7 @@ function renderStrategy() {
       ${metricCard("En ejecución", visible.filter((item) => item.start <= todayIsoDate()).length)}
     </section>
     <section class="content-card">
-      ${renderTable(["Hallazgo", "Objetivo", "Resultado esperado", "Responsable", "KPI", "Inicio", "Fin", "Presupuesto"], visible.map((item) => [
+      ${renderTable(["Hallazgo", "Objetivo", "Resultado esperado", "Responsable", "KPI", "Inicio", "Fin", "Presupuesto", "Acción"], visible.map((item) => [
         item.finding,
         item.objective,
         item.expected,
@@ -1977,6 +2227,7 @@ function renderStrategy() {
         item.start,
         item.end,
         formatCurrency(item.budget),
+        transformActions("strategies", item.rowId),
       ]))}
     </section>
   `;
@@ -1987,6 +2238,7 @@ function renderWorkPlan() {
   const columns = ["pendiente", "en revision", "falta evidencia", "en ejecucion", "cerrado"];
   appContent.innerHTML = `
     ${sectionHeading("Plan de trabajo", "Acciones derivadas de la estrategia", scopeText())}
+    ${transformToolbar("workPlan")}
     <section class="executive-grid">
       ${metricCard("Acciones", items.length)}
       ${metricCard("Vencidas", items.filter((item) => item.due < todayIsoDate() && !["cerrado", "aprobado"].includes(item.status)).length)}
@@ -1995,7 +2247,7 @@ function renderWorkPlan() {
     </section>
     <section class="content-card">
       <div class="view-strip">${["Kanban", "Calendario", "Timeline", "Gantt", "Lista"].map((item) => `<span>${item}</span>`).join("")}</div>
-      ${renderTable(["Acción", "Responsable", "Inicio", "Compromiso", "Prioridad", "Evidencia", "Estado", "Vista"], items.map((item) => [
+      ${renderTable(["Acción", "Responsable", "Inicio", "Compromiso", "Prioridad", "Evidencia", "Estado", "Vista", "Acción"], items.map((item) => [
         item.action,
         item.owner,
         item.start,
@@ -2004,6 +2256,7 @@ function renderWorkPlan() {
         evidenceCell(item.evidence),
         statusBadge(item.status),
         item.view,
+        transformActions("workPlan", item.rowId),
       ]))}
     </section>
     <section class="kanban-board">
@@ -2045,6 +2298,7 @@ function renderAgreements() {
   const items = visibleAgreements();
   appContent.innerHTML = `
     ${sectionHeading("Acuerdos", "Compromisos integrados al seguimiento", scopeText())}
+    ${transformToolbar("agreements")}
     <section class="executive-grid">
       ${metricCard("Acuerdos", items.length)}
       ${metricCard("Pendientes", items.filter((item) => item.status === "pendiente").length)}
@@ -2052,12 +2306,13 @@ function renderAgreements() {
       ${metricCard("Vencidos", items.filter((item) => item.due < todayIsoDate() && item.status !== "cerrado").length)}
     </section>
     <section class="content-card">
-      ${renderTable(["Acuerdo", "Responsable", "Fecha compromiso", "Evidencia", "Estado"], items.map((item) => [
+      ${renderTable(["Acuerdo", "Responsable", "Fecha compromiso", "Evidencia", "Estado", "Acción"], items.map((item) => [
         item.agreement,
         item.owner,
         item.due,
         evidenceCell(item.evidence),
         statusBadge(item.status),
+        transformActions("agreements", item.rowId),
       ]))}
     </section>
   `;
@@ -2067,6 +2322,7 @@ function renderRisks() {
   const items = visibleRisks();
   appContent.innerHTML = `
     ${sectionHeading("Riesgos", "Probabilidad, impacto y mitigación", scopeText())}
+    ${transformToolbar("risks")}
     <section class="executive-grid">
       ${metricCard("Riesgos", items.length)}
       ${metricCard("Críticos", items.filter((item) => riskSignal(item) === "rojo").length)}
@@ -2074,13 +2330,14 @@ function renderRisks() {
       ${metricCard("Mitigados", items.filter((item) => item.mitigation).length)}
     </section>
     <section class="content-card">
-      ${renderTable(["Riesgo", "Probabilidad", "Impacto", "Plan de mitigación", "Responsable", "Semáforo"], items.map((item) => [
+      ${renderTable(["Riesgo", "Probabilidad", "Impacto", "Plan de mitigación", "Responsable", "Semáforo", "Acción"], items.map((item) => [
         item.risk,
         item.probability,
         item.impact,
         item.mitigation,
         item.owner,
         trafficBadge(riskSignal(item), titleCase(riskSignal(item))),
+        transformActions("risks", item.rowId),
       ]))}
     </section>
   `;
@@ -2091,6 +2348,7 @@ function renderBenefits() {
   const totalImpact = sum(benefits, "financialImpact");
   appContent.innerHTML = `
     ${sectionHeading("Beneficios obtenidos", "Impacto financiero y operativo generado", scopeText())}
+    ${transformToolbar("benefits")}
     <section class="executive-grid">
       ${metricCard("Ahorro generado", formatCurrency(totalSavings))}
       ${metricCard("Impacto financiero", formatCurrency(totalImpact))}
@@ -2098,12 +2356,13 @@ function renderBenefits() {
       ${metricCard("Reducción de incidencias", "Hasta 15%")}
     </section>
     <section class="content-card">
-      ${renderTable(["Ahorro generado", "Reducción de tiempos", "Reducción de incidencias", "Mejoras implementadas", "Impacto financiero"], benefits.map((item) => [
+      ${renderTable(["Ahorro generado", "Reducción de tiempos", "Reducción de incidencias", "Mejoras implementadas", "Impacto financiero", "Acción"], benefits.map((item) => [
         formatCurrency(item.saving),
         item.timeReduction,
         item.incidentReduction,
         item.improvements,
         formatCurrency(item.financialImpact),
+        transformActions("benefits", item.rowId),
       ]))}
     </section>
   `;
@@ -2378,7 +2637,7 @@ function renderGlobalSearch(query) {
       status: trafficBadge(leadershipTrafficLight(item).level, leadershipTrafficLight(item).label),
       detail: `${item.email} ${item.phone} ${item.mainKpi} ${item.leadership}`,
     })),
-    ...gerencias.map((item) => ({
+    ...visibleGerencias().map((item) => ({
       type: "Gerencia",
       title: item.label,
       owner: item.manager,
@@ -2389,7 +2648,7 @@ function renderGlobalSearch(query) {
   ].filter((item) => normalizePlainText(`${item.type} ${item.title} ${item.owner} ${item.area} ${item.detail}`).includes(needle));
 
   appContent.innerHTML = `
-    ${sectionHeading("Buscador global", `Resultados para "${escapeHtml(query)}"`, `${results.length} coincidencias`)}
+    ${sectionHeading("Buscador global", "Resultados filtrados", `${results.length} coincidencias`)}
     <section class="content-card">
       ${renderTable(["Tipo", "Título", "Responsable", "Área", "Estatus", "Detalle"], results.map((item) => [
         item.type,
@@ -2401,6 +2660,11 @@ function renderGlobalSearch(query) {
       ]))}
     </section>
   `;
+}
+
+function visibleGerencias() {
+  if (!activeUser || activeUser.access !== "area") return gerencias;
+  return gerencias.filter((item) => item.area === activeUser.area);
 }
 
 function buildAdminAlerts() {

@@ -13,7 +13,16 @@ window.MENLUN_APPWRITE_CONFIG = {
     jefaturas: "jefaturas",
     gastos: "gastos",
     viaticos: "viaticos",
-    mantenimientos: "mantenimientos"
+    mantenimientos: "mantenimientos",
+    diagnosticoBase: "diagnostico_base",
+    entrevistas: "entrevistas",
+    mapaDolor: "mapa_dolor",
+    diagnosticoEjecutivo: "diagnostico_ejecutivo",
+    estrategias: "estrategias",
+    planTrabajo: "plan_trabajo",
+    acuerdos: "acuerdos",
+    riesgos: "riesgos",
+    beneficios: "beneficios"
   },
   buckets: {
     evidencias: "evidencias"

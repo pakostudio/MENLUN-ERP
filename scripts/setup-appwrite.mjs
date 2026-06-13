@@ -48,7 +48,7 @@ const areaUserIds = {
   "Sistemas": "sistemas"
 };
 
-const adminUserIds = ["pako", "carmen"];
+const adminUserIds = ["pako"];
 const executiveUserIds = ["direccion"];
 
 const tablePermissions = [
@@ -290,6 +290,159 @@ const tables = [
     rows: []
   },
   {
+    id: "diagnostico_base",
+    name: "Diagnostico Base",
+    columns: [
+      string("bloque", 80, true),
+      string("area", 80, true),
+      text("detalle", true),
+      string("responsable", 120, true),
+      string("evidencia", 180, false),
+      string("estatus", 40, true)
+    ],
+    rows: [
+      row("diag-1", { bloque: "Organigrama", area: "Dirección", detalle: "Estructura operativa con jefaturas funcionales y dependencia directa de Carmen para control operativo.", responsable: "Administrador General", evidencia: "organigrama-pmps.pdf", estatus: "en revision" }),
+      row("diag-2", { bloque: "Puestos", area: "Almacén", detalle: "Roles operativos con responsabilidades mezcladas entre inventario, surtido y evidencias.", responsable: "Moisés Prado", evidencia: "descriptivos-almacen.docx", estatus: "pendiente" }),
+      row("diag-3", { bloque: "Procesos", area: "Logística", detalle: "Rutas y viáticos se capturan fuera de un flujo único de autorización.", responsable: "Guillermo Nieto", evidencia: "rutas-actuales.xlsx", estatus: "falta evidencia" })
+    ]
+  },
+  {
+    id: "entrevistas",
+    name: "Entrevistas",
+    columns: [
+      datetime("fecha", true),
+      string("entrevistado", 120, true),
+      string("area", 80, true),
+      string("puesto", 120, true),
+      string("responsableEntrevista", 120, true),
+      text("funcionesActuales", false),
+      text("responsabilidades", false),
+      text("problemasDetectados", false),
+      text("riesgos", false),
+      text("oportunidades", false),
+      text("ideasMejora", false),
+      text("necesidadesInformacion", false),
+      text("automatizacionesSugeridas", false),
+      text("preguntaOro", false)
+    ],
+    rows: [
+      row("ent-1", { fecha: "2026-06-03T12:00:00.000Z", entrevistado: "Moisés Prado", area: "Almacén", puesto: "Supervisor de Almacén", responsableEntrevista: "Administrador General", funcionesActuales: "Control de entradas, salidas, evidencias e inventario físico.", responsabilidades: "Surtido correcto y conteos cíclicos.", problemasDetectados: "Diferencias físicas y evidencias tardías.", riesgos: "Inventario incorrecto para compras y producción.", oportunidades: "Tablero de diferencias y evidencia por movimiento.", ideasMejora: "Escaneo móvil de evidencias.", necesidadesInformacion: "Stock real, diferencias, pendientes.", automatizacionesSugeridas: "Alertas por evidencia faltante.", preguntaOro: "Eliminar capturas duplicadas, evidencia manual y falta de visibilidad de diferencias." })
+    ]
+  },
+  {
+    id: "mapa_dolor",
+    name: "Mapa de Dolor",
+    columns: [
+      string("clasificacion", 80, true),
+      text("descripcion", true),
+      string("areaAfectada", 80, true),
+      text("impacto", false),
+      string("frecuencia", 40, false),
+      string("prioridad", 20, true),
+      string("responsable", 120, true),
+      string("semaforo", 20, true)
+    ],
+    rows: [
+      row("dolor-1", { clasificacion: "Procesos", descripcion: "Evidencias operativas se cargan tarde o incompletas.", areaAfectada: "Almacén", impacto: "Afecta control de inventario y auditoría.", frecuencia: "Alta", prioridad: "alta", responsable: "Moisés Prado", semaforo: "rojo" }),
+      row("dolor-2", { clasificacion: "Finanzas", descripcion: "Gastos logísticos extraordinarios sin presupuesto visible.", areaAfectada: "Logística", impacto: "Eleva costo por ruta.", frecuencia: "Media", prioridad: "alta", responsable: "Guillermo Nieto", semaforo: "rojo" })
+    ]
+  },
+  {
+    id: "diagnostico_ejecutivo",
+    name: "Diagnostico Ejecutivo",
+    columns: [
+      text("hallazgo", true),
+      text("causaRaiz", true),
+      text("riesgo", false),
+      string("impacto", 80, false),
+      string("area", 80, true),
+      string("prioridad", 20, true),
+      string("responsable", 120, true)
+    ],
+    rows: [
+      row("hall-1", { hallazgo: "Control operativo disperso", causaRaiz: "No existe tablero único de compromisos, evidencias y riesgos.", riesgo: "Dirección decide con información incompleta.", impacto: "Alto", area: "Todas", prioridad: "alta", responsable: "Administrador General" }),
+      row("hall-2", { hallazgo: "Evidencias faltantes", causaRaiz: "La comprobación no está integrada al seguimiento.", riesgo: "Auditoría débil y retrasos.", impacto: "Alto", area: "Almacén", prioridad: "alta", responsable: "Moisés Prado" })
+    ]
+  },
+  {
+    id: "estrategias",
+    name: "Estrategias",
+    columns: [
+      text("hallazgo", false),
+      text("objetivo", true),
+      text("resultadoEsperado", false),
+      string("responsable", 120, true),
+      string("kpi", 120, false),
+      datetime("fechaInicio", false),
+      datetime("fechaFin", false),
+      float("presupuesto", false)
+    ],
+    rows: [
+      row("est-1", { hallazgo: "Evidencias faltantes", objetivo: "Centralizar control de evidencias", resultadoEsperado: "100% de reportes críticos con evidencia", responsable: "Administrador General", kpi: "Evidencias completas", fechaInicio: "2026-06-10T12:00:00.000Z", fechaFin: "2026-07-10T12:00:00.000Z", presupuesto: 0 }),
+      row("est-2", { hallazgo: "Evidencias faltantes", objetivo: "Cerrar diferencias de inventario con evidencia semanal", resultadoEsperado: "Reducir 20% diferencias físicas", responsable: "Moisés Prado", kpi: "Exactitud de inventario", fechaInicio: "2026-06-11T12:00:00.000Z", fechaFin: "2026-07-20T12:00:00.000Z", presupuesto: 12000 })
+    ]
+  },
+  {
+    id: "plan_trabajo",
+    name: "Plan de Trabajo",
+    columns: [
+      text("accion", true),
+      string("responsable", 120, true),
+      datetime("fechaInicio", false),
+      datetime("fechaCompromiso", true),
+      string("prioridad", 20, true),
+      string("evidencia", 180, false),
+      string("estado", 40, true),
+      string("vista", 40, false)
+    ],
+    rows: [
+      row("plan-1", { accion: "Definir checklist de evidencia por área", responsable: "Administrador General", fechaInicio: "2026-06-10T12:00:00.000Z", fechaCompromiso: "2026-06-17T12:00:00.000Z", prioridad: "alta", evidencia: "checklist-evidencias.xlsx", estado: "en revision", vista: "Kanban" }),
+      row("plan-2", { accion: "Conciliar diferencias de inventario con evidencia fotográfica", responsable: "Moisés Prado", fechaInicio: "2026-06-11T12:00:00.000Z", fechaCompromiso: "2026-06-18T12:00:00.000Z", prioridad: "alta", evidencia: "", estado: "pendiente", vista: "Lista" })
+    ]
+  },
+  {
+    id: "acuerdos",
+    name: "Acuerdos",
+    columns: [
+      text("acuerdo", true),
+      string("responsable", 120, true),
+      datetime("fechaCompromiso", true),
+      string("evidencia", 180, false),
+      string("estado", 40, true)
+    ],
+    rows: [
+      row("acu-1", { acuerdo: "Toda evidencia crítica debe cargarse antes del cierre semanal.", responsable: "Moisés Prado", fechaCompromiso: "2026-06-17T12:00:00.000Z", evidencia: "", estado: "pendiente" })
+    ]
+  },
+  {
+    id: "riesgos",
+    name: "Riesgos",
+    columns: [
+      text("riesgo", true),
+      string("probabilidad", 40, true),
+      string("impacto", 40, true),
+      text("planMitigacion", false),
+      string("responsable", 120, true)
+    ],
+    rows: [
+      row("risk-1", { riesgo: "Pausa de Appwrite Free por inactividad o política de plan", probabilidad: "Media", impacto: "Alto", planMitigacion: "Heartbeat reforzado y plan de migración/pago aprobado", responsable: "Administrador General" })
+    ]
+  },
+  {
+    id: "beneficios",
+    name: "Beneficios",
+    columns: [
+      float("ahorroGenerado", false),
+      string("reduccionTiempos", 120, false),
+      string("reduccionIncidencias", 80, false),
+      text("mejorasImplementadas", false),
+      float("impactoFinanciero", false)
+    ],
+    rows: [
+      row("ben-1", { ahorroGenerado: 42000, reduccionTiempos: "8 horas semanales", reduccionIncidencias: "12%", mejorasImplementadas: "Checklist de evidencias y tablero de seguimiento", impactoFinanciero: 42000 })
+    ]
+  },
+  {
     id: "bitacora",
     name: "Bitacora",
     columns: [
@@ -462,6 +615,32 @@ function permissionsForRow(tableId, data, rowId = "") {
     ]);
   }
 
+  if (["diagnostico_base", "entrevistas", "mapa_dolor", "diagnostico_ejecutivo"].includes(tableId)) {
+    const areaUserId = areaUserIds[data.area] || areaUserIds[data.areaAfectada];
+    return uniquePermissions([
+      ...readForUsers([...adminUserIds, ...executiveUserIds, areaUserId]),
+      ...updateForUsers([...adminUserIds, areaUserId]),
+      ...deleteForUsers(adminUserIds),
+    ]);
+  }
+
+  if (["estrategias", "plan_trabajo", "acuerdos", "riesgos"].includes(tableId)) {
+    const ownerId = userIdForResponsible(data.responsable);
+    return uniquePermissions([
+      ...readForUsers([...adminUserIds, ...executiveUserIds, ownerId]),
+      ...updateForUsers([...adminUserIds, ownerId]),
+      ...deleteForUsers(adminUserIds),
+    ]);
+  }
+
+  if (tableId === "beneficios") {
+    return uniquePermissions([
+      ...readForUsers([...adminUserIds, ...executiveUserIds]),
+      ...updateForUsers(adminUserIds),
+      ...deleteForUsers(adminUserIds),
+    ]);
+  }
+
   if (tableId === "bitacora") {
     return uniquePermissions([
       ...readForUsers(adminUserIds),
@@ -481,6 +660,17 @@ function areaFromReport(reportId) {
   const reportTable = tables.find((table) => table.id === "reportes");
   const report = reportTable?.rows.find((item) => item.id === reportId);
   return report?.data.gerencia || "";
+}
+
+function userIdForResponsible(name) {
+  const map = {
+    "Administrador General": "pako",
+    "Moisés Prado": "jef-moises-prado",
+    "Guillermo Nieto": "jef-guillermo-nieto",
+    "José Luis Sánchez": "jef-jose-luis-sanchez",
+    "José Carlos González": "jef-jose-carlos-gonzalez"
+  };
+  return map[name] || "";
 }
 
 function readForUsers(ids) {
