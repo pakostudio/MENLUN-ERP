@@ -175,17 +175,146 @@ const tables = [
     id: "tareas",
     name: "Tareas",
     columns: [
+      string("proyectoId", 80, false),
       string("titulo", 160, true),
+      text("descripcion", false),
       string("gerencia", 80, true),
       string("responsable", 120, true),
       string("prioridad", 20, true),
       string("estatus", 40, true),
+      datetime("fechaInicio", false),
       datetime("vencimiento", true),
+      string("evidencia", 180, false),
+      string("kpi", 120, false),
       string("reporteId", 36, false)
     ],
     rows: [
-      row("task-001", { titulo: "Cargar evidencia de desviación", gerencia: "Calidad", responsable: "Mariana Ruiz", prioridad: "alta", estatus: "vencida", vencimiento: "2026-06-04T18:00:00.000Z", reporteId: "rep-002" }),
-      row("task-002", { titulo: "Validar gasto de refacciones", gerencia: "Producción", responsable: "Luis Ortega", prioridad: "alta", estatus: "pendiente", vencimiento: "2026-06-06T18:00:00.000Z", reporteId: "rep-001" })
+      row("task-001", { proyectoId: "proy-control-evidencias", titulo: "Cargar evidencia de desviación", descripcion: "Integrar respaldo y causa de la desviación.", gerencia: "Calidad", responsable: "Mariana Ruiz", prioridad: "alta", estatus: "vencida", fechaInicio: "2026-06-02T12:00:00.000Z", vencimiento: "2026-06-04T18:00:00.000Z", evidencia: "", kpi: "Evidencias completas", reporteId: "rep-002" }),
+      row("task-002", { proyectoId: "proy-control-evidencias", titulo: "Validar gasto de refacciones", descripcion: "Confirmar autorización y evidencia del gasto.", gerencia: "Producción", responsable: "Luis Ortega", prioridad: "alta", estatus: "pendiente", fechaInicio: "2026-06-05T12:00:00.000Z", vencimiento: "2026-06-20T18:00:00.000Z", evidencia: "", kpi: "Gasto autorizado", reporteId: "rep-001" }),
+      row("task-003", { proyectoId: "proy-logistica-trazable", titulo: "Definir ruta de liberación y entrega", descripcion: "Documentar responsable, fecha y evidencia por etapa.", gerencia: "Logística", responsable: "Guillermo Nieto", prioridad: "alta", estatus: "en proceso", fechaInicio: "2026-06-16T12:00:00.000Z", vencimiento: "2026-06-23T18:00:00.000Z", evidencia: "mapa-ruta-v1.pdf", kpi: "Entregas a tiempo", reporteId: "" }),
+      row("task-004", { proyectoId: "proy-mantenimiento-confiable", titulo: "Completar causa raíz del compresor", descripcion: "Registrar causa, mitigación y acción preventiva.", gerencia: "Mantenimiento", responsable: "José Luis Sánchez", prioridad: "alta", estatus: "con riesgo", fechaInicio: "2026-06-15T12:00:00.000Z", vencimiento: "2026-06-19T18:00:00.000Z", evidencia: "", kpi: "Reincidencia crítica", reporteId: "" }),
+      row("task-005", { proyectoId: "proy-ventas-seguimiento", titulo: "Actualizar siguiente acción de oportunidades", descripcion: "Toda oportunidad activa debe tener responsable y siguiente contacto.", gerencia: "Ventas", responsable: "José Carlos González", prioridad: "media", estatus: "en proceso", fechaInicio: "2026-06-17T12:00:00.000Z", vencimiento: "2026-06-24T18:00:00.000Z", evidencia: "", kpi: "Oportunidades con seguimiento", reporteId: "" })
+    ]
+  },
+  {
+    id: "proyectos",
+    name: "Proyectos NEXUS",
+    columns: [
+      string("nombre", 180, true),
+      text("objetivo", true),
+      string("area", 80, true),
+      string("responsable", 120, true),
+      datetime("fechaInicio", true),
+      datetime("fechaCompromiso", true),
+      string("prioridad", 20, true),
+      string("estado", 40, true),
+      string("kpi", 120, false),
+      string("resultadoEsperado", 120, false)
+    ],
+    rows: [
+      row("proy-control-evidencias", { nombre: "Control integral de evidencias", objetivo: "Centralizar evidencias y eliminar cierres sin respaldo.", area: "Todas", responsable: "Administrador General", fechaInicio: "2026-06-10T12:00:00.000Z", fechaCompromiso: "2026-07-15T18:00:00.000Z", prioridad: "alta", estado: "en proceso", kpi: "Evidencias completas", resultadoEsperado: "95%" }),
+      row("proy-logistica-trazable", { nombre: "Logística trazable", objetivo: "Asegurar visibilidad de rutas, entregas, liberaciones y comprobaciones.", area: "Logística", responsable: "Guillermo Nieto", fechaInicio: "2026-06-12T12:00:00.000Z", fechaCompromiso: "2026-07-31T18:00:00.000Z", prioridad: "alta", estado: "en proceso", kpi: "Entregas a tiempo", resultadoEsperado: "92%" }),
+      row("proy-mantenimiento-confiable", { nombre: "Mantenimiento confiable", objetivo: "Reducir reincidencias mediante causa raíz y preventivos.", area: "Mantenimiento", responsable: "José Luis Sánchez", fechaInicio: "2026-06-14T12:00:00.000Z", fechaCompromiso: "2026-08-15T18:00:00.000Z", prioridad: "alta", estado: "con riesgo", kpi: "Reincidencia crítica", resultadoEsperado: "< 5%" }),
+      row("proy-ventas-seguimiento", { nombre: "Disciplina comercial", objetivo: "Controlar seguimiento, forecast y compromisos comerciales.", area: "Ventas", responsable: "José Carlos González", fechaInicio: "2026-06-16T12:00:00.000Z", fechaCompromiso: "2026-07-30T18:00:00.000Z", prioridad: "media", estado: "en proceso", kpi: "Oportunidades con siguiente acción", resultadoEsperado: "100%" })
+    ]
+  },
+  {
+    id: "subtareas",
+    name: "Subtareas",
+    columns: [
+      string("tareaId", 80, true),
+      string("titulo", 180, true),
+      string("responsable", 120, true),
+      datetime("fechaCompromiso", true),
+      string("estado", 40, true)
+    ],
+    rows: [
+      row("sub-001", { tareaId: "task-003", titulo: "Validar responsables por etapa", responsable: "Guillermo Nieto", fechaCompromiso: "2026-06-20T18:00:00.000Z", estado: "cerrado" }),
+      row("sub-002", { tareaId: "task-003", titulo: "Definir evidencia mínima de entrega", responsable: "Guillermo Nieto", fechaCompromiso: "2026-06-23T18:00:00.000Z", estado: "en proceso" }),
+      row("sub-003", { tareaId: "task-004", titulo: "Adjuntar diagnóstico técnico", responsable: "José Luis Sánchez", fechaCompromiso: "2026-06-19T18:00:00.000Z", estado: "vencido" })
+    ]
+  },
+  {
+    id: "incidencias",
+    name: "Incidencias",
+    columns: [
+      string("folio", 40, true),
+      string("area", 80, true),
+      string("clasificacion", 40, true),
+      text("descripcion", true),
+      string("responsable", 120, true),
+      datetime("fechaApertura", true),
+      datetime("fechaCierre", false),
+      string("evidencia", 180, false),
+      string("impacto", 20, true),
+      string("prioridad", 20, true),
+      string("estado", 40, true)
+    ],
+    rows: [
+      row("inc-2026-001", { folio: "INC-2026-001", area: "Mantenimiento", clasificacion: "Mantenimiento", descripcion: "Paro crítico de compresor con reincidencia.", responsable: "José Luis Sánchez", fechaApertura: "2026-06-15T12:00:00.000Z", evidencia: "orden-servicio.pdf", impacto: "Alto", prioridad: "alta", estado: "en proceso" }),
+      row("inc-2026-002", { folio: "INC-2026-002", area: "Logística", clasificacion: "Logística", descripcion: "Entrega detenida por liberación documental incompleta.", responsable: "Guillermo Nieto", fechaApertura: "2026-06-18T12:00:00.000Z", evidencia: "", impacto: "Medio", prioridad: "alta", estado: "con riesgo" }),
+      row("inc-2026-003", { folio: "INC-2026-003", area: "Almacén", clasificacion: "Operativa", descripcion: "Diferencia entre conteo físico y reporte MicroSip.", responsable: "Moisés Prado", fechaApertura: "2026-06-17T12:00:00.000Z", fechaCierre: "2026-06-19T18:00:00.000Z", evidencia: "conteo-ciclico.xlsx", impacto: "Medio", prioridad: "media", estado: "cerrado" })
+    ]
+  },
+  {
+    id: "reuniones",
+    name: "Reuniones",
+    columns: [
+      datetime("fecha", true),
+      string("tipo", 30, true),
+      string("titulo", 180, true),
+      string("area", 80, true),
+      string("responsable", 120, true),
+      text("participantes", false),
+      text("minuta", false),
+      text("acuerdo", false),
+      string("responsableAcuerdo", 120, false),
+      datetime("fechaCompromiso", false),
+      string("estado", 40, true)
+    ],
+    rows: [
+      row("reu-001", { fecha: "2026-06-18T12:00:00.000Z", tipo: "Semanal", titulo: "Junta de operaciones", area: "Todas", responsable: "Administrador General", participantes: "Dirección, Ventas, Almacén, Logística, Mantenimiento", minuta: "Se revisaron focos rojos, incidencias y compromisos de la semana.", acuerdo: "Cerrar evidencias críticas antes del siguiente corte.", responsableAcuerdo: "Administrador General", fechaCompromiso: "2026-06-23T18:00:00.000Z", estado: "cerrado" }),
+      row("reu-002", { fecha: "2026-06-20T12:00:00.000Z", tipo: "Extraordinaria", titulo: "Seguimiento de compresor crítico", area: "Mantenimiento", responsable: "José Luis Sánchez", participantes: "Mantenimiento, Dirección", minuta: "Pendiente de realizar.", acuerdo: "Documentar causa raíz y acción preventiva.", responsableAcuerdo: "José Luis Sánchez", fechaCompromiso: "2026-06-22T18:00:00.000Z", estado: "pendiente" })
+    ]
+  },
+  {
+    id: "kpis",
+    name: "KPIs por jefatura",
+    columns: [
+      string("area", 80, true),
+      string("indicador", 160, true),
+      float("objetivo", true),
+      float("resultadoActual", true),
+      string("unidad", 20, true),
+      string("frecuencia", 30, true),
+      string("responsable", 120, true),
+      string("tendencia", 20, true),
+      string("semaforo", 20, true)
+    ],
+    rows: [
+      row("kpi-ventas-01", { area: "Ventas", indicador: "Oportunidades con siguiente acción", objetivo: 100, resultadoActual: 76, unidad: "%", frecuencia: "Semanal", responsable: "José Carlos González", tendencia: "sube", semaforo: "amarillo" }),
+      row("kpi-almacen-01", { area: "Almacén", indicador: "Exactitud de inventario", objetivo: 98, resultadoActual: 94, unidad: "%", frecuencia: "Semanal", responsable: "Moisés Prado", tendencia: "estable", semaforo: "amarillo" }),
+      row("kpi-logistica-01", { area: "Logística", indicador: "Entregas a tiempo", objetivo: 92, resultadoActual: 84, unidad: "%", frecuencia: "Semanal", responsable: "Guillermo Nieto", tendencia: "baja", semaforo: "rojo" }),
+      row("kpi-mantto-01", { area: "Mantenimiento", indicador: "Preventivos cumplidos", objetivo: 95, resultadoActual: 88, unidad: "%", frecuencia: "Mensual", responsable: "José Luis Sánchez", tendencia: "sube", semaforo: "amarillo" })
+    ]
+  },
+  {
+    id: "evidencias_operativas",
+    name: "Evidencias operativas",
+    columns: [
+      string("tipoRelacion", 30, true),
+      string("relacionId", 80, true),
+      string("nombreArchivo", 180, true),
+      string("tipoArchivo", 60, false),
+      string("responsable", 120, true),
+      datetime("fechaCarga", false),
+      string("estado", 30, true),
+      string("fileId", 100, false)
+    ],
+    rows: [
+      row("ev-001", { tipoRelacion: "Proyecto", relacionId: "proy-control-evidencias", nombreArchivo: "checklist-evidencias.xlsx", tipoArchivo: "Excel", responsable: "Administrador General", fechaCarga: "2026-06-17T12:00:00.000Z", estado: "validada", fileId: "" }),
+      row("ev-002", { tipoRelacion: "Incidencia", relacionId: "inc-2026-001", nombreArchivo: "orden-servicio.pdf", tipoArchivo: "PDF", responsable: "José Luis Sánchez", fechaCarga: "2026-06-16T12:00:00.000Z", estado: "cargada", fileId: "" }),
+      row("ev-003", { tipoRelacion: "Tarea", relacionId: "task-004", nombreArchivo: "Diagnóstico técnico pendiente", tipoArchivo: "PDF", responsable: "José Luis Sánchez", estado: "faltante", fileId: "" })
     ]
   },
   {
@@ -405,7 +534,10 @@ const tables = [
     name: "Acuerdos",
     columns: [
       text("acuerdo", true),
+      datetime("fecha", false),
+      string("area", 80, false),
       string("responsable", 120, true),
+      string("prioridad", 20, false),
       datetime("fechaCompromiso", true),
       string("evidencia", 180, false),
       string("estado", 40, true)
@@ -606,11 +738,20 @@ function permissionsForRow(tableId, data, rowId = "") {
     ]);
   }
 
-  if (["reportes", "autorizaciones", "tareas", "evidencias", "jefaturas", "gastos", "viaticos", "mantenimientos"].includes(tableId)) {
-    const areaUserId = areaUserIds[data.gerencia] || areaUserIds[areaFromReport(data.reporteId)];
+  if (["reportes", "autorizaciones", "tareas", "evidencias", "jefaturas", "gastos", "viaticos", "mantenimientos", "proyectos", "incidencias", "reuniones", "kpis"].includes(tableId)) {
+    const areaUserId = areaUserIds[data.gerencia] || areaUserIds[data.area] || areaUserIds[areaFromReport(data.reporteId)];
     return uniquePermissions([
       ...readForUsers([...adminUserIds, ...executiveUserIds, areaUserId]),
       ...updateForUsers([...adminUserIds, areaUserId]),
+      ...deleteForUsers(adminUserIds),
+    ]);
+  }
+
+  if (["subtareas", "evidencias_operativas"].includes(tableId)) {
+    const ownerId = userIdForResponsible(data.responsable);
+    return uniquePermissions([
+      ...readForUsers([...adminUserIds, ...executiveUserIds, ownerId]),
+      ...updateForUsers([...adminUserIds, ownerId]),
       ...deleteForUsers(adminUserIds),
     ]);
   }

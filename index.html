@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PMPS Control 360</title>
+  <title>MENLUN NEXUS</title>
   <link rel="icon" type="image/png" href="assets/pmps-icon.png">
   <link rel="stylesheet" href="styles.css?v=1.1.1">
 </head>
@@ -17,8 +17,8 @@
             <span class="logo-fallback" aria-hidden="true">PMPS</span>
           </div>
           <div>
-            <p class="eyebrow">PMPS</p>
-            <h1>Control 360</h1>
+            <p class="eyebrow">MENLUN</p>
+            <h1>NEXUS</h1>
           </div>
         </div>
 
@@ -42,41 +42,55 @@
             <img src="assets/pmps-logo.png" alt="PMPS" data-logo>
             <span class="logo-fallback" aria-hidden="true">PMPS</span>
           </div>
-          <span class="sidebar-system-name">Control 360</span>
+          <span class="sidebar-system-name">MENLUN NEXUS</span>
         </div>
 
-        <nav class="module-nav" aria-label="Oficina de transformaci&oacute;n operativa">
+        <nav class="module-nav" aria-label="Gesti&oacute;n, ejecuci&oacute;n y control operativo">
+          <p>Direcci&oacute;n</p>
+          <button class="active" type="button" data-view="direction-dashboard" data-module="Dashboard ejecutivo" data-area="Direcci&oacute;n">Dashboard ejecutivo</button>
+          <button type="button" data-view="alerts" data-module="Centro de alertas" data-area="Control preventivo">Centro de alertas</button>
+          <button type="button" data-view="carmen" data-module="Dashboard Carmen" data-area="Focos rojos">Dashboard Carmen</button>
+
+          <p>Ejecuci&oacute;n operativa</p>
+          <button type="button" data-view="projects" data-module="Proyectos" data-area="Ejecuci&oacute;n y resultados">Proyectos</button>
+          <button type="button" data-view="tasks" data-module="Tareas y subtareas" data-area="Compromisos operativos">Tareas y subtareas</button>
+          <button type="button" data-view="agreements" data-module="Acuerdos" data-area="Compromisos de reuni&oacute;n">Acuerdos</button>
+          <button type="button" data-view="incidents" data-module="Incidencias" data-area="Control de desviaciones">Incidencias</button>
+          <button type="button" data-view="meetings" data-module="Reuniones" data-area="Minutas y seguimiento">Reuniones</button>
+          <button type="button" data-view="evidence-center" data-module="Evidencias" data-area="Repositorio operativo">Evidencias</button>
+          <button type="button" data-view="kanban" data-module="Kanban" data-area="Tablero visual">Kanban</button>
+          <button type="button" data-view="calendar" data-module="Calendario" data-area="Agenda operativa">Calendario</button>
+          <button type="button" data-view="gantt" data-module="Gantt" data-area="Cronograma de ejecuci&oacute;n">Gantt</button>
+          <button type="button" data-view="kpis" data-module="KPIs" data-area="Indicadores por jefatura">KPIs</button>
+
           <p>Transformaci&oacute;n</p>
-          <button class="active" type="button" data-view="diagnostic-base" data-module="Diagn&oacute;stico base" data-area="Oficina de transformaci&oacute;n">Diagn&oacute;stico base</button>
+          <button type="button" data-view="diagnostic-base" data-module="Diagn&oacute;stico base" data-area="Oficina de transformaci&oacute;n">Diagn&oacute;stico base</button>
           <button type="button" data-view="interviews" data-module="Entrevistas" data-area="Levantamiento operativo">Entrevistas</button>
           <button type="button" data-view="pain-map" data-module="Mapa de dolor" data-area="Problemas estructurados">Mapa de dolor</button>
           <button type="button" data-view="executive-diagnosis" data-module="Diagn&oacute;stico ejecutivo" data-area="Hallazgos y causas">Diagn&oacute;stico ejecutivo</button>
           <button type="button" data-view="strategy" data-module="Estrategia" data-area="Objetivos y KPIs">Estrategia</button>
           <button type="button" data-view="work-plan" data-module="Plan de trabajo" data-area="Ejecuci&oacute;n operativa">Plan de trabajo</button>
           <button type="button" data-view="follow-up" data-module="Seguimiento" data-area="Control de ejecuci&oacute;n">Seguimiento</button>
-          <button type="button" data-view="agreements" data-module="Acuerdos" data-area="Compromisos de reuni&oacute;n">Acuerdos</button>
           <button type="button" data-view="risks" data-module="Riesgos" data-area="Riesgo operativo">Riesgos</button>
           <button type="button" data-view="benefits" data-module="Beneficios obtenidos" data-area="Impacto generado">Beneficios obtenidos</button>
 
-          <p>Control</p>
-          <button type="button" data-view="carmen" data-module="Dashboard Carmen" data-area="Focos rojos">Dashboard Carmen</button>
-          <button type="button" data-view="direction-dashboard" data-module="Dashboard Direcci&oacute;n" data-area="Vista ejecutiva">Dashboard Direcci&oacute;n</button>
+          <p>Administraci&oacute;n</p>
           <button type="button" data-view="admin" data-module="Panel administrador" data-area="Centro de control" data-admin-only>Panel administrador</button>
           <button type="button" data-view="leadership" data-module="Jefaturas 360" data-area="Control de jefaturas" data-admin-only>Jefaturas 360</button>
           <button type="button" data-view="management" data-module="Gerencias" data-area="Panel administrativo" data-admin-only>Gerencias</button>
           <button type="button" data-view="audit" data-module="Bit&aacute;cora" data-area="Auditor&iacute;a" data-admin-only>Bit&aacute;cora</button>
 
-          <p>Consulta anterior</p>
+          <p>Control operativo</p>
           <button type="button" data-view="capture" data-module="Captura de reportes" data-area="Reportes">Reportes operativos</button>
-          <button type="button" data-view="kanban" data-module="Kanban" data-area="Seguimiento">Kanban</button>
-          <button type="button" data-view="calendar" data-module="Calendario" data-area="Calendario operativo">Calendario</button>
-          <button type="button" data-view="area" data-area-key="Produccion" data-module="Producci&oacute;n" data-area="Gerencia de Producci&oacute;n">Producci&oacute;n</button>
-          <button type="button" data-view="area" data-area-key="Calidad" data-module="Calidad" data-area="Gerencia de Calidad">Calidad</button>
-          <button type="button" data-view="area" data-area-key="Compras" data-module="Compras" data-area="Gerencia de Compras">Compras</button>
           <button type="button" data-view="area" data-area-key="Almacen" data-module="Almac&eacute;n" data-area="Gerencia de Almac&eacute;n">Almac&eacute;n</button>
           <button type="button" data-view="area" data-area-key="Logistica" data-module="Log&iacute;stica" data-area="Gerencia de Log&iacute;stica">Log&iacute;stica</button>
           <button type="button" data-view="area" data-area-key="Mantenimiento" data-module="Mantenimiento" data-area="Gerencia de Mantenimiento">Mantenimiento</button>
           <button type="button" data-view="area" data-area-key="Ventas" data-module="Ventas" data-area="Gerencia Comercial">Ventas</button>
+
+          <p>&Aacute;reas de soporte</p>
+          <button type="button" data-view="area" data-area-key="Produccion" data-module="Producci&oacute;n" data-area="Gerencia de Producci&oacute;n">Producci&oacute;n</button>
+          <button type="button" data-view="area" data-area-key="Calidad" data-module="Calidad" data-area="Gerencia de Calidad">Calidad</button>
+          <button type="button" data-view="area" data-area-key="Compras" data-module="Compras" data-area="Gerencia de Compras">Compras</button>
           <button type="button" data-view="area" data-area-key="Recursos Humanos" data-module="Recursos Humanos" data-area="Gerencia de Recursos Humanos">Recursos Humanos</button>
           <button type="button" data-view="area" data-area-key="Contabilidad" data-module="Contabilidad" data-area="Gerencia de Contabilidad">Contabilidad</button>
           <button type="button" data-view="area" data-area-key="Sistemas" data-module="Sistemas" data-area="Gerencia de Sistemas">Sistemas</button>
@@ -96,7 +110,7 @@
             </div>
           </div>
           <div class="topbar-actions">
-            <input class="global-search" id="global-search" type="search" placeholder="Buscar hallazgo, dolor, acuerdo, riesgo...">
+            <input class="global-search" id="global-search" type="search" placeholder="Buscar proyecto, tarea, acuerdo, incidencia...">
             <span class="status-pill" id="data-status" data-state="loading">Conectando sistema...</span>
             <div class="user-chip" id="user-chip">Sin sesi&oacute;n</div>
             <button class="logout-button" id="logout-button" type="button">Cerrar sesi&oacute;n</button>

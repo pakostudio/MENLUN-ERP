@@ -84,8 +84,48 @@ let auditLogs = [
 ];
 
 let tasks = [
-  { rowId: "task-001", title: "Cargar evidencia de desviación", area: "Calidad", responsible: "Mariana Ruiz", priority: "alta", status: "vencida", due: "2026-06-04", reportId: "rep-002" },
-  { rowId: "task-002", title: "Validar gasto de refacciones", area: "Produccion", responsible: "Luis Ortega", priority: "alta", status: "pendiente", due: "2026-06-06", reportId: "rep-001" },
+  { rowId: "task-001", projectId: "proy-control-evidencias", title: "Cargar evidencia de desviación", description: "Integrar respaldo y causa de la desviación.", area: "Calidad", responsible: "Mariana Ruiz", priority: "alta", status: "vencida", start: "2026-06-02", due: "2026-06-04", evidence: "", kpi: "Evidencias completas", reportId: "rep-002" },
+  { rowId: "task-002", projectId: "proy-control-evidencias", title: "Validar gasto de refacciones", description: "Confirmar autorización y evidencia del gasto.", area: "Produccion", responsible: "Luis Ortega", priority: "alta", status: "pendiente", start: "2026-06-05", due: "2026-06-20", evidence: "", kpi: "Gasto autorizado", reportId: "rep-001" },
+  { rowId: "task-003", projectId: "proy-logistica-trazable", title: "Definir ruta de liberación y entrega", description: "Documentar responsable, fecha y evidencia por etapa.", area: "Logistica", responsible: "Guillermo Nieto", priority: "alta", status: "en proceso", start: "2026-06-16", due: "2026-06-23", evidence: "mapa-ruta-v1.pdf", kpi: "Entregas a tiempo", reportId: "" },
+  { rowId: "task-004", projectId: "proy-mantenimiento-confiable", title: "Completar causa raíz del compresor", description: "Registrar causa, mitigación y acción preventiva.", area: "Mantenimiento", responsible: "José Luis Sánchez", priority: "alta", status: "con riesgo", start: "2026-06-15", due: "2026-06-19", evidence: "", kpi: "Reincidencia crítica", reportId: "" },
+  { rowId: "task-005", projectId: "proy-ventas-seguimiento", title: "Actualizar siguiente acción de oportunidades", description: "Toda oportunidad activa debe tener responsable y siguiente contacto.", area: "Ventas", responsible: "José Carlos González", priority: "media", status: "en proceso", start: "2026-06-17", due: "2026-06-24", evidence: "", kpi: "Oportunidades con seguimiento", reportId: "" },
+];
+
+let projects = [
+  { rowId: "proy-control-evidencias", name: "Control integral de evidencias", objective: "Centralizar evidencias y eliminar cierres sin respaldo.", area: "Todas", owner: "Administrador General", start: "2026-06-10", due: "2026-07-15", priority: "alta", status: "en proceso", kpi: "Evidencias completas", expected: "95%" },
+  { rowId: "proy-logistica-trazable", name: "Logística trazable", objective: "Asegurar visibilidad de rutas, entregas, liberaciones y comprobaciones.", area: "Logistica", owner: "Guillermo Nieto", start: "2026-06-12", due: "2026-07-31", priority: "alta", status: "en proceso", kpi: "Entregas a tiempo", expected: "92%" },
+  { rowId: "proy-mantenimiento-confiable", name: "Mantenimiento confiable", objective: "Reducir reincidencias mediante causa raíz y preventivos.", area: "Mantenimiento", owner: "José Luis Sánchez", start: "2026-06-14", due: "2026-08-15", priority: "alta", status: "con riesgo", kpi: "Reincidencia crítica", expected: "< 5%" },
+  { rowId: "proy-ventas-seguimiento", name: "Disciplina comercial", objective: "Controlar seguimiento, forecast y compromisos comerciales.", area: "Ventas", owner: "José Carlos González", start: "2026-06-16", due: "2026-07-30", priority: "media", status: "en proceso", kpi: "Oportunidades con siguiente acción", expected: "100%" },
+];
+
+let subtasks = [
+  { rowId: "sub-001", taskId: "task-003", title: "Validar responsables por etapa", responsible: "Guillermo Nieto", due: "2026-06-20", status: "cerrado" },
+  { rowId: "sub-002", taskId: "task-003", title: "Definir evidencia mínima de entrega", responsible: "Guillermo Nieto", due: "2026-06-23", status: "en proceso" },
+  { rowId: "sub-003", taskId: "task-004", title: "Adjuntar diagnóstico técnico", responsible: "José Luis Sánchez", due: "2026-06-19", status: "vencido" },
+];
+
+let incidents = [
+  { rowId: "inc-2026-001", folio: "INC-2026-001", area: "Mantenimiento", classification: "Mantenimiento", description: "Paro crítico de compresor con reincidencia.", responsible: "José Luis Sánchez", openDate: "2026-06-15", closeDate: "", evidence: "orden-servicio.pdf", impact: "Alto", priority: "alta", status: "en proceso" },
+  { rowId: "inc-2026-002", folio: "INC-2026-002", area: "Logistica", classification: "Logística", description: "Entrega detenida por liberación documental incompleta.", responsible: "Guillermo Nieto", openDate: "2026-06-18", closeDate: "", evidence: "", impact: "Medio", priority: "alta", status: "con riesgo" },
+  { rowId: "inc-2026-003", folio: "INC-2026-003", area: "Almacen", classification: "Operativa", description: "Diferencia entre conteo físico y reporte MicroSip.", responsible: "Moisés Prado", openDate: "2026-06-17", closeDate: "2026-06-19", evidence: "conteo-ciclico.xlsx", impact: "Medio", priority: "media", status: "cerrado" },
+];
+
+let meetings = [
+  { rowId: "reu-001", date: "2026-06-18", type: "Semanal", title: "Junta de operaciones", area: "Todas", owner: "Administrador General", attendees: "Dirección, Ventas, Almacén, Logística, Mantenimiento", minutes: "Se revisaron focos rojos, incidencias y compromisos de la semana.", agreement: "Cerrar evidencias críticas antes del siguiente corte.", agreementOwner: "Administrador General", commitmentDate: "2026-06-23", status: "cerrado" },
+  { rowId: "reu-002", date: "2026-06-20", type: "Extraordinaria", title: "Seguimiento de compresor crítico", area: "Mantenimiento", owner: "José Luis Sánchez", attendees: "Mantenimiento, Dirección", minutes: "Pendiente de realizar.", agreement: "Documentar causa raíz y acción preventiva.", agreementOwner: "José Luis Sánchez", commitmentDate: "2026-06-22", status: "pendiente" },
+];
+
+let kpis = [
+  { rowId: "kpi-ventas-01", area: "Ventas", name: "Oportunidades con siguiente acción", target: 100, current: 76, unit: "%", frequency: "Semanal", owner: "José Carlos González", trend: "sube", status: "amarillo" },
+  { rowId: "kpi-almacen-01", area: "Almacen", name: "Exactitud de inventario", target: 98, current: 94, unit: "%", frequency: "Semanal", owner: "Moisés Prado", trend: "estable", status: "amarillo" },
+  { rowId: "kpi-logistica-01", area: "Logistica", name: "Entregas a tiempo", target: 92, current: 84, unit: "%", frequency: "Semanal", owner: "Guillermo Nieto", trend: "baja", status: "rojo" },
+  { rowId: "kpi-mantto-01", area: "Mantenimiento", name: "Preventivos cumplidos", target: 95, current: 88, unit: "%", frequency: "Mensual", owner: "José Luis Sánchez", trend: "sube", status: "amarillo" },
+];
+
+let evidenceLibrary = [
+  { rowId: "ev-001", relationType: "Proyecto", relationId: "proy-control-evidencias", name: "checklist-evidencias.xlsx", type: "Excel", owner: "Administrador General", date: "2026-06-17", status: "validada", fileId: "" },
+  { rowId: "ev-002", relationType: "Incidencia", relationId: "inc-2026-001", name: "orden-servicio.pdf", type: "PDF", owner: "José Luis Sánchez", date: "2026-06-16", status: "cargada", fileId: "" },
+  { rowId: "ev-003", relationType: "Tarea", relationId: "task-004", name: "Diagnóstico técnico pendiente", type: "PDF", owner: "José Luis Sánchez", date: "", status: "faltante", fileId: "" },
 ];
 
 let diagnosticBase = [
@@ -135,9 +175,9 @@ let workPlan = [
 ];
 
 let agreements = [
-  { agreement: "Toda evidencia crítica debe cargarse antes del cierre semanal.", owner: "Moisés Prado", due: "2026-06-17", evidence: "", status: "pendiente" },
-  { agreement: "Los gastos extraordinarios requieren justificación previa.", owner: "Guillermo Nieto", due: "2026-06-20", evidence: "formato-viaticos.pdf", status: "en revision" },
-  { agreement: "Cada falla crítica debe incluir causa raíz y acción preventiva.", owner: "José Luis Sánchez", due: "2026-06-22", evidence: "", status: "falta evidencia" },
+  { agreement: "Toda evidencia crítica debe cargarse antes del cierre semanal.", date: "2026-06-18", area: "Almacen", owner: "Moisés Prado", priority: "alta", due: "2026-06-23", evidence: "", status: "en proceso" },
+  { agreement: "Los gastos extraordinarios requieren justificación previa.", date: "2026-06-18", area: "Logistica", owner: "Guillermo Nieto", priority: "alta", due: "2026-06-20", evidence: "formato-viaticos.pdf", status: "con riesgo" },
+  { agreement: "Cada falla crítica debe incluir causa raíz y acción preventiva.", date: "2026-06-18", area: "Mantenimiento", owner: "José Luis Sánchez", priority: "alta", due: "2026-06-22", evidence: "", status: "pendiente" },
 ];
 
 let riskRegister = [
@@ -162,6 +202,12 @@ workPlan = workPlan.map((item, index) => ({ rowId: item.rowId || `plan-${index +
 agreements = agreements.map((item, index) => ({ rowId: item.rowId || `acu-${index + 1}`, ...item }));
 riskRegister = riskRegister.map((item, index) => ({ rowId: item.rowId || `risk-${index + 1}`, ...item }));
 benefits = benefits.map((item, index) => ({ rowId: item.rowId || `ben-${index + 1}`, ...item }));
+projects = projects.map((item, index) => ({ rowId: item.rowId || `proy-${index + 1}`, ...item }));
+subtasks = subtasks.map((item, index) => ({ rowId: item.rowId || `sub-${index + 1}`, ...item }));
+incidents = incidents.map((item, index) => ({ rowId: item.rowId || `inc-${index + 1}`, ...item }));
+meetings = meetings.map((item, index) => ({ rowId: item.rowId || `reu-${index + 1}`, ...item }));
+kpis = kpis.map((item, index) => ({ rowId: item.rowId || `kpi-${index + 1}`, ...item }));
+evidenceLibrary = evidenceLibrary.map((item, index) => ({ rowId: item.rowId || `ev-${index + 1}`, ...item }));
 
 let jefaturas = [
   { rowId: "jef-moises-prado", name: "Moisés Prado", photo: "", position: "Supervisor de Almacén", area: "Almacen", leadership: "Almacén", email: "supervisor.almacen@pmpsquimicos.com", phone: "56 4007 0190", whatsapp: "56 4007 0190", boss: "Carmen", user: "supervisor.almacen@pmpsquimicos.com", role: "Jefatura", status: "Activo", monthlyGoal: "Inventario exacto y evidencias completas", quarterlyGoal: "Reducir diferencias físicas", annualGoal: "Mejorar control operativo de almacén", mainKpi: "Exactitud de inventario", secondaryKpis: "Evidencias, reportes, cumplimiento", budget: 410000, spent: 51000, carmenComments: "Reforzar evidencia semanal.", directionComments: "Prioridad media." },
@@ -276,7 +322,7 @@ logoutButton.addEventListener("click", async () => {
   document.body.classList.remove("is-app");
   document.body.classList.add("is-login");
   navButtons.forEach((item) => item.classList.remove("active"));
-  document.querySelector('[data-view="diagnostic-base"]')?.classList.add("active");
+  document.querySelector('[data-view="direction-dashboard"]')?.classList.add("active");
   logoutButton.disabled = false;
 });
 
@@ -330,6 +376,8 @@ appContent.addEventListener("click", async (event) => {
     if (action === "reject-report") await changeReportStatus(target, "rechazado");
     if (action === "missing-evidence") await changeReportStatus(target, "falta evidencia");
     if (action === "close-report") await changeReportStatus(target, "cerrado");
+    if (action === "open-project") renderTasks(target);
+    if (action === "back-projects") renderProjects();
   } catch (error) {
     notify("No se pudo completar la acción. Revisa la conexión del sistema.");
     console.warn(error);
@@ -349,6 +397,12 @@ async function initializeAppData() {
       remoteAuditLogs,
       remoteJefaturas,
       remoteTasks,
+      remoteProjects,
+      remoteSubtasks,
+      remoteIncidents,
+      remoteMeetings,
+      remoteKpis,
+      remoteEvidenceLibrary,
       remoteDiagnosticBase,
       remoteInterviews,
       remotePainMap,
@@ -365,6 +419,12 @@ async function initializeAppData() {
       listRows(TABLES.bitacora),
       listRowsOptional(TABLES.jefaturas),
       listRowsOptional(TABLES.tareas),
+      listRowsOptional(TABLES.proyectos),
+      listRowsOptional(TABLES.subtareas),
+      listRowsOptional(TABLES.incidencias),
+      listRowsOptional(TABLES.reuniones),
+      listRowsOptional(TABLES.kpis),
+      listRowsOptional(TABLES.evidenciasOperativas),
       listRowsOptional(TABLES.diagnosticoBase),
       listRowsOptional(TABLES.entrevistas),
       listRowsOptional(TABLES.mapaDolor),
@@ -417,6 +477,13 @@ async function initializeAppData() {
     if (remoteTasks.length) {
       tasks = remoteTasks.map(mapTaskRow);
     }
+
+    if (remoteProjects.length) projects = remoteProjects.map(mapProjectRow);
+    if (remoteSubtasks.length) subtasks = remoteSubtasks.map(mapSubtaskRow);
+    if (remoteIncidents.length) incidents = remoteIncidents.map(mapIncidentRow);
+    if (remoteMeetings.length) meetings = remoteMeetings.map(mapMeetingRow);
+    if (remoteKpis.length) kpis = remoteKpis.map(mapKpiRow);
+    if (remoteEvidenceLibrary.length) evidenceLibrary = remoteEvidenceLibrary.map(mapOperationalEvidenceRow);
 
     if (remoteDiagnosticBase.length) diagnosticBase = remoteDiagnosticBase.map(mapDiagnosticBaseRow);
     if (remoteInterviews.length) interviews = remoteInterviews.map(mapInterviewRow);
@@ -818,7 +885,11 @@ function permissionsForRow(tableId, data) {
     return permissionsForArea(areaKeyFromLabel(data.area || data.areaAfectada), { adminOnlyUpdate: true });
   }
 
-  if ([TABLES.estrategias, TABLES.planTrabajo, TABLES.acuerdos, TABLES.riesgos, TABLES.beneficios].includes(tableId)) {
+  if ([TABLES.proyectos, TABLES.incidencias, TABLES.reuniones, TABLES.kpis, TABLES.evidenciasOperativas].includes(tableId)) {
+    return permissionsForArea(areaKeyFromLabel(data.area || data.gerencia), { adminOnlyUpdate: false });
+  }
+
+  if ([TABLES.subtareas, TABLES.estrategias, TABLES.planTrabajo, TABLES.acuerdos, TABLES.riesgos, TABLES.beneficios].includes(tableId)) {
     const ownerId = userIdForResponsible(data.responsable);
     return uniquePermissions([
       ...readPermissions([...ADMIN_USER_IDS, ...EXECUTIVE_USER_IDS, ownerId]),
@@ -879,13 +950,20 @@ function userIdForResponsible(name) {
 
 function transformModules() {
   return {
+    projects: { table: TABLES.proyectos, data: () => projects, set: (items) => { projects = items; }, render: renderProjects, prefix: "proy", label: "proyecto", fields: [["name", "Proyecto", "text"], ["objective", "Objetivo", "textarea"], ["area", "Área", "area"], ["owner", "Responsable", "text"], ["start", "Fecha inicio", "date"], ["due", "Fecha compromiso", "date"], ["priority", "Prioridad", "priority"], ["status", "Estado", "executionStatus"], ["kpi", "KPI", "text"], ["expected", "Resultado esperado", "text"]] },
+    tasks: { table: TABLES.tareas, data: () => tasks, set: (items) => { tasks = items; }, render: renderTasks, prefix: "task", label: "tarea", fields: [["projectId", "Proyecto", "project"], ["title", "Tarea", "text"], ["description", "Descripción", "textarea"], ["area", "Área", "area"], ["responsible", "Responsable", "text"], ["start", "Fecha inicio", "date"], ["due", "Fecha compromiso", "date"], ["priority", "Prioridad", "priority"], ["status", "Estado", "executionStatus"], ["evidence", "Evidencia", "text"], ["kpi", "KPI", "text"]] },
+    subtasks: { table: TABLES.subtareas, data: () => subtasks, set: (items) => { subtasks = items; }, render: renderTasks, prefix: "sub", label: "subtarea", fields: [["taskId", "Tarea principal", "task"], ["title", "Subtarea", "text"], ["responsible", "Responsable", "text"], ["due", "Fecha compromiso", "date"], ["status", "Estado", "executionStatus"]] },
+    incidents: { table: TABLES.incidencias, data: () => incidents, set: (items) => { incidents = items; }, render: renderIncidents, prefix: "inc", label: "incidencia", fields: [["folio", "Folio", "text"], ["area", "Área", "area"], ["classification", "Clasificación", "incidentClass"], ["description", "Descripción", "textarea"], ["responsible", "Responsable", "text"], ["openDate", "Fecha apertura", "date"], ["closeDate", "Fecha cierre", "optionalDate"], ["evidence", "Evidencia", "text"], ["impact", "Impacto", "impact"], ["priority", "Prioridad", "priority"], ["status", "Estado", "executionStatus"]] },
+    meetings: { table: TABLES.reuniones, data: () => meetings, set: (items) => { meetings = items; }, render: renderMeetings, prefix: "reu", label: "reunión", fields: [["date", "Fecha", "date"], ["type", "Tipo", "meetingType"], ["title", "Reunión", "text"], ["area", "Área", "area"], ["owner", "Responsable", "text"], ["attendees", "Participantes", "textarea"], ["minutes", "Minuta", "textarea"], ["agreement", "Acuerdo generado", "textarea"], ["agreementOwner", "Responsable del acuerdo", "text"], ["commitmentDate", "Fecha compromiso", "date"], ["status", "Estado", "executionStatus"]] },
+    kpis: { table: TABLES.kpis, data: () => kpis, set: (items) => { kpis = items; }, render: renderKpis, prefix: "kpi", label: "KPI", fields: [["area", "Área", "area"], ["name", "Indicador", "text"], ["target", "Objetivo", "number"], ["current", "Resultado actual", "number"], ["unit", "Unidad", "text"], ["frequency", "Frecuencia", "frequency"], ["owner", "Responsable", "text"], ["trend", "Tendencia", "trend"], ["status", "Semáforo", "traffic"]] },
+    evidenceLibrary: { table: TABLES.evidenciasOperativas, data: () => evidenceLibrary, set: (items) => { evidenceLibrary = items; }, render: renderEvidenceCenter, prefix: "evi", label: "evidencia", fields: [["relationType", "Relacionado con", "relationType"], ["relationId", "Folio / ID relacionado", "text"], ["name", "Nombre del archivo", "text"], ["type", "Tipo", "text"], ["owner", "Responsable", "text"], ["date", "Fecha", "date"], ["status", "Estado", "evidenceStatus"], ["fileId", "Referencia de almacenamiento", "text"]] },
     diagnosticBase: { table: TABLES.diagnosticoBase, data: () => diagnosticBase, set: (items) => { diagnosticBase = items; }, render: renderDiagnosticBase, prefix: "diag", label: "diagnóstico", fields: [["section", "Bloque", "text"], ["area", "Área", "area"], ["detail", "Detalle / observaciones", "textarea"], ["owner", "Responsable", "text"], ["evidence", "Evidencia", "text"], ["status", "Estatus", "status"]] },
     interviews: { table: TABLES.entrevistas, data: () => interviews, set: (items) => { interviews = items; }, render: renderInterviews, prefix: "ent", label: "entrevista", fields: [["date", "Fecha", "date"], ["interviewed", "Entrevistado", "text"], ["area", "Área", "area"], ["position", "Puesto", "text"], ["responsible", "Responsable entrevista", "text"], ["functions", "Funciones actuales", "textarea"], ["responsibilities", "Responsabilidades", "textarea"], ["problems", "Problemas detectados", "textarea"], ["risks", "Riesgos", "textarea"], ["opportunities", "Oportunidades", "textarea"], ["ideas", "Ideas de mejora", "textarea"], ["needs", "Necesidades de información", "textarea"], ["automations", "Automatizaciones sugeridas", "textarea"], ["golden", "Pregunta de oro", "textarea"]] },
     painMap: { table: TABLES.mapaDolor, data: () => painMap, set: (items) => { painMap = items; }, render: renderPainMap, prefix: "dolor", label: "dolor", fields: [["category", "Clasificación", "text"], ["description", "Descripción", "textarea"], ["area", "Área afectada", "area"], ["impact", "Impacto", "text"], ["frequency", "Frecuencia", "text"], ["priority", "Prioridad", "priority"], ["owner", "Responsable", "text"], ["signal", "Semáforo", "traffic"]] },
     executiveFindings: { table: TABLES.diagnosticoEjecutivo, data: () => executiveFindings, set: (items) => { executiveFindings = items; }, render: renderExecutiveDiagnosis, prefix: "hall", label: "hallazgo", fields: [["finding", "Hallazgo", "textarea"], ["rootCause", "Causa raíz", "textarea"], ["risk", "Riesgo", "textarea"], ["impact", "Impacto", "text"], ["area", "Área", "area"], ["priority", "Prioridad", "priority"], ["owner", "Responsable", "text"]] },
     strategies: { table: TABLES.estrategias, data: () => strategies, set: (items) => { strategies = items; }, render: renderStrategy, prefix: "est", label: "estrategia", fields: [["finding", "Hallazgo", "text"], ["objective", "Objetivo", "textarea"], ["expected", "Resultado esperado", "textarea"], ["owner", "Responsable", "text"], ["kpi", "KPI", "text"], ["start", "Fecha inicio", "date"], ["end", "Fecha fin", "date"], ["budget", "Presupuesto", "number"]] },
     workPlan: { table: TABLES.planTrabajo, data: () => workPlan, set: (items) => { workPlan = items; }, render: renderWorkPlan, prefix: "plan", label: "acción", fields: [["action", "Acción", "textarea"], ["owner", "Responsable", "text"], ["start", "Fecha inicio", "date"], ["due", "Fecha compromiso", "date"], ["priority", "Prioridad", "priority"], ["evidence", "Evidencia", "text"], ["status", "Estado", "status"], ["view", "Vista", "text"]] },
-    agreements: { table: TABLES.acuerdos, data: () => agreements, set: (items) => { agreements = items; }, render: renderAgreements, prefix: "acu", label: "acuerdo", fields: [["agreement", "Acuerdo", "textarea"], ["owner", "Responsable", "text"], ["due", "Fecha compromiso", "date"], ["evidence", "Evidencia", "text"], ["status", "Estado", "status"]] },
+    agreements: { table: TABLES.acuerdos, data: () => agreements, set: (items) => { agreements = items; }, render: renderAgreements, prefix: "acu", label: "acuerdo", fields: [["agreement", "Acuerdo", "textarea"], ["date", "Fecha", "date"], ["owner", "Responsable", "text"], ["area", "Área", "area"], ["priority", "Prioridad", "priority"], ["due", "Fecha compromiso", "date"], ["evidence", "Evidencia", "text"], ["status", "Estado", "executionStatus"]] },
     risks: { table: TABLES.riesgos, data: () => riskRegister, set: (items) => { riskRegister = items; }, render: renderRisks, prefix: "risk", label: "riesgo", fields: [["risk", "Riesgo", "textarea"], ["probability", "Probabilidad", "text"], ["impact", "Impacto", "text"], ["mitigation", "Plan de mitigación", "textarea"], ["owner", "Responsable", "text"]] },
     benefits: { table: TABLES.beneficios, data: () => benefits, set: (items) => { benefits = items; }, render: renderBenefits, prefix: "ben", label: "beneficio", fields: [["saving", "Ahorro generado", "number"], ["timeReduction", "Reducción de tiempos", "text"], ["incidentReduction", "Reducción de incidencias", "text"], ["improvements", "Mejoras implementadas", "textarea"], ["financialImpact", "Impacto financiero", "number"]] },
   };
@@ -918,7 +996,7 @@ async function openTransformForm(moduleKey, rowId = "") {
         <div><p class="eyebrow">Control de gestión</p><h3>${current ? "Editar registro" : "Nuevo registro"}</h3></div>
         <button class="icon-button" type="button" data-modal-close>×</button>
       </div>
-      ${config.fields.map(([key, label, type]) => transformFieldHtml(config.prefix, key, label, type, current?.[key])).join("")}
+      ${config.fields.map(([key, label, type]) => transformFieldHtml(config.prefix, key, label, type, current ? current[key] : transformDefaultValue(moduleKey, key))).join("")}
       <div class="modal-actions field-wide">
         <button class="secondary-button" type="button" data-modal-close>Cancelar</button>
         <button class="primary-button" type="submit">Guardar</button>
@@ -948,6 +1026,21 @@ async function openTransformForm(moduleKey, rowId = "") {
         await createRow(config.table, nextItem.rowId, data);
         config.set([nextItem, ...config.data()]);
       }
+      if (moduleKey === "meetings" && !current && nextItem.agreement) {
+        const generatedAgreement = {
+          rowId: createRowId("acu"),
+          agreement: nextItem.agreement,
+          date: nextItem.date,
+          area: nextItem.area,
+          owner: nextItem.agreementOwner || nextItem.owner,
+          priority: "alta",
+          due: nextItem.commitmentDate,
+          evidence: "",
+          status: "pendiente",
+        };
+        await createRow(TABLES.acuerdos, generatedAgreement.rowId, transformToAppwriteData("agreements", generatedAgreement));
+        agreements = [generatedAgreement, ...agreements];
+      }
       await logAudit(current ? "editar registro" : "crear registro", null, `${moduleKey}: ${recordLabel(nextItem)}.`);
       closeModal();
       notify("Registro guardado correctamente.");
@@ -959,6 +1052,15 @@ async function openTransformForm(moduleKey, rowId = "") {
       submitButton.textContent = "Guardar";
     }
   });
+}
+
+function transformDefaultValue(moduleKey, key) {
+  if (["date", "openDate", "start"].includes(key)) return todayIsoDate();
+  if (["due", "commitmentDate"].includes(key)) return addDaysIso(7);
+  if (moduleKey === "incidents" && key === "folio") return `INC-${new Date().getFullYear()}-${String(incidents.length + 1).padStart(3, "0")}`;
+  if (key === "status") return "pendiente";
+  if (key === "priority") return "media";
+  return "";
 }
 
 async function deleteTransformRecord(moduleKey, rowId) {
@@ -988,11 +1090,26 @@ function transformFieldHtml(prefix, key, label, type, value = "") {
   if (type === "priority") return `<label>${label}<select id="${id}">${["alta", "media", "baja"].map((item) => `<option value="${item}" ${item === value ? "selected" : ""}>${titleCase(item)}</option>`).join("")}</select></label>`;
   if (type === "status") return `<label>${label}<select id="${id}">${["pendiente", "en revision", "falta evidencia", "aprobado", "rechazado", "en ejecucion", "cerrado"].map((item) => `<option value="${item}" ${item === value ? "selected" : ""}>${titleCase(item)}</option>`).join("")}</select></label>`;
   if (type === "traffic") return `<label>${label}<select id="${id}">${["verde", "amarillo", "rojo"].map((item) => `<option value="${item}" ${item === value ? "selected" : ""}>${titleCase(item)}</option>`).join("")}</select></label>`;
+  if (type === "project") return `<label>${label}<select id="${id}">${projects.map((item) => `<option value="${item.rowId}" ${item.rowId === value ? "selected" : ""}>${escapeHtml(item.name)}</option>`).join("")}</select></label>`;
+  if (type === "task") return `<label>${label}<select id="${id}">${tasks.map((item) => `<option value="${item.rowId}" ${item.rowId === value ? "selected" : ""}>${escapeHtml(item.title)}</option>`).join("")}</select></label>`;
+  if (type === "executionStatus") return selectTransformField(id, label, ["pendiente", "en proceso", "con riesgo", "vencido", "cerrado"], value);
+  if (type === "incidentClass") return selectTransformField(id, label, ["Operativa", "Comercial", "Logística", "Mantenimiento", "Calidad", "Administrativa"], value);
+  if (type === "meetingType") return selectTransformField(id, label, ["Semanal", "Mensual", "Trimestral", "Extraordinaria"], value);
+  if (type === "impact") return selectTransformField(id, label, ["Alto", "Medio", "Bajo"], value);
+  if (type === "frequency") return selectTransformField(id, label, ["Semanal", "Quincenal", "Mensual", "Trimestral"], value);
+  if (type === "trend") return selectTransformField(id, label, ["sube", "estable", "baja"], value);
+  if (type === "relationType") return selectTransformField(id, label, ["Proyecto", "Tarea", "Acuerdo", "Incidencia", "Reunión"], value);
+  if (type === "evidenceStatus") return selectTransformField(id, label, ["cargada", "validada", "faltante", "rechazada"], value);
+  if (type === "optionalDate") return `<label>${label}<input id="${id}" type="date" value="${escapeHtml(value || "")}"></label>`;
   return `<label>${label}<input id="${id}" type="${type}" value="${escapeHtml(value || "")}" required></label>`;
 }
 
+function selectTransformField(id, label, options, value) {
+  return `<label>${label}<select id="${id}">${options.map((item) => `<option value="${escapeHtml(item)}" ${normalizePlainText(item) === normalizePlainText(value) ? "selected" : ""}>${escapeHtml(titleCase(item))}</option>`).join("")}</select></label>`;
+}
+
 function recordLabel(item) {
-  return item.finding || item.objective || item.action || item.agreement || item.risk || item.description || item.detail || item.interviewed || item.section || item.improvements || "registro";
+  return item.name || item.title || item.folio || item.finding || item.objective || item.action || item.agreement || item.risk || item.description || item.detail || item.interviewed || item.section || item.improvements || "registro";
 }
 
 function mapReportRow(row) {
@@ -1058,14 +1175,43 @@ function mapJefaturaRow(row) {
 function mapTaskRow(row) {
   return {
     rowId: row.$id,
+    projectId: row.proyectoId || "",
     title: row.titulo || "",
+    description: row.descripcion || "",
     area: areaKeyFromLabel(row.gerencia),
     responsible: row.responsable || "",
     priority: normalizePlainText(row.prioridad),
     status: normalizePlainText(row.estatus),
+    start: formatDate(row.fechaInicio),
     due: formatDate(row.vencimiento),
+    evidence: row.evidencia || "",
+    kpi: row.kpi || "",
     reportId: row.reporteId || "",
   };
+}
+
+function mapProjectRow(row) {
+  return { rowId: row.$id, name: row.nombre || "", objective: row.objetivo || "", area: areaKeyFromLabel(row.area), owner: row.responsable || "", start: formatDate(row.fechaInicio), due: formatDate(row.fechaCompromiso), priority: normalizePlainText(row.prioridad || "media"), status: normalizePlainText(row.estado || "pendiente"), kpi: row.kpi || "", expected: row.resultadoEsperado || "" };
+}
+
+function mapSubtaskRow(row) {
+  return { rowId: row.$id, taskId: row.tareaId || "", title: row.titulo || "", responsible: row.responsable || "", due: formatDate(row.fechaCompromiso), status: normalizePlainText(row.estado || "pendiente") };
+}
+
+function mapIncidentRow(row) {
+  return { rowId: row.$id, folio: row.folio || row.$id, area: areaKeyFromLabel(row.area), classification: row.clasificacion || "Operativa", description: row.descripcion || "", responsible: row.responsable || "", openDate: formatDate(row.fechaApertura), closeDate: formatDate(row.fechaCierre), evidence: row.evidencia || "", impact: row.impacto || "Medio", priority: normalizePlainText(row.prioridad || "media"), status: normalizePlainText(row.estado || "pendiente") };
+}
+
+function mapMeetingRow(row) {
+  return { rowId: row.$id, date: formatDate(row.fecha), type: row.tipo || "Semanal", title: row.titulo || "", area: areaKeyFromLabel(row.area), owner: row.responsable || "", attendees: row.participantes || "", minutes: row.minuta || "", agreement: row.acuerdo || "", agreementOwner: row.responsableAcuerdo || "", commitmentDate: formatDate(row.fechaCompromiso), status: normalizePlainText(row.estado || "pendiente") };
+}
+
+function mapKpiRow(row) {
+  return { rowId: row.$id, area: areaKeyFromLabel(row.area), name: row.indicador || "", target: Number(row.objetivo || 0), current: Number(row.resultadoActual || 0), unit: row.unidad || "", frequency: row.frecuencia || "Mensual", owner: row.responsable || "", trend: normalizePlainText(row.tendencia || "estable"), status: normalizePlainText(row.semaforo || "amarillo") };
+}
+
+function mapOperationalEvidenceRow(row) {
+  return { rowId: row.$id, relationType: row.tipoRelacion || "", relationId: row.relacionId || "", name: row.nombreArchivo || "", type: row.tipoArchivo || "", owner: row.responsable || "", date: formatDate(row.fechaCarga), status: normalizePlainText(row.estado || "cargada"), fileId: row.fileId || "" };
 }
 
 function mapDiagnosticBaseRow(row) {
@@ -1093,7 +1239,7 @@ function mapWorkPlanRow(row) {
 }
 
 function mapAgreementRow(row) {
-  return { rowId: row.$id, agreement: row.acuerdo || "", owner: row.responsable || "", due: formatDate(row.fechaCompromiso), evidence: row.evidencia || "", status: normalizeStatus(row.estado || "pendiente") };
+  return { rowId: row.$id, agreement: row.acuerdo || "", date: formatDate(row.fecha), area: areaKeyFromLabel(row.area), owner: row.responsable || "", priority: normalizePlainText(row.prioridad || "media"), due: formatDate(row.fechaCompromiso), evidence: row.evidencia || "", status: normalizePlainText(row.estado || "pendiente") };
 }
 
 function mapRiskRow(row) {
@@ -1123,13 +1269,20 @@ function reportToAppwriteData(report) {
 
 function transformToAppwriteData(moduleKey, item) {
   const map = {
+    projects: { nombre: item.name, objetivo: item.objective, area: labelForArea(item.area), responsable: item.owner, fechaInicio: toIsoDate(item.start), fechaCompromiso: toIsoDate(item.due), prioridad: item.priority, estado: item.status, kpi: item.kpi, resultadoEsperado: item.expected },
+    tasks: { proyectoId: item.projectId, titulo: item.title, descripcion: item.description, gerencia: labelForArea(item.area), responsable: item.responsible, fechaInicio: toIsoDate(item.start), vencimiento: toIsoDate(item.due), prioridad: item.priority, estatus: item.status, evidencia: item.evidence, kpi: item.kpi, reporteId: item.reportId || "" },
+    subtasks: { tareaId: item.taskId, titulo: item.title, responsable: item.responsible, fechaCompromiso: toIsoDate(item.due), estado: item.status },
+    incidents: { folio: item.folio, area: labelForArea(item.area), clasificacion: item.classification, descripcion: item.description, responsable: item.responsible, fechaApertura: toIsoDate(item.openDate), fechaCierre: toIsoDate(item.closeDate), evidencia: item.evidence, impacto: item.impact, prioridad: item.priority, estado: item.status },
+    meetings: { fecha: toIsoDate(item.date), tipo: item.type, titulo: item.title, area: labelForArea(item.area), responsable: item.owner, participantes: item.attendees, minuta: item.minutes, acuerdo: item.agreement, responsableAcuerdo: item.agreementOwner, fechaCompromiso: toIsoDate(item.commitmentDate), estado: item.status },
+    kpis: { area: labelForArea(item.area), indicador: item.name, objetivo: Number(item.target || 0), resultadoActual: Number(item.current || 0), unidad: item.unit, frecuencia: item.frequency, responsable: item.owner, tendencia: item.trend, semaforo: item.status },
+    evidenceLibrary: { tipoRelacion: item.relationType, relacionId: item.relationId, nombreArchivo: item.name, tipoArchivo: item.type, responsable: item.owner, fechaCarga: toIsoDate(item.date), estado: item.status, fileId: item.fileId },
     diagnosticBase: { bloque: item.section, area: labelForArea(item.area), detalle: item.detail, responsable: item.owner, evidencia: item.evidence, estatus: item.status },
     interviews: { fecha: toIsoDate(item.date), entrevistado: item.interviewed, area: labelForArea(item.area), puesto: item.position, responsableEntrevista: item.responsible, funcionesActuales: item.functions, responsabilidades: item.responsibilities, problemasDetectados: item.problems, riesgos: item.risks, oportunidades: item.opportunities, ideasMejora: item.ideas, necesidadesInformacion: item.needs, automatizacionesSugeridas: item.automations, preguntaOro: item.golden },
     painMap: { clasificacion: item.category, descripcion: item.description, areaAfectada: labelForArea(item.area), impacto: item.impact, frecuencia: item.frequency, prioridad: item.priority, responsable: item.owner, semaforo: item.signal },
     executiveFindings: { hallazgo: item.finding, causaRaiz: item.rootCause, riesgo: item.risk, impacto: item.impact, area: labelForArea(item.area), prioridad: item.priority, responsable: item.owner },
     strategies: { hallazgo: item.finding, objetivo: item.objective, resultadoEsperado: item.expected, responsable: item.owner, kpi: item.kpi, fechaInicio: toIsoDate(item.start), fechaFin: toIsoDate(item.end), presupuesto: Number(item.budget || 0) },
     workPlan: { accion: item.action, responsable: item.owner, fechaInicio: toIsoDate(item.start), fechaCompromiso: toIsoDate(item.due), prioridad: item.priority, evidencia: item.evidence, estado: item.status, vista: item.view },
-    agreements: { acuerdo: item.agreement, responsable: item.owner, fechaCompromiso: toIsoDate(item.due), evidencia: item.evidence, estado: item.status },
+    agreements: { acuerdo: item.agreement, fecha: toIsoDate(item.date), area: labelForArea(item.area), responsable: item.owner, prioridad: item.priority, fechaCompromiso: toIsoDate(item.due), evidencia: item.evidence, estado: item.status },
     risks: { riesgo: item.risk, probabilidad: item.probability, impacto: item.impact, planMitigacion: item.mitigation, responsable: item.owner },
     benefits: { ahorroGenerado: Number(item.saving || 0), reduccionTiempos: item.timeReduction, reduccionIncidencias: item.incidentReduction, mejorasImplementadas: item.improvements, impactoFinanciero: Number(item.financialImpact || 0) },
   };
@@ -1776,10 +1929,10 @@ function applyVisibilityRules() {
 }
 
 function navigateInitialView() {
-  let target = document.querySelector('[data-view="diagnostic-base"]');
+  let target = document.querySelector('[data-view="direction-dashboard"]');
 
   if (activeUser.access === "area") {
-    target = document.querySelector('[data-view="follow-up"]');
+    target = document.querySelector('[data-view="tasks"]');
   }
 
   if (activeUser.access === "executive") {
@@ -1796,6 +1949,14 @@ function navigate(view, title, area, areaKey) {
   moduleArea.textContent = area;
 
   if (view === "diagnostic-base") renderDiagnosticBase();
+  if (view === "projects") renderProjects();
+  if (view === "tasks") renderTasks();
+  if (view === "alerts") renderAlerts();
+  if (view === "incidents") renderIncidents();
+  if (view === "meetings") renderMeetings();
+  if (view === "evidence-center") renderEvidenceCenter();
+  if (view === "gantt") renderGantt();
+  if (view === "kpis") renderKpis();
   if (view === "interviews") renderInterviews();
   if (view === "pain-map") renderPainMap();
   if (view === "executive-diagnosis") renderExecutiveDiagnosis();
@@ -1836,6 +1997,42 @@ function visibleLeadership() {
 function visibleTasks() {
   if (!activeUser || activeUser.access === "all" || activeUser.access === "executive") return tasks;
   return tasks.filter((task) => task.area === activeUser.area);
+}
+
+function visibleProjects() {
+  if (!activeUser || activeUser.access === "all" || activeUser.access === "executive") return projects;
+  return projects.filter((project) => project.area === activeUser.area || project.area === "Todas");
+}
+
+function visibleSubtasks() {
+  const taskIds = new Set(visibleTasks().map((task) => task.rowId));
+  return subtasks.filter((subtask) => taskIds.has(subtask.taskId));
+}
+
+function visibleIncidents() {
+  if (!activeUser || activeUser.access === "all" || activeUser.access === "executive") return incidents;
+  return incidents.filter((incident) => incident.area === activeUser.area);
+}
+
+function visibleMeetings() {
+  if (!activeUser || activeUser.access === "all" || activeUser.access === "executive") return meetings;
+  return meetings.filter((meeting) => meeting.area === activeUser.area || meeting.area === "Todas");
+}
+
+function visibleKpis() {
+  if (!activeUser || activeUser.access === "all" || activeUser.access === "executive") return kpis;
+  return kpis.filter((kpi) => kpi.area === activeUser.area);
+}
+
+function visibleEvidenceLibrary() {
+  if (!activeUser || activeUser.access === "all" || activeUser.access === "executive") return evidenceLibrary;
+  const visibleIds = new Set([
+    ...visibleProjects().map((item) => item.rowId),
+    ...visibleTasks().map((item) => item.rowId),
+    ...visibleIncidents().map((item) => item.rowId),
+    ...visibleMeetings().map((item) => item.rowId),
+  ]);
+  return evidenceLibrary.filter((item) => visibleIds.has(item.relationId) || item.owner === activeUser.name);
 }
 
 function visibleWorkPlan() {
@@ -2095,6 +2292,220 @@ function visibleByArea(items, areaKey = "area") {
   return items.filter((item) => item[areaKey] === activeUser.area || item[areaKey] === labelForArea(activeUser.area) || item[areaKey] === "Todas");
 }
 
+function renderProjects() {
+  const items = visibleProjects();
+  const taskItems = visibleTasks();
+  appContent.innerHTML = `
+    ${sectionHeading("Proyectos", "De la estrategia al resultado medible", scopeText())}
+    ${transformToolbar("projects")}
+    <section class="executive-grid">
+      ${metricCard("Proyectos activos", items.filter((item) => item.status !== "cerrado").length)}
+      ${metricCard("En riesgo", items.filter((item) => executionSignal(item) === "rojo").length)}
+      ${metricCard("Tareas abiertas", taskItems.filter((item) => item.status !== "cerrado").length)}
+      ${metricCard("Avance promedio", `${average(items.map(projectProgress))}%`)}
+    </section>
+    <section class="project-grid">
+      ${items.map((project) => {
+        const related = taskItems.filter((task) => task.projectId === project.rowId);
+        const progress = projectProgress(project);
+        return `<article class="project-card">
+          <div class="project-card-head"><div><p class="eyebrow">${escapeHtml(labelForArea(project.area))}</p><h3>${escapeHtml(project.name)}</h3></div>${trafficBadge(executionSignal(project), executionSignalLabel(project))}</div>
+          <p>${escapeHtml(project.objective)}</p>
+          <div class="progress-track"><span style="width:${progress}%"></span></div>
+          <div class="project-meta"><strong>${progress}%</strong><span>${related.filter((task) => task.status === "cerrado").length}/${related.length} tareas</span><span>${escapeHtml(project.owner)}</span></div>
+          <div class="project-actions">${transformActions("projects", project.rowId)}<button class="secondary-button" type="button" data-action="open-project" data-target="${project.rowId}">Ver ejecución</button></div>
+        </article>`;
+      }).join("") || emptyState("No existen proyectos en este alcance.")}
+    </section>
+    <section class="content-card">
+      ${renderTable(["Proyecto", "Área", "Responsable", "Inicio", "Compromiso", "Prioridad", "KPI", "Avance", "Estatus", "Acción"], items.map((item) => [
+        item.name, labelForArea(item.area), item.owner, item.start, item.due, priorityBadge(item.priority), item.kpi, `${projectProgress(item)}%`, statusBadge(item.status), transformActions("projects", item.rowId),
+      ]))}
+    </section>`;
+}
+
+function renderTasks(projectId = "") {
+  const items = visibleTasks().filter((task) => !projectId || task.projectId === projectId);
+  const childItems = visibleSubtasks();
+  const project = projects.find((item) => item.rowId === projectId);
+  appContent.innerHTML = `
+    ${sectionHeading(project ? project.name : "Tareas y subtareas", project ? "Ejecución detallada del proyecto" : "Responsable, compromiso, evidencia, KPI y cierre", scopeText())}
+    <div class="export-actions export-actions-top">${project ? `<button class="secondary-button" type="button" data-action="back-projects">Volver a proyectos</button>` : ""}${transformToolbar("tasks")}${transformToolbar("subtasks")}</div>
+    <section class="executive-grid">
+      ${metricCard("Tareas", items.length)}
+      ${metricCard("Vencidas", items.filter((item) => executionSignal(item) === "rojo" && item.status !== "cerrado").length)}
+      ${metricCard("Sin evidencia", items.filter((item) => !item.evidence).length)}
+      ${metricCard("Subtareas", childItems.filter((item) => items.some((task) => task.rowId === item.taskId)).length)}
+    </section>
+    <section class="content-card">
+      ${renderTable(["Proyecto", "Tarea", "Responsable", "Área", "Compromiso", "Prioridad", "Evidencia", "KPI", "Subtareas", "Semáforo", "Estado", "Acción"], items.map((item) => [
+        projectName(item.projectId), item.title, item.responsible, labelForArea(item.area), item.due, priorityBadge(item.priority), evidenceCell(item.evidence), item.kpi, childItems.filter((subtask) => subtask.taskId === item.rowId).length, trafficBadge(executionSignal(item), executionSignalLabel(item)), statusBadge(item.status), transformActions("tasks", item.rowId),
+      ]), "wide-table")}
+    </section>
+    <section class="content-card">
+      <div class="section-heading section-heading-compact"><div><p class="eyebrow">Desglose</p><h3>Subtareas</h3></div></div>
+      ${renderTable(["Tarea principal", "Subtarea", "Responsable", "Compromiso", "Estado", "Acción"], childItems.filter((item) => items.some((task) => task.rowId === item.taskId)).map((item) => [
+        taskName(item.taskId), item.title, item.responsible, item.due, statusBadge(item.status), transformActions("subtasks", item.rowId),
+      ]))}
+    </section>`;
+}
+
+function renderAlerts() {
+  const items = operationalAlerts();
+  appContent.innerHTML = `
+    ${sectionHeading("Centro de alertas", "Excepciones que requieren decisión o seguimiento", scopeText())}
+    <section class="executive-grid">
+      ${metricCard("Alertas activas", items.length)}
+      ${metricCard("Críticas", items.filter((item) => item.signal === "rojo").length)}
+      ${metricCard("Vencimientos", items.filter((item) => item.type.includes("vencid")).length)}
+      ${metricCard("Sin evidencia", items.filter((item) => item.type === "Evidencia faltante").length)}
+    </section>
+    <section class="content-card">
+      ${renderTable(["Tipo", "Área", "Responsable", "Detalle", "Fecha", "Semáforo"], items.map((item) => [item.type, labelForArea(item.area), item.owner, item.detail, item.date || "N/A", trafficBadge(item.signal, titleCase(item.signal))]))}
+    </section>`;
+}
+
+function renderIncidents() {
+  const items = visibleIncidents();
+  appContent.innerHTML = `
+    ${sectionHeading("Incidencias", "Registro, impacto, responsable, evidencia y cierre", scopeText())}
+    ${transformToolbar("incidents")}
+    <section class="executive-grid">
+      ${metricCard("Incidencias abiertas", items.filter((item) => item.status !== "cerrado").length)}
+      ${metricCard("Prioridad alta", items.filter((item) => item.priority === "alta" && item.status !== "cerrado").length)}
+      ${metricCard("Críticas", items.filter((item) => item.impact === "Alto" && item.status !== "cerrado").length)}
+      ${metricCard("Sin evidencia", items.filter((item) => !item.evidence).length)}
+    </section>
+    <section class="content-card">
+      ${renderTable(["Folio", "Área", "Clasificación", "Descripción", "Responsable", "Apertura", "Cierre", "Impacto", "Prioridad", "Evidencia", "Semáforo", "Estado", "Acción"], items.map((item) => [
+        item.folio, labelForArea(item.area), item.classification, item.description, item.responsible, item.openDate, item.closeDate || "Abierta", item.impact, priorityBadge(item.priority), evidenceCell(item.evidence), trafficBadge(executionSignal(item), executionSignalLabel(item)), statusBadge(item.status), transformActions("incidents", item.rowId),
+      ]), "wide-table")}
+    </section>`;
+}
+
+function renderMeetings() {
+  const items = visibleMeetings();
+  appContent.innerHTML = `
+    ${sectionHeading("Reuniones", "Cada reunión produce minuta, acuerdo, responsable y compromiso", scopeText())}
+    ${transformToolbar("meetings")}
+    <section class="executive-grid">
+      ${metricCard("Reuniones", items.length)}
+      ${metricCard("Próximas", items.filter((item) => item.date >= todayIsoDate() && item.status !== "cerrado").length)}
+      ${metricCard("Minutas cerradas", items.filter((item) => item.minutes && item.status === "cerrado").length)}
+      ${metricCard("Acuerdos generados", items.filter((item) => item.agreement).length)}
+    </section>
+    <section class="content-card">
+      ${renderTable(["Fecha", "Tipo", "Reunión", "Área", "Responsable", "Participantes", "Minuta", "Acuerdo", "Responsable acuerdo", "Compromiso", "Estado", "Acción"], items.map((item) => [
+        item.date, item.type, item.title, labelForArea(item.area), item.owner, item.attendees, item.minutes, item.agreement, item.agreementOwner, item.commitmentDate, statusBadge(item.status), transformActions("meetings", item.rowId),
+      ]), "wide-table")}
+    </section>`;
+}
+
+function renderEvidenceCenter() {
+  const items = visibleEvidenceLibrary();
+  appContent.innerHTML = `
+    ${sectionHeading("Evidencias", "Repositorio relacionado con proyectos, tareas, acuerdos e incidencias", scopeText())}
+    ${transformToolbar("evidenceLibrary")}
+    <section class="executive-grid">
+      ${metricCard("Evidencias", items.length)}
+      ${metricCard("Validadas", items.filter((item) => item.status === "validada").length)}
+      ${metricCard("Pendientes", items.filter((item) => item.status === "cargada").length)}
+      ${metricCard("Faltantes", items.filter((item) => item.status === "faltante").length)}
+    </section>
+    <section class="content-card">
+      ${renderTable(["Relacionado con", "Folio / ID", "Archivo", "Tipo", "Responsable", "Fecha", "Estado", "Acción"], items.map((item) => [
+        item.relationType, item.relationId, item.fileId ? evidenceCell(`${item.fileId}|${item.name}`) : item.name, item.type, item.owner, item.date || "Pendiente", statusBadge(item.status), transformActions("evidenceLibrary", item.rowId),
+      ]))}
+    </section>`;
+}
+
+function renderKpis() {
+  const items = visibleKpis();
+  appContent.innerHTML = `
+    ${sectionHeading("KPIs por jefatura", "Objetivo, resultado, tendencia y semáforo", scopeText())}
+    ${transformToolbar("kpis")}
+    <section class="kpi-grid">
+      ${items.map((item) => {
+        const attainment = item.target ? Math.round((item.current / item.target) * 100) : 0;
+        return `<article class="kpi-card status-${normalizeClassName(item.status)}"><div class="kpi-card-head"><div><p class="eyebrow">${escapeHtml(labelForArea(item.area))}</p><h3>${escapeHtml(item.name)}</h3></div>${trafficBadge(item.status, titleCase(item.status))}</div><div class="kpi-value">${item.current}${escapeHtml(item.unit)}</div><p>Objetivo: ${item.target}${escapeHtml(item.unit)} · ${escapeHtml(item.frequency)}</p><div class="progress-track"><span style="width:${Math.min(attainment, 100)}%"></span></div><div class="project-meta"><span>${escapeHtml(item.owner)}</span><strong>${titleCase(item.trend)}</strong></div>${transformActions("kpis", item.rowId)}</article>`;
+      }).join("") || emptyState("No existen KPIs en este alcance.")}
+    </section>`;
+}
+
+function renderGantt() {
+  const projectItems = visibleProjects();
+  const taskItems = visibleTasks().filter((item) => item.start && item.due);
+  const dates = [...projectItems.flatMap((item) => [item.start, item.due]), ...taskItems.flatMap((item) => [item.start, item.due])].filter(Boolean).sort();
+  const minDate = dates[0] || todayIsoDate();
+  const maxDate = dates[dates.length - 1] || addDaysIso(30);
+  appContent.innerHTML = `
+    ${sectionHeading("Gantt", "Cronograma de proyectos y tareas", scopeText())}
+    <section class="content-card gantt-shell">
+      <div class="gantt-scale"><span>${minDate}</span><span>${maxDate}</span></div>
+      ${projectItems.map((project) => ganttRow(project.name, project.start, project.due, minDate, maxDate, "project")).join("")}
+      ${taskItems.map((task) => ganttRow(task.title, task.start, task.due, minDate, maxDate, "task")).join("")}
+    </section>`;
+}
+
+function projectProgress(project) {
+  const related = tasks.filter((task) => task.projectId === project.rowId);
+  return related.length ? Math.round((related.filter((task) => task.status === "cerrado").length / related.length) * 100) : 0;
+}
+
+function projectName(projectId) {
+  return projects.find((project) => project.rowId === projectId)?.name || "Sin proyecto";
+}
+
+function taskName(taskId) {
+  return tasks.find((task) => task.rowId === taskId)?.title || "Tarea no disponible";
+}
+
+function executionSignal(item) {
+  const status = normalizePlainText(item.status);
+  if (status === "cerrado") return "verde";
+  if (["con riesgo", "vencido", "vencida"].includes(status)) return "rojo";
+  const due = item.due || item.commitmentDate || item.closeDate;
+  if (due && due < todayIsoDate()) return "rojo";
+  if (due && due <= addDaysIso(3)) return "amarillo";
+  return "verde";
+}
+
+function executionSignalLabel(item) {
+  const signal = executionSignal(item);
+  return signal === "rojo" ? "Atención" : signal === "amarillo" ? "Próximo" : "En control";
+}
+
+function operationalAlerts() {
+  const alerts = [];
+  visibleTasks().forEach((item) => {
+    if (item.status !== "cerrado" && item.due < todayIsoDate()) alerts.push({ type: "Tarea vencida", area: item.area, owner: item.responsible, detail: item.title, date: item.due, signal: "rojo" });
+    if (item.status !== "cerrado" && !item.evidence) alerts.push({ type: "Evidencia faltante", area: item.area, owner: item.responsible, detail: item.title, date: item.due, signal: item.due <= addDaysIso(3) ? "rojo" : "amarillo" });
+  });
+  visibleIncidents().filter((item) => item.status !== "cerrado" && (item.priority === "alta" || item.impact === "Alto")).forEach((item) => alerts.push({ type: "Incidencia crítica", area: item.area, owner: item.responsible, detail: `${item.folio}: ${item.description}`, date: item.openDate, signal: "rojo" }));
+  visibleAgreements().filter((item) => item.status !== "cerrado" && item.due < todayIsoDate()).forEach((item) => alerts.push({ type: "Acuerdo vencido", area: item.area, owner: item.owner, detail: item.agreement, date: item.due, signal: "rojo" }));
+  visibleKpis().filter((item) => item.status !== "verde").forEach((item) => alerts.push({ type: "KPI fuera de rango", area: item.area, owner: item.owner, detail: `${item.name}: ${item.current}${item.unit} / meta ${item.target}${item.unit}`, date: "", signal: item.status }));
+  return alerts;
+}
+
+function ganttRow(label, start, due, minDate, maxDate, type) {
+  const total = Math.max(1, dateDistance(minDate, maxDate));
+  const left = Math.max(0, Math.min(100, (dateDistance(minDate, start) / total) * 100));
+  const width = Math.max(3, Math.min(100 - left, (Math.max(1, dateDistance(start, due)) / total) * 100));
+  return `<div class="gantt-row"><strong>${escapeHtml(label)}</strong><div class="gantt-track"><span class="gantt-bar gantt-${type}" style="left:${left}%;width:${width}%">${start} · ${due}</span></div></div>`;
+}
+
+function dateDistance(start, end) {
+  return Math.round((new Date(`${end}T12:00:00`) - new Date(`${start}T12:00:00`)) / 86400000);
+}
+
+function average(values) {
+  return values.length ? Math.round(values.reduce((total, value) => total + Number(value || 0), 0) / values.length) : 0;
+}
+
+function emptyState(message) {
+  return `<div class="empty-state">${escapeHtml(message)}</div>`;
+}
+
 function renderDiagnosticBase() {
   const items = visibleByArea(diagnosticBase);
   appContent.innerHTML = `
@@ -2301,16 +2712,20 @@ function renderAgreements() {
     ${transformToolbar("agreements")}
     <section class="executive-grid">
       ${metricCard("Acuerdos", items.length)}
-      ${metricCard("Pendientes", items.filter((item) => item.status === "pendiente").length)}
+      ${metricCard("Pendientes", items.filter((item) => item.status !== "cerrado").length)}
       ${metricCard("Sin evidencia", items.filter((item) => !item.evidence).length)}
       ${metricCard("Vencidos", items.filter((item) => item.due < todayIsoDate() && item.status !== "cerrado").length)}
     </section>
     <section class="content-card">
-      ${renderTable(["Acuerdo", "Responsable", "Fecha compromiso", "Evidencia", "Estado", "Acción"], items.map((item) => [
+      ${renderTable(["Fecha", "Acuerdo", "Área", "Responsable", "Prioridad", "Fecha compromiso", "Evidencia", "Semáforo", "Estado", "Acción"], items.map((item) => [
+        item.date,
         item.agreement,
+        labelForArea(item.area),
         item.owner,
+        priorityBadge(item.priority),
         item.due,
         evidenceCell(item.evidence),
+        trafficBadge(executionSignal(item), executionSignalLabel(item)),
         statusBadge(item.status),
         transformActions("agreements", item.rowId),
       ]))}
@@ -2369,17 +2784,29 @@ function renderBenefits() {
 }
 
 function renderDirectionDashboard() {
-  const planItems = workPlan;
-  const compliance = planItems.length ? Math.round((planItems.filter((item) => ["cerrado", "aprobado"].includes(item.status)).length / planItems.length) * 100) : 0;
+  const taskItems = visibleTasks();
+  const projectItems = visibleProjects();
+  const compliance = taskItems.length ? Math.round((taskItems.filter((item) => item.status === "cerrado").length / taskItems.length) * 100) : 0;
+  const alerts = operationalAlerts();
   appContent.innerHTML = `
-    ${sectionHeading("Dashboard Dirección", "Cumplimiento general, riesgos, avance y beneficios", "Vista ejecutiva")}
+    ${sectionHeading("Dashboard ejecutivo", "Gestión, ejecución y control operativo sobre MicroSip", "Vista ejecutiva")}
     <section class="executive-grid">
       ${metricCard("Cumplimiento general", `${compliance}%`)}
-      ${metricCard("KPIs activos", strategies.length)}
-      ${metricCard("Riesgos críticos", riskRegister.filter((item) => riskSignal(item) === "rojo").length)}
-      ${metricCard("Avance del plan", `${planItems.filter((item) => item.status === "en ejecucion").length}/${planItems.length}`)}
+      ${metricCard("KPIs fuera de rango", visibleKpis().filter((item) => item.status !== "verde").length)}
+      ${metricCard("Riesgos críticos", visibleIncidents().filter((item) => item.status !== "cerrado" && (item.priority === "alta" || item.impact === "Alto")).length)}
+      ${metricCard("Avance de proyectos", `${average(projectItems.map(projectProgress))}%`)}
+      ${metricCard("Acuerdos vencidos", visibleAgreements().filter((item) => item.status !== "cerrado" && item.due < todayIsoDate()).length)}
+      ${metricCard("Alertas activas", alerts.length)}
       ${metricCard("Beneficios", formatCurrency(sum(benefits, "financialImpact")))}
       ${metricCard("Focos rojos", painMap.filter((item) => item.signal === "rojo").length)}
+    </section>
+    <section class="content-card">
+      <div class="section-heading section-heading-compact"><div><p class="eyebrow">Ejecución</p><h3>Avance de proyectos</h3></div></div>
+      ${renderTable(["Proyecto", "Área", "Responsable", "Avance", "Compromiso", "Semáforo"], projectItems.map((item) => [item.name, labelForArea(item.area), item.owner, `${projectProgress(item)}%`, item.due, trafficBadge(executionSignal(item), executionSignalLabel(item))]))}
+    </section>
+    <section class="content-card">
+      <div class="section-heading section-heading-compact"><div><p class="eyebrow">Indicadores</p><h3>KPIs por jefatura</h3></div></div>
+      ${renderTable(["Área", "KPI", "Actual", "Objetivo", "Tendencia", "Semáforo"], visibleKpis().map((item) => [labelForArea(item.area), item.name, `${item.current}${item.unit}`, `${item.target}${item.unit}`, titleCase(item.trend), trafficBadge(item.status, titleCase(item.status))]))}
     </section>
     <section class="content-card">
       <div class="section-heading section-heading-compact"><div><p class="eyebrow">Resumen ejecutivo</p><h3>Hallazgos prioritarios</h3></div></div>
@@ -2873,22 +3300,36 @@ function renderAreaModule(area, filters = {}) {
   const meta = gerencias.find((item) => item.area === area);
   const normalizedFilters = { ...filters, area };
   const items = filterReports(areaReports(area), normalizedFilters);
+  const projectItems = visibleProjects().filter((item) => item.area === area || item.area === "Todas");
+  const taskItems = visibleTasks().filter((item) => item.area === area);
+  const incidentItems = visibleIncidents().filter((item) => item.area === area);
+  const kpiItems = visibleKpis().filter((item) => item.area === area);
   const gastos = sum(items.filter((item) => item.type === "gasto"), "amount");
   const ahorros = sum(items.filter((item) => item.type === "ahorro"), "amount");
+  const capabilities = operationalCapabilities(area);
 
   appContent.innerHTML = `
     ${sectionHeading(meta.label, `Responsable: ${meta.manager}`, meta.status)}
+    ${["Ventas", "Almacen", "Logistica", "Mantenimiento"].includes(area) ? `<section class="integration-banner"><strong>Capa de ejecución sobre MicroSip</strong><span>Los datos transaccionales permanecen en MicroSip; NEXUS controla responsables, compromisos, alertas, evidencias y KPIs.</span></section>` : ""}
+    <div class="view-strip operational-strip">${capabilities.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>
     <section class="executive-grid">
-      ${metricCard("Reportes capturados", items.length)}
-      ${metricCard("Gastos", formatCurrency(gastos))}
-      ${metricCard("Incidencias", items.filter((item) => item.type === "incidencia").length)}
-      ${metricCard("Solicitudes", items.filter((item) => item.type === "solicitud").length)}
-      ${metricCard("Ahorros", formatCurrency(ahorros))}
-      ${metricCard("Evidencias", items.filter((item) => item.evidence).length)}
+      ${metricCard("Proyectos", projectItems.length)}
+      ${metricCard("Tareas abiertas", taskItems.filter((item) => item.status !== "cerrado").length)}
+      ${metricCard("Incidencias abiertas", incidentItems.filter((item) => item.status !== "cerrado").length)}
+      ${metricCard("KPIs fuera de rango", kpiItems.filter((item) => item.status !== "verde").length)}
+      ${metricCard("Evidencias pendientes", taskItems.filter((item) => !item.evidence).length)}
+      ${metricCard("Cumplimiento", `${taskItems.length ? Math.round((taskItems.filter((item) => item.status === "cerrado").length / taskItems.length) * 100) : 0}%`)}
     </section>
     <section class="content-card">
-      <div class="section-heading section-heading-compact"><div><p class="eyebrow">Resumen del área</p><h3>Estatus operativo</h3></div>${statusBadge(meta.status.toLowerCase())}</div>
-      <p class="muted-copy">Frecuencia de reporte: ${meta.frequency}. Último reporte: ${meta.lastReport}. Presupuesto asignado: ${formatCurrency(meta.budget)}.</p>
+      <div class="section-heading section-heading-compact"><div><p class="eyebrow">Ejecución</p><h3>Proyectos y compromisos</h3></div>${statusBadge(meta.status.toLowerCase())}</div>
+      ${renderTable(["Proyecto", "Responsable", "Compromiso", "Avance", "Semáforo"], projectItems.map((item) => [item.name, item.owner, item.due, `${projectProgress(item)}%`, trafficBadge(executionSignal(item), executionSignalLabel(item))]))}
+    </section>
+    <section class="content-card">
+      <div class="section-heading section-heading-compact"><div><p class="eyebrow">Indicadores</p><h3>KPIs del área</h3></div></div>
+      ${renderTable(["KPI", "Actual", "Objetivo", "Tendencia", "Semáforo"], kpiItems.map((item) => [item.name, `${item.current}${item.unit}`, `${item.target}${item.unit}`, titleCase(item.trend), trafficBadge(item.status, titleCase(item.status))]))}
+    </section>
+    <section class="content-card">
+      <div class="section-heading section-heading-compact"><div><p class="eyebrow">Antecedentes</p><h3>Reportes operativos</h3></div></div>
       ${exportActions("reports", normalizedFilters, area)}
       ${renderReportFilters(`area-${normalizeClassName(area)}`, normalizedFilters, { lockArea: area })}
       ${renderReportTable(items)}
@@ -2896,6 +3337,16 @@ function renderAreaModule(area, filters = {}) {
   `;
 
   bindReportFilters(`area-${normalizeClassName(area)}`, (nextFilters) => renderAreaModule(area, nextFilters), area);
+}
+
+function operationalCapabilities(area) {
+  const map = {
+    Ventas: ["CRM", "Pipeline", "Forecast", "Visitas", "Viáticos", "Muestras", "Comodatos", "KPIs"],
+    Almacen: ["Inventario crítico", "Forecast", "Muestras", "Recepciones", "Diferencias", "KPIs"],
+    Logistica: ["Rutas", "Entregas", "Facturas pendientes", "Liberaciones", "Evidencias", "KPIs"],
+    Mantenimiento: ["Órdenes de trabajo", "Preventivos", "Refacciones", "Equipos espumadores", "Evidencias", "KPIs"],
+  };
+  return map[area] || ["Proyectos", "Tareas", "Incidencias", "Acuerdos", "Evidencias", "KPIs"];
 }
 
 function renderCaptureForm() {
@@ -3018,44 +3469,55 @@ function renderReportsView(filters = {}) {
 }
 
 function renderKanban(filters = {}) {
-  const columns = ["pendiente", "en revision", "falta evidencia", "aprobado", "rechazado", "en ejecucion", "cerrado"];
-  const items = filterReports(visibleReports(), filters);
+  const columns = ["pendiente", "en proceso", "con riesgo", "vencido", "cerrado"];
+  const items = visibleTasks();
   appContent.innerHTML = `
-    ${sectionHeading("Kanban", "Seguimiento por estatus", scopeText())}
-    <section class="content-card">
-      ${exportActions("reports", filters)}
-      ${renderReportFilters("kanban", filters)}
-    </section>
+    ${sectionHeading("Kanban", "Ejecución de proyectos por estatus", scopeText())}
+    ${transformToolbar("tasks")}
     <section class="kanban-board">
       ${columns.map((status) => `
         <article class="kanban-column">
-          <h3>${titleCase(status)}</h3>
-          ${items.filter((item) => item.status === status).map((item) => `
+          <h3>${titleCase(status)} <span class="kanban-count">${items.filter((item) => normalizeExecutionStatus(item) === status).length}</span></h3>
+          ${items.filter((item) => normalizeExecutionStatus(item) === status).map((item) => `
             <div class="kanban-card">
-              <strong>${labelForArea(item.area)}</strong>
-              <span>${item.type} - ${item.responsible}</span>
-              <small>${priorityBadge(item.priority)} ${formatCurrency(item.amount)}</small>
+              <strong>${escapeHtml(item.title)}</strong>
+              <span>${escapeHtml(projectName(item.projectId))}</span>
+              <span>${escapeHtml(item.responsible)} · ${escapeHtml(labelForArea(item.area))}</span>
+              <small>${priorityBadge(item.priority)} ${item.due}</small>
+              ${activeUser?.access === "executive" ? "" : `<button class="secondary-button kanban-edit" type="button" data-action="edit-transform" data-module-key="tasks" data-target="${item.rowId}">Editar</button>`}
             </div>
           `).join("") || `<p class="muted-copy">Sin registros</p>`}
         </article>
       `).join("")}
     </section>
   `;
-
-  bindReportFilters("kanban", renderKanban);
 }
 
 function renderCalendar() {
+  const events = [];
+  visibleTasks().forEach((item) => item.due && events.push({ date: item.due, label: `Tarea: ${item.title}`, signal: executionSignal(item) }));
+  visibleAgreements().forEach((item) => item.due && events.push({ date: item.due, label: `Acuerdo: ${item.agreement}`, signal: executionSignal(item) }));
+  visibleMeetings().forEach((item) => item.date && events.push({ date: item.date, label: `Reunión: ${item.title}`, signal: item.status === "cerrado" ? "verde" : "amarillo" }));
+  visibleIncidents().forEach((item) => item.openDate && events.push({ date: item.openDate, label: `Incidencia: ${item.folio}`, signal: item.status === "cerrado" ? "verde" : "rojo" }));
   appContent.innerHTML = `
     ${sectionHeading("Calendario", "Junio 2026", scopeText())}
     <section class="calendar-grid">
       ${Array.from({ length: 30 }, (_, index) => {
         const day = index + 1;
-        const events = calendarEvents.filter((event) => event.day === day);
-        return `<article class="calendar-day"><strong>${day}</strong>${events.map((event) => `<span>${event.title}</span>`).join("")}</article>`;
+        const dayEvents = events.filter((event) => Number(event.date.slice(-2)) === day);
+        return `<article class="calendar-day ${day === Number(todayIsoDate().slice(-2)) ? "is-today" : ""}"><strong>${day}</strong>${dayEvents.map((event) => `<span class="calendar-${event.signal}">${escapeHtml(event.label)}</span>`).join("")}</article>`;
       }).join("")}
     </section>
   `;
+}
+
+function normalizeExecutionStatus(item) {
+  const value = normalizePlainText(item.status);
+  if (value === "cerrado") return "cerrado";
+  if (["vencido", "vencida"].includes(value) || (item.due && item.due < todayIsoDate())) return "vencido";
+  if (["con riesgo", "falta evidencia"].includes(value)) return "con riesgo";
+  if (["en proceso", "en ejecucion", "en revision"].includes(value)) return "en proceso";
+  return "pendiente";
 }
 
 function renderReportTable(items) {
