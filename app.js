@@ -743,9 +743,10 @@ function appwriteError(status, message = "") {
   return error;
 }
 
-async function createRow(tableId, rowId, data, permissions = clientWritePermissions()) {
+async function createRow(tableId, rowId, data, permissions = null) {
+  const rowPermissions = permissions || permissionsForRow(tableId, data);
   const body = { rowId, data };
-  if (permissions?.length) body.permissions = permissions;
+  if (rowPermissions?.length) body.permissions = rowPermissions;
 
   return appwriteRequest(`/tablesdb/${APPWRITE_CONFIG.databaseId}/tables/${tableId}/rows`, {
     method: "POST",
@@ -776,7 +777,7 @@ async function uploadEvidenceFile(file, area) {
   const formData = new FormData();
   formData.append("fileId", fileId);
   formData.append("file", file);
-  const filePermissions = area ? permissionsForArea(area) : clientWritePermissions();
+  const filePermissions = permissionsForArea(area);
   filePermissions.forEach((permission) => formData.append("permissions[]", permission));
 
   const data = await appwriteUpload(`/storage/buckets/${STORAGE.evidencias}/files`, formData);
@@ -1048,7 +1049,8 @@ async function openTransformForm(moduleKey, rowId = "") {
       if (moduleKey === "evidenceLibrary") {
         const file = document.querySelector(`#${config.prefix}-upload`)?.files?.[0];
         if (file) {
-          const uploaded = await uploadEvidenceFile(file, activeUser?.access === "area" ? activeUser.area : "");
+          const evidenceArea = activeUser?.access === "area" ? activeUser.area : evidenceAreaForRelation(nextItem.relationType, nextItem.relationId);
+          const uploaded = await uploadEvidenceFile(file, evidenceArea);
           const [fileId, fileName] = uploaded.split("|");
           nextItem.fileId = fileId;
           nextItem.name = fileName || file.name;
@@ -1155,6 +1157,16 @@ function selectTransformField(id, label, options, value) {
 
 function recordLabel(item) {
   return item.name || item.title || item.folio || item.finding || item.objective || item.action || item.agreement || item.risk || item.description || item.detail || item.interviewed || item.section || item.improvements || "registro";
+}
+
+function evidenceAreaForRelation(relationType, relationId) {
+  const type = normalizePlainText(relationType);
+  if (type === "proyecto") return projects.find((item) => item.rowId === relationId)?.area || "";
+  if (type === "tarea") return tasks.find((item) => item.rowId === relationId)?.area || "";
+  if (type === "incidencia") return incidents.find((item) => item.rowId === relationId)?.area || "";
+  if (type === "reunion") return meetings.find((item) => item.rowId === relationId)?.area || "";
+  if (type === "acuerdo") return agreements.find((item) => item.rowId === relationId)?.area || "";
+  return "";
 }
 
 function mapReportRow(row) {

@@ -51,10 +51,20 @@ const areaUserIds = {
 const adminUserIds = ["pako"];
 const executiveUserIds = ["direccion"];
 
-const tablePermissions = [
-  'read("users")',
-  'create("users")'
-];
+const areaCreatorIds = Array.from(new Set([
+  ...Object.values(areaUserIds),
+  "jef-moises-prado",
+  "jef-guillermo-nieto",
+  "jef-jose-luis-sanchez",
+  "jef-jose-carlos-gonzalez"
+]));
+
+const adminCreateOnlyTables = new Set(["gerencias", "usuarios", "bitacora", "jefaturas", "beneficios"]);
+
+function permissionsForTable(tableId) {
+  const creators = adminCreateOnlyTables.has(tableId) ? adminUserIds : [...adminUserIds, ...areaCreatorIds];
+  return ['read("users")', ...creators.map((id) => `create("user:${id}")`)];
+}
 
 const tables = [
   {
@@ -652,11 +662,12 @@ function row(id, data) {
 }
 
 async function ensureTable(table) {
+  const permissions = permissionsForTable(table.id);
   const existing = await request("GET", `/tablesdb/${databaseId}/tables/${table.id}`, null, [404]);
   if (existing.status === 200) {
     await request("PUT", `/tablesdb/${databaseId}/tables/${table.id}`, {
       name: table.name,
-      permissions: tablePermissions,
+      permissions,
       rowSecurity: true,
       enabled: true,
       purge: true
@@ -668,7 +679,7 @@ async function ensureTable(table) {
   await request("POST", `/tablesdb/${databaseId}/tables`, {
     tableId: table.id,
     name: table.name,
-    permissions: tablePermissions,
+    permissions,
     rowSecurity: true,
     enabled: true,
     columns: [],

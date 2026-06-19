@@ -17,9 +17,11 @@ const headers = {
 const bucketId = "evidencias";
 const permissions = [
   'read("users")',
-  'create("users")',
-  'update("users")',
-  'delete("users")',
+  'create("user:pako")',
+  'create("user:jef-moises-prado")',
+  'create("user:jef-guillermo-nieto")',
+  'create("user:jef-jose-luis-sanchez")',
+  'create("user:jef-jose-carlos-gonzalez")',
 ];
 
 const existing = await request("GET", `/storage/buckets/${bucketId}`, null, [404]);
@@ -28,7 +30,7 @@ if (existing.status === 200) {
   await request("PUT", `/storage/buckets/${bucketId}`, {
     name: "Evidencias",
     permissions,
-    fileSecurity: false,
+    fileSecurity: true,
     enabled: true,
     maximumFileSize: 10485760,
     allowedFileExtensions: ["pdf", "png", "jpg", "jpeg", "webp", "xlsx", "xls", "doc", "docx", "csv", "zip", "mp4", "mov"],
@@ -42,7 +44,7 @@ if (existing.status === 200) {
     bucketId,
     name: "Evidencias",
     permissions,
-    fileSecurity: false,
+    fileSecurity: true,
     enabled: true,
     maximumFileSize: 10485760,
     allowedFileExtensions: ["pdf", "png", "jpg", "jpeg", "webp", "xlsx", "xls", "doc", "docx", "csv", "zip", "mp4", "mov"],
