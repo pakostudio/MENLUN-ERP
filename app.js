@@ -240,6 +240,8 @@ const logoutButton = document.querySelector("#logout-button");
 const appContent = document.querySelector("#app-content");
 const dataStatus = document.querySelector("#data-status");
 const globalSearchInput = document.querySelector("#global-search");
+const mobileNavToggle = document.querySelector("#mobile-nav-toggle");
+const mainNavigation = document.querySelector("#main-navigation");
 
 let activeUser = null;
 
@@ -332,8 +334,21 @@ navButtons.forEach((button) => {
     navButtons.forEach((item) => item.classList.remove("active"));
     button.classList.add("active");
     navigate(button.dataset.view, button.dataset.module, button.dataset.area, button.dataset.areaKey);
+    closeMobileNavigation();
   });
 });
+
+mobileNavToggle?.addEventListener("click", () => {
+  const isOpen = document.body.classList.toggle("is-mobile-nav-open");
+  mobileNavToggle.setAttribute("aria-expanded", String(isOpen));
+  mobileNavToggle.setAttribute("aria-label", isOpen ? "Ocultar navegación" : "Mostrar navegación");
+});
+
+function closeMobileNavigation() {
+  document.body.classList.remove("is-mobile-nav-open");
+  mobileNavToggle?.setAttribute("aria-expanded", "false");
+  mobileNavToggle?.setAttribute("aria-label", "Mostrar navegación");
+}
 
 globalSearchInput?.addEventListener("input", () => {
   const query = globalSearchInput.value.trim();
@@ -951,12 +966,12 @@ function userIdForResponsible(name) {
 function transformModules() {
   return {
     projects: { table: TABLES.proyectos, data: () => projects, set: (items) => { projects = items; }, render: renderProjects, prefix: "proy", label: "proyecto", fields: [["name", "Proyecto", "text"], ["objective", "Objetivo", "textarea"], ["area", "Área", "area"], ["owner", "Responsable", "text"], ["start", "Fecha inicio", "date"], ["due", "Fecha compromiso", "date"], ["priority", "Prioridad", "priority"], ["status", "Estado", "executionStatus"], ["kpi", "KPI", "text"], ["expected", "Resultado esperado", "text"]] },
-    tasks: { table: TABLES.tareas, data: () => tasks, set: (items) => { tasks = items; }, render: renderTasks, prefix: "task", label: "tarea", fields: [["projectId", "Proyecto", "project"], ["title", "Tarea", "text"], ["description", "Descripción", "textarea"], ["area", "Área", "area"], ["responsible", "Responsable", "text"], ["start", "Fecha inicio", "date"], ["due", "Fecha compromiso", "date"], ["priority", "Prioridad", "priority"], ["status", "Estado", "executionStatus"], ["evidence", "Evidencia", "text"], ["kpi", "KPI", "text"]] },
+    tasks: { table: TABLES.tareas, data: () => tasks, set: (items) => { tasks = items; }, render: renderTasks, prefix: "task", label: "tarea", fields: [["projectId", "Proyecto", "project"], ["title", "Tarea", "text"], ["description", "Descripción", "textarea"], ["area", "Área", "area"], ["responsible", "Responsable", "text"], ["start", "Fecha inicio", "date"], ["due", "Fecha compromiso", "date"], ["priority", "Prioridad", "priority"], ["status", "Estado", "executionStatus"], ["evidence", "Evidencia", "optionalText"], ["kpi", "KPI", "optionalText"]] },
     subtasks: { table: TABLES.subtareas, data: () => subtasks, set: (items) => { subtasks = items; }, render: renderTasks, prefix: "sub", label: "subtarea", fields: [["taskId", "Tarea principal", "task"], ["title", "Subtarea", "text"], ["responsible", "Responsable", "text"], ["due", "Fecha compromiso", "date"], ["status", "Estado", "executionStatus"]] },
-    incidents: { table: TABLES.incidencias, data: () => incidents, set: (items) => { incidents = items; }, render: renderIncidents, prefix: "inc", label: "incidencia", fields: [["folio", "Folio", "text"], ["area", "Área", "area"], ["classification", "Clasificación", "incidentClass"], ["description", "Descripción", "textarea"], ["responsible", "Responsable", "text"], ["openDate", "Fecha apertura", "date"], ["closeDate", "Fecha cierre", "optionalDate"], ["evidence", "Evidencia", "text"], ["impact", "Impacto", "impact"], ["priority", "Prioridad", "priority"], ["status", "Estado", "executionStatus"]] },
+    incidents: { table: TABLES.incidencias, data: () => incidents, set: (items) => { incidents = items; }, render: renderIncidents, prefix: "inc", label: "incidencia", fields: [["folio", "Folio", "text"], ["area", "Área", "area"], ["classification", "Clasificación", "incidentClass"], ["description", "Descripción", "textarea"], ["responsible", "Responsable", "text"], ["openDate", "Fecha apertura", "date"], ["closeDate", "Fecha cierre", "optionalDate"], ["evidence", "Evidencia", "optionalText"], ["impact", "Impacto", "impact"], ["priority", "Prioridad", "priority"], ["status", "Estado", "executionStatus"]] },
     meetings: { table: TABLES.reuniones, data: () => meetings, set: (items) => { meetings = items; }, render: renderMeetings, prefix: "reu", label: "reunión", fields: [["date", "Fecha", "date"], ["type", "Tipo", "meetingType"], ["title", "Reunión", "text"], ["area", "Área", "area"], ["owner", "Responsable", "text"], ["attendees", "Participantes", "textarea"], ["minutes", "Minuta", "textarea"], ["agreement", "Acuerdo generado", "textarea"], ["agreementOwner", "Responsable del acuerdo", "text"], ["commitmentDate", "Fecha compromiso", "date"], ["status", "Estado", "executionStatus"]] },
     kpis: { table: TABLES.kpis, data: () => kpis, set: (items) => { kpis = items; }, render: renderKpis, prefix: "kpi", label: "KPI", fields: [["area", "Área", "area"], ["name", "Indicador", "text"], ["target", "Objetivo", "number"], ["current", "Resultado actual", "number"], ["unit", "Unidad", "text"], ["frequency", "Frecuencia", "frequency"], ["owner", "Responsable", "text"], ["trend", "Tendencia", "trend"], ["status", "Semáforo", "traffic"]] },
-    evidenceLibrary: { table: TABLES.evidenciasOperativas, data: () => evidenceLibrary, set: (items) => { evidenceLibrary = items; }, render: renderEvidenceCenter, prefix: "evi", label: "evidencia", fields: [["relationType", "Relacionado con", "relationType"], ["relationId", "Folio / ID relacionado", "text"], ["name", "Nombre del archivo", "text"], ["type", "Tipo", "text"], ["owner", "Responsable", "text"], ["date", "Fecha", "date"], ["status", "Estado", "evidenceStatus"], ["fileId", "Referencia de almacenamiento", "text"]] },
+    evidenceLibrary: { table: TABLES.evidenciasOperativas, data: () => evidenceLibrary, set: (items) => { evidenceLibrary = items; }, render: renderEvidenceCenter, prefix: "evi", label: "evidencia", fields: [["relationType", "Relacionado con", "relationType"], ["relationId", "Folio / ID relacionado", "text"], ["name", "Nombre del archivo", "text"], ["type", "Tipo", "text"], ["owner", "Responsable", "text"], ["date", "Fecha", "optionalDate"], ["status", "Estado", "evidenceStatus"], ["fileId", "Referencia de almacenamiento", "optionalText"]] },
     diagnosticBase: { table: TABLES.diagnosticoBase, data: () => diagnosticBase, set: (items) => { diagnosticBase = items; }, render: renderDiagnosticBase, prefix: "diag", label: "diagnóstico", fields: [["section", "Bloque", "text"], ["area", "Área", "area"], ["detail", "Detalle / observaciones", "textarea"], ["owner", "Responsable", "text"], ["evidence", "Evidencia", "text"], ["status", "Estatus", "status"]] },
     interviews: { table: TABLES.entrevistas, data: () => interviews, set: (items) => { interviews = items; }, render: renderInterviews, prefix: "ent", label: "entrevista", fields: [["date", "Fecha", "date"], ["interviewed", "Entrevistado", "text"], ["area", "Área", "area"], ["position", "Puesto", "text"], ["responsible", "Responsable entrevista", "text"], ["functions", "Funciones actuales", "textarea"], ["responsibilities", "Responsabilidades", "textarea"], ["problems", "Problemas detectados", "textarea"], ["risks", "Riesgos", "textarea"], ["opportunities", "Oportunidades", "textarea"], ["ideas", "Ideas de mejora", "textarea"], ["needs", "Necesidades de información", "textarea"], ["automations", "Automatizaciones sugeridas", "textarea"], ["golden", "Pregunta de oro", "textarea"]] },
     painMap: { table: TABLES.mapaDolor, data: () => painMap, set: (items) => { painMap = items; }, render: renderPainMap, prefix: "dolor", label: "dolor", fields: [["category", "Clasificación", "text"], ["description", "Descripción", "textarea"], ["area", "Área afectada", "area"], ["impact", "Impacto", "text"], ["frequency", "Frecuencia", "text"], ["priority", "Prioridad", "priority"], ["owner", "Responsable", "text"], ["signal", "Semáforo", "traffic"]] },
@@ -1101,6 +1116,7 @@ function transformFieldHtml(prefix, key, label, type, value = "") {
   if (type === "relationType") return selectTransformField(id, label, ["Proyecto", "Tarea", "Acuerdo", "Incidencia", "Reunión"], value);
   if (type === "evidenceStatus") return selectTransformField(id, label, ["cargada", "validada", "faltante", "rechazada"], value);
   if (type === "optionalDate") return `<label>${label}<input id="${id}" type="date" value="${escapeHtml(value || "")}"></label>`;
+  if (type === "optionalText") return `<label>${label}<input id="${id}" type="text" value="${escapeHtml(value || "")}"></label>`;
   return `<label>${label}<input id="${id}" type="${type}" value="${escapeHtml(value || "")}" required></label>`;
 }
 

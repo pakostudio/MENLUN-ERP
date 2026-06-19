@@ -192,6 +192,19 @@ body.is-app .workspace-view {
   margin-left: 2px;
 }
 
+.mobile-nav-toggle {
+  display: none;
+  width: 42px;
+  height: 42px;
+  margin-left: auto;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--white);
+  color: var(--navy);
+  cursor: pointer;
+  font: 700 22px/1 Arial, sans-serif;
+}
+
 .logo-frame {
   display: flex;
   align-items: center;
@@ -1321,6 +1334,20 @@ tbody tr:hover {
     position: static;
     height: auto;
     max-height: none;
+  }
+
+  .mobile-nav-toggle {
+    display: inline-grid;
+    flex: 0 0 42px;
+    place-items: center;
+  }
+
+  .module-nav {
+    display: none;
+  }
+
+  .is-mobile-nav-open .module-nav {
+    display: grid;
   }
 
   .module-nav {
