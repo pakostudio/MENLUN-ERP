@@ -35,6 +35,13 @@ const USER_IDS_BY_AREA = {
   Sistemas: "sistemas",
 };
 
+const JEFATURA_IDS_BY_AREA = {
+  Almacen: "jef-moises-prado",
+  Logistica: "jef-guillermo-nieto",
+  Mantenimiento: "jef-jose-luis-sanchez",
+  Ventas: "jef-jose-carlos-gonzalez",
+};
+
 const ADMIN_USER_IDS = ["pako"];
 const EXECUTIVE_USER_IDS = ["direccion"];
 const APPWRITE_PAUSED_MESSAGE = "Proyecto Appwrite pausado o sin conexión. Restaurar proyecto desde Appwrite Console antes de continuar.";
@@ -940,11 +947,11 @@ function clientWritePermissions() {
 }
 
 function permissionsForArea(area, options = {}) {
-  const areaUserId = USER_IDS_BY_AREA[area];
-  const updateUsers = options.adminOnlyUpdate ? ADMIN_USER_IDS : [...ADMIN_USER_IDS, areaUserId];
+  const areaUsers = [USER_IDS_BY_AREA[area], JEFATURA_IDS_BY_AREA[area]].filter(Boolean);
+  const updateUsers = options.adminOnlyUpdate ? ADMIN_USER_IDS : [...ADMIN_USER_IDS, ...areaUsers];
 
   return uniquePermissions([
-    ...readPermissions([...ADMIN_USER_IDS, ...EXECUTIVE_USER_IDS, areaUserId]),
+    ...readPermissions([...ADMIN_USER_IDS, ...EXECUTIVE_USER_IDS, ...areaUsers]),
     ...updatePermissions(updateUsers),
     ...deletePermissions(ADMIN_USER_IDS),
   ]);

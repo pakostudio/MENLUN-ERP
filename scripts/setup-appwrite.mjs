@@ -48,6 +48,13 @@ const areaUserIds = {
   "Sistemas": "sistemas"
 };
 
+const areaJefaturaIds = {
+  "Almacén": "jef-moises-prado",
+  "Logística": "jef-guillermo-nieto",
+  "Mantenimiento": "jef-jose-luis-sanchez",
+  "Ventas": "jef-jose-carlos-gonzalez"
+};
+
 const adminUserIds = ["pako"];
 const executiveUserIds = ["direccion"];
 
@@ -63,7 +70,7 @@ const adminCreateOnlyTables = new Set(["gerencias", "usuarios", "bitacora", "jef
 
 function permissionsForTable(tableId) {
   const creators = adminCreateOnlyTables.has(tableId) ? adminUserIds : [...adminUserIds, ...areaCreatorIds];
-  return ['read("users")', ...creators.map((id) => `create("user:${id}")`)];
+  return creators.map((id) => `create("user:${id}")`);
 }
 
 const tables = [
@@ -758,19 +765,19 @@ function permissionsForRow(tableId, data, rowId = "") {
   }
 
   if (tableId === "gerencias") {
-    const areaUserId = areaUserIds[data.gerencia];
+    const areaUsers = userIdsForArea(data.gerencia);
     return uniquePermissions([
-      ...readForUsers([...adminUserIds, ...executiveUserIds, areaUserId]),
+      ...readForUsers([...adminUserIds, ...executiveUserIds, ...areaUsers]),
       ...updateForUsers(adminUserIds),
       ...deleteForUsers(adminUserIds),
     ]);
   }
 
   if (["reportes", "autorizaciones", "tareas", "evidencias", "jefaturas", "gastos", "viaticos", "mantenimientos", "proyectos", "incidencias", "reuniones", "kpis"].includes(tableId)) {
-    const areaUserId = areaUserIds[data.gerencia] || areaUserIds[data.area] || areaUserIds[areaFromReport(data.reporteId)];
+    const areaUsers = userIdsForArea(data.gerencia || data.area || areaFromReport(data.reporteId));
     return uniquePermissions([
-      ...readForUsers([...adminUserIds, ...executiveUserIds, areaUserId]),
-      ...updateForUsers([...adminUserIds, areaUserId]),
+      ...readForUsers([...adminUserIds, ...executiveUserIds, ...areaUsers]),
+      ...updateForUsers([...adminUserIds, ...areaUsers]),
       ...deleteForUsers(adminUserIds),
     ]);
   }
@@ -785,10 +792,10 @@ function permissionsForRow(tableId, data, rowId = "") {
   }
 
   if (["diagnostico_base", "entrevistas", "mapa_dolor", "diagnostico_ejecutivo", "lecciones_aprendidas"].includes(tableId)) {
-    const areaUserId = areaUserIds[data.area] || areaUserIds[data.areaAfectada];
+    const areaUsers = userIdsForArea(data.area || data.areaAfectada);
     return uniquePermissions([
-      ...readForUsers([...adminUserIds, ...executiveUserIds, areaUserId]),
-      ...updateForUsers([...adminUserIds, areaUserId]),
+      ...readForUsers([...adminUserIds, ...executiveUserIds, ...areaUsers]),
+      ...updateForUsers([...adminUserIds, ...areaUsers]),
       ...deleteForUsers(adminUserIds),
     ]);
   }
@@ -829,6 +836,10 @@ function areaFromReport(reportId) {
   const reportTable = tables.find((table) => table.id === "reportes");
   const report = reportTable?.rows.find((item) => item.id === reportId);
   return report?.data.gerencia || "";
+}
+
+function userIdsForArea(area) {
+  return [areaUserIds[area], areaJefaturaIds[area]].filter(Boolean);
 }
 
 function userIdForResponsible(name) {

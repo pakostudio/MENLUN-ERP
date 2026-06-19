@@ -16,7 +16,6 @@ const headers = {
 
 const bucketId = "evidencias";
 const permissions = [
-  'read("users")',
   'create("user:pako")',
   'create("user:jef-moises-prado")',
   'create("user:jef-guillermo-nieto")',
@@ -53,6 +52,28 @@ if (existing.status === 200) {
     antivirus: true,
   });
   console.log("Bucket creado: evidencias");
+}
+
+await hardenExistingFiles();
+
+async function hardenExistingFiles() {
+  const response = await request("GET", `/storage/buckets/${bucketId}/files`, null);
+  const files = response.json.files || [];
+  const securePermissions = [
+    'read("user:pako")',
+    'read("user:direccion")',
+    'update("user:pako")',
+    'delete("user:pako")',
+  ];
+
+  for (const file of files) {
+    await request("PUT", `/storage/buckets/${bucketId}/files/${file.$id}`, {
+      name: file.name,
+      permissions: securePermissions,
+    });
+  }
+
+  console.log(`Permisos cerrados en ${files.length} archivos existentes.`);
 }
 
 async function request(method, path, body, expectedSoftErrors = []) {
