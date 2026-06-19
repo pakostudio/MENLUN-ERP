@@ -767,7 +767,8 @@ async function uploadEvidenceFile(file, area) {
   const formData = new FormData();
   formData.append("fileId", fileId);
   formData.append("file", file);
-  clientWritePermissions().forEach((permission) => formData.append("permissions[]", permission));
+  const filePermissions = area ? permissionsForArea(area) : clientWritePermissions();
+  filePermissions.forEach((permission) => formData.append("permissions[]", permission));
 
   const data = await appwriteUpload(`/storage/buckets/${STORAGE.evidencias}/files`, formData);
   return `${data.$id}|${file.name}`;
@@ -900,11 +901,11 @@ function permissionsForRow(tableId, data) {
     return permissionsForArea(areaKeyFromLabel(data.area || data.areaAfectada), { adminOnlyUpdate: true });
   }
 
-  if ([TABLES.proyectos, TABLES.incidencias, TABLES.reuniones, TABLES.kpis, TABLES.evidenciasOperativas].includes(tableId)) {
+  if ([TABLES.proyectos, TABLES.incidencias, TABLES.reuniones, TABLES.kpis].includes(tableId)) {
     return permissionsForArea(areaKeyFromLabel(data.area || data.gerencia), { adminOnlyUpdate: false });
   }
 
-  if ([TABLES.subtareas, TABLES.estrategias, TABLES.planTrabajo, TABLES.acuerdos, TABLES.riesgos, TABLES.beneficios].includes(tableId)) {
+  if ([TABLES.subtareas, TABLES.evidenciasOperativas, TABLES.estrategias, TABLES.planTrabajo, TABLES.acuerdos, TABLES.riesgos, TABLES.beneficios].includes(tableId)) {
     const ownerId = userIdForResponsible(data.responsable);
     return uniquePermissions([
       ...readPermissions([...ADMIN_USER_IDS, ...EXECUTIVE_USER_IDS, ownerId]),
@@ -971,7 +972,7 @@ function transformModules() {
     incidents: { table: TABLES.incidencias, data: () => incidents, set: (items) => { incidents = items; }, render: renderIncidents, prefix: "inc", label: "incidencia", fields: [["folio", "Folio", "text"], ["area", "Área", "area"], ["classification", "Clasificación", "incidentClass"], ["description", "Descripción", "textarea"], ["responsible", "Responsable", "text"], ["openDate", "Fecha apertura", "date"], ["closeDate", "Fecha cierre", "optionalDate"], ["evidence", "Evidencia", "optionalText"], ["impact", "Impacto", "impact"], ["priority", "Prioridad", "priority"], ["status", "Estado", "executionStatus"]] },
     meetings: { table: TABLES.reuniones, data: () => meetings, set: (items) => { meetings = items; }, render: renderMeetings, prefix: "reu", label: "reunión", fields: [["date", "Fecha", "date"], ["type", "Tipo", "meetingType"], ["title", "Reunión", "text"], ["area", "Área", "area"], ["owner", "Responsable", "text"], ["attendees", "Participantes", "textarea"], ["minutes", "Minuta", "textarea"], ["agreement", "Acuerdo generado", "textarea"], ["agreementOwner", "Responsable del acuerdo", "text"], ["commitmentDate", "Fecha compromiso", "date"], ["status", "Estado", "executionStatus"]] },
     kpis: { table: TABLES.kpis, data: () => kpis, set: (items) => { kpis = items; }, render: renderKpis, prefix: "kpi", label: "KPI", fields: [["area", "Área", "area"], ["name", "Indicador", "text"], ["target", "Objetivo", "number"], ["current", "Resultado actual", "number"], ["unit", "Unidad", "text"], ["frequency", "Frecuencia", "frequency"], ["owner", "Responsable", "text"], ["trend", "Tendencia", "trend"], ["status", "Semáforo", "traffic"]] },
-    evidenceLibrary: { table: TABLES.evidenciasOperativas, data: () => evidenceLibrary, set: (items) => { evidenceLibrary = items; }, render: renderEvidenceCenter, prefix: "evi", label: "evidencia", fields: [["relationType", "Relacionado con", "relationType"], ["relationId", "Folio / ID relacionado", "text"], ["name", "Nombre del archivo", "text"], ["type", "Tipo", "text"], ["owner", "Responsable", "text"], ["date", "Fecha", "optionalDate"], ["status", "Estado", "evidenceStatus"], ["fileId", "Referencia de almacenamiento", "optionalText"]] },
+    evidenceLibrary: { table: TABLES.evidenciasOperativas, data: () => evidenceLibrary, set: (items) => { evidenceLibrary = items; }, render: renderEvidenceCenter, prefix: "evi", label: "evidencia", fields: [["relationType", "Relacionado con", "relationType"], ["relationId", "Folio / ID relacionado", "text"], ["name", "Nombre del archivo", "text"], ["type", "Tipo", "text"], ["owner", "Responsable", "text"], ["date", "Fecha", "optionalDate"], ["status", "Estado", "evidenceStatus"], ["fileId", "Referencia de almacenamiento", "optionalText"], ["upload", "Adjuntar archivo", "file"]] },
     diagnosticBase: { table: TABLES.diagnosticoBase, data: () => diagnosticBase, set: (items) => { diagnosticBase = items; }, render: renderDiagnosticBase, prefix: "diag", label: "diagnóstico", fields: [["section", "Bloque", "text"], ["area", "Área", "area"], ["detail", "Detalle / observaciones", "textarea"], ["owner", "Responsable", "text"], ["evidence", "Evidencia", "text"], ["status", "Estatus", "status"]] },
     interviews: { table: TABLES.entrevistas, data: () => interviews, set: (items) => { interviews = items; }, render: renderInterviews, prefix: "ent", label: "entrevista", fields: [["date", "Fecha", "date"], ["interviewed", "Entrevistado", "text"], ["area", "Área", "area"], ["position", "Puesto", "text"], ["responsible", "Responsable entrevista", "text"], ["functions", "Funciones actuales", "textarea"], ["responsibilities", "Responsabilidades", "textarea"], ["problems", "Problemas detectados", "textarea"], ["risks", "Riesgos", "textarea"], ["opportunities", "Oportunidades", "textarea"], ["ideas", "Ideas de mejora", "textarea"], ["needs", "Necesidades de información", "textarea"], ["automations", "Automatizaciones sugeridas", "textarea"], ["golden", "Pregunta de oro", "textarea"]] },
     painMap: { table: TABLES.mapaDolor, data: () => painMap, set: (items) => { painMap = items; }, render: renderPainMap, prefix: "dolor", label: "dolor", fields: [["category", "Clasificación", "text"], ["description", "Descripción", "textarea"], ["area", "Área afectada", "area"], ["impact", "Impacto", "text"], ["frequency", "Frecuencia", "text"], ["priority", "Prioridad", "priority"], ["owner", "Responsable", "text"], ["signal", "Semáforo", "traffic"]] },
@@ -1027,12 +1028,25 @@ async function openTransformForm(moduleKey, rowId = "") {
     const nextItem = { ...(current || {}), rowId: current?.rowId || createRowId(config.prefix) };
 
     config.fields.forEach(([key, , type]) => {
+      if (type === "file") return;
       const value = document.querySelector(`#${config.prefix}-${key}`).value.trim();
       nextItem[key] = type === "number" ? Number(value || 0) : value;
     });
 
     try {
       if (!(await ensureAppwriteWriteReady())) throw appwriteError(0, APPWRITE_PAUSED_MESSAGE);
+      if (moduleKey === "evidenceLibrary") {
+        const file = document.querySelector(`#${config.prefix}-upload`)?.files?.[0];
+        if (file) {
+          const uploaded = await uploadEvidenceFile(file, activeUser?.access === "area" ? activeUser.area : "");
+          const [fileId, fileName] = uploaded.split("|");
+          nextItem.fileId = fileId;
+          nextItem.name = fileName || file.name;
+          nextItem.type = file.type || file.name.split(".").pop()?.toUpperCase() || "Archivo";
+          nextItem.date = todayIsoDate();
+          if (nextItem.status === "faltante") nextItem.status = "cargada";
+        }
+      }
       const data = transformToAppwriteData(moduleKey, nextItem);
       if (current) {
         await updateRow(config.table, current.rowId, data);
@@ -1101,12 +1115,16 @@ async function deleteTransformRecord(moduleKey, rowId) {
 function transformFieldHtml(prefix, key, label, type, value = "") {
   const id = `${prefix}-${key}`;
   if (type === "textarea") return `<label class="field-wide">${label}<textarea id="${id}" required>${escapeHtml(value || "")}</textarea></label>`;
-  if (type === "area") return `<label>${label}<select id="${id}">${gerencias.map((item) => `<option value="${item.area}" ${item.area === value ? "selected" : ""}>${item.label}</option>`).join("")}<option value="Todas" ${value === "Todas" ? "selected" : ""}>Todas</option></select></label>`;
+  if (type === "area") {
+    const availableAreas = activeUser?.access === "area" ? gerencias.filter((item) => item.area === activeUser.area) : gerencias;
+    const allOption = activeUser?.access === "area" ? "" : `<option value="Todas" ${value === "Todas" ? "selected" : ""}>Todas</option>`;
+    return `<label>${label}<select id="${id}">${availableAreas.map((item) => `<option value="${item.area}" ${item.area === value ? "selected" : ""}>${item.label}</option>`).join("")}${allOption}</select></label>`;
+  }
   if (type === "priority") return `<label>${label}<select id="${id}">${["alta", "media", "baja"].map((item) => `<option value="${item}" ${item === value ? "selected" : ""}>${titleCase(item)}</option>`).join("")}</select></label>`;
   if (type === "status") return `<label>${label}<select id="${id}">${["pendiente", "en revision", "falta evidencia", "aprobado", "rechazado", "en ejecucion", "cerrado"].map((item) => `<option value="${item}" ${item === value ? "selected" : ""}>${titleCase(item)}</option>`).join("")}</select></label>`;
   if (type === "traffic") return `<label>${label}<select id="${id}">${["verde", "amarillo", "rojo"].map((item) => `<option value="${item}" ${item === value ? "selected" : ""}>${titleCase(item)}</option>`).join("")}</select></label>`;
-  if (type === "project") return `<label>${label}<select id="${id}">${projects.map((item) => `<option value="${item.rowId}" ${item.rowId === value ? "selected" : ""}>${escapeHtml(item.name)}</option>`).join("")}</select></label>`;
-  if (type === "task") return `<label>${label}<select id="${id}">${tasks.map((item) => `<option value="${item.rowId}" ${item.rowId === value ? "selected" : ""}>${escapeHtml(item.title)}</option>`).join("")}</select></label>`;
+  if (type === "project") return `<label>${label}<select id="${id}">${visibleProjects().map((item) => `<option value="${item.rowId}" ${item.rowId === value ? "selected" : ""}>${escapeHtml(item.name)}</option>`).join("")}</select></label>`;
+  if (type === "task") return `<label>${label}<select id="${id}">${visibleTasks().map((item) => `<option value="${item.rowId}" ${item.rowId === value ? "selected" : ""}>${escapeHtml(item.title)}</option>`).join("")}</select></label>`;
   if (type === "executionStatus") return selectTransformField(id, label, ["pendiente", "en proceso", "con riesgo", "vencido", "cerrado"], value);
   if (type === "incidentClass") return selectTransformField(id, label, ["Operativa", "Comercial", "Logística", "Mantenimiento", "Calidad", "Administrativa"], value);
   if (type === "meetingType") return selectTransformField(id, label, ["Semanal", "Mensual", "Trimestral", "Extraordinaria"], value);
@@ -1117,6 +1135,7 @@ function transformFieldHtml(prefix, key, label, type, value = "") {
   if (type === "evidenceStatus") return selectTransformField(id, label, ["cargada", "validada", "faltante", "rechazada"], value);
   if (type === "optionalDate") return `<label>${label}<input id="${id}" type="date" value="${escapeHtml(value || "")}"></label>`;
   if (type === "optionalText") return `<label>${label}<input id="${id}" type="text" value="${escapeHtml(value || "")}"></label>`;
+  if (type === "file") return `<label class="field-wide">${label}<input id="${id}" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.png,.jpg,.jpeg,.webp"></label>`;
   return `<label>${label}<input id="${id}" type="${type}" value="${escapeHtml(value || "")}" required></label>`;
 }
 
@@ -1988,6 +2007,8 @@ function navigate(view, title, area, areaKey) {
   if (view === "capture") renderCaptureForm(areaKey);
   if (view === "kanban") renderKanban();
   if (view === "calendar") renderCalendar();
+  if (view === "timeline") renderTimeline();
+  if (view === "pipeline") renderPipeline();
   if (view === "central") renderCentralBoard();
   if (view === "admin") renderAdminPanel();
   if (view === "leadership") renderLeadershipPanel();
@@ -2017,7 +2038,7 @@ function visibleTasks() {
 
 function visibleProjects() {
   if (!activeUser || activeUser.access === "all" || activeUser.access === "executive") return projects;
-  return projects.filter((project) => project.area === activeUser.area || project.area === "Todas");
+  return projects.filter((project) => project.area === activeUser.area);
 }
 
 function visibleSubtasks() {
@@ -2032,7 +2053,7 @@ function visibleIncidents() {
 
 function visibleMeetings() {
   if (!activeUser || activeUser.access === "all" || activeUser.access === "executive") return meetings;
-  return meetings.filter((meeting) => meeting.area === activeUser.area || meeting.area === "Todas");
+  return meetings.filter((meeting) => meeting.area === activeUser.area);
 }
 
 function visibleKpis() {
@@ -2305,7 +2326,7 @@ function dateStamp() {
 
 function visibleByArea(items, areaKey = "area") {
   if (!activeUser || activeUser.access !== "area") return items;
-  return items.filter((item) => item[areaKey] === activeUser.area || item[areaKey] === labelForArea(activeUser.area) || item[areaKey] === "Todas");
+  return items.filter((item) => item[areaKey] === activeUser.area || item[areaKey] === labelForArea(activeUser.area));
 }
 
 function renderProjects() {
@@ -2460,6 +2481,43 @@ function renderGantt() {
       <div class="gantt-scale"><span>${minDate}</span><span>${maxDate}</span></div>
       ${projectItems.map((project) => ganttRow(project.name, project.start, project.due, minDate, maxDate, "project")).join("")}
       ${taskItems.map((task) => ganttRow(task.title, task.start, task.due, minDate, maxDate, "task")).join("")}
+    </section>`;
+}
+
+function renderTimeline() {
+  const events = [
+    ...visibleProjects().flatMap((item) => [
+      { date: item.start, type: "Inicio de proyecto", title: item.name, owner: item.owner, area: item.area, signal: "amarillo" },
+      { date: item.due, type: "Compromiso de proyecto", title: item.name, owner: item.owner, area: item.area, signal: executionSignal(item) },
+    ]),
+    ...visibleTasks().map((item) => ({ date: item.due, type: "Tarea", title: item.title, owner: item.responsible, area: item.area, signal: executionSignal(item) })),
+    ...visibleAgreements().map((item) => ({ date: item.due, type: "Acuerdo", title: item.agreement, owner: item.owner, area: item.area, signal: executionSignal(item) })),
+    ...visibleMeetings().map((item) => ({ date: item.date, type: "Reunión", title: item.title, owner: item.owner, area: item.area, signal: item.status === "cerrado" ? "verde" : "amarillo" })),
+  ].filter((item) => item.date).sort((a, b) => a.date.localeCompare(b.date));
+
+  appContent.innerHTML = `
+    ${sectionHeading("Timeline operativo", "Secuencia cronológica de proyectos, tareas, acuerdos y reuniones", scopeText())}
+    <section class="timeline-list">
+      ${events.map((item) => `<article class="timeline-item">
+        <time>${escapeHtml(item.date)}</time>
+        <span class="timeline-dot status-${normalizeClassName(item.signal)}"></span>
+        <div><p class="eyebrow">${escapeHtml(item.type)} · ${escapeHtml(labelForArea(item.area))}</p><h3>${escapeHtml(item.title)}</h3><span>${escapeHtml(item.owner)}</span></div>
+      </article>`).join("") || emptyState("No existen compromisos en el timeline.")}
+    </section>`;
+}
+
+function renderPipeline() {
+  const stages = ["pendiente", "en proceso", "con riesgo", "vencido", "cerrado"];
+  const items = visibleProjects();
+  appContent.innerHTML = `
+    ${sectionHeading("Pipeline de ejecución", "Proyectos organizados por etapa y nivel de control", scopeText())}
+    <section class="kanban-board pipeline-board">
+      ${stages.map((stage) => {
+        const stageItems = items.filter((item) => normalizeExecutionStatus(item.status) === stage);
+        return `<article class="kanban-column"><h3>${titleCase(stage)} <span class="kanban-count">${stageItems.length}</span></h3>
+          ${stageItems.map((item) => `<div class="kanban-card"><strong>${escapeHtml(item.name)}</strong><span>${escapeHtml(labelForArea(item.area))}</span><span>${escapeHtml(item.owner)}</span><span>${escapeHtml(item.due)}</span>${trafficBadge(executionSignal(item), executionSignalLabel(item))}</div>`).join("") || `<p class="muted-copy">Sin proyectos</p>`}
+        </article>`;
+      }).join("")}
     </section>`;
 }
 
@@ -3316,7 +3374,7 @@ function renderAreaModule(area, filters = {}) {
   const meta = gerencias.find((item) => item.area === area);
   const normalizedFilters = { ...filters, area };
   const items = filterReports(areaReports(area), normalizedFilters);
-  const projectItems = visibleProjects().filter((item) => item.area === area || item.area === "Todas");
+  const projectItems = visibleProjects().filter((item) => item.area === area);
   const taskItems = visibleTasks().filter((item) => item.area === area);
   const incidentItems = visibleIncidents().filter((item) => item.area === area);
   const kpiItems = visibleKpis().filter((item) => item.area === area);

@@ -1325,6 +1325,65 @@ tbody tr:hover {
   text-align: center;
 }
 
+.timeline-list {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 20px;
+  background: var(--white);
+  box-shadow: var(--shadow);
+}
+
+.timeline-item {
+  display: grid;
+  grid-template-columns: 110px 16px minmax(0, 1fr);
+  align-items: start;
+  gap: 14px;
+  border-bottom: 1px solid var(--surface-line);
+  padding: 18px 0;
+}
+
+.timeline-item:last-child {
+  border-bottom: 0;
+}
+
+.timeline-item time,
+.timeline-item span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.timeline-item h3 {
+  margin: 3px 0 6px;
+  color: var(--navy);
+  font-size: 15px;
+}
+
+.timeline-dot {
+  width: 12px;
+  height: 12px;
+  margin-top: 3px;
+  border: 3px solid var(--white);
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 0 1px var(--line);
+}
+
+.timeline-dot.status-rojo {
+  background: #B63232;
+}
+
+.timeline-dot.status-amarillo {
+  background: #B7791F;
+}
+
+.timeline-dot.status-verde {
+  background: #287A55;
+}
+
+.pipeline-board {
+  grid-template-columns: repeat(5, minmax(220px, 1fr));
+}
+
 @media (max-width: 820px) {
   .workspace-view {
     grid-template-columns: 1fr;
@@ -1557,6 +1616,15 @@ tbody tr:hover {
   .project-actions {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .timeline-item {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .timeline-dot {
+    display: none;
   }
 
   th,
